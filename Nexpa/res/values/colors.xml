@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_login">#e9eef0</color>
+    <color name="bg_register">#f3f7df</color>
+    <color name="bg_main">#428bca</color>
+    <color name="white">#ffffff</color>
+    <color name="input_login">#222222</color>
+    <color name="input_login_hint">#999999</color>
+    <color name="input_register">#90C695</color>
+    <color name="input_register_2">#e7e7aa</color>
+    <color name="input_register_bg">#91c391</color>
+    <color name="input_register_bg_2">#489060</color>
+    <color name="input_register_hint">#5e7856</color>
+    <color name="input_register_hint_2">#e7e7aa</color>
+    <color name="btn_login">#26ae90</color>
+    <color name="btn_login_bg">#eceef1</color>
+    <color name="lbl_name">#333333</color>
+    <color name="btn_logut_bg">#ff6861</color>
+    <color name="txt_color">#000000</color>
+    <color name="textColor">#FFF</color>
+    <color name="sendbtn">#cc6600</color>
+    <color name="lynch">#6C7A89</color>
+    <color name="black">#000000</color>
+    <color name="bg_gradient_start">#EB5038</color>
+    <color name="bg_gradient_end">#CA3822</color>
+    <color name="bg_button_login">#A92815</color>
+    <color name="flat_silver">#bdc3c7</color>
+    <color name="flat_gray">#7f8c8d</color>
+    <color name="soft_sky">#a3e7f1</color>
+    <color name="burnt_orange">#D35400</color>
+    <color name="niagara">#16A085</color>
+    <color name="buttercup">#F39C12</color>
+    <color name="carrara">#F2F1EF</color>
+    <color name="cirque_orange">#f09060</color>
+    <color name="dark_cirque_orange">#f86f45</color>
+    <color name="tang_orange">#ee6c21</color>
+    <color name="strong_tang_orange">#d65d18</color>
+    <color name="orangy_white">#f0f2e7</color>
+    <color name="pale_blue">#c3dcdb</color>
+    <color name="algae_blue">#186078</color>
+    <color name="flat_white">#f5f3f3</color>
+    <color name="google_blue">#3d88ec</color>
+    <color name="old_black">#252525</color>
+     <color name="pubescent_white">#cdcccd</color>
+      <color name="toucan_green">#03A678</color>
+       <color name="toucan_light_green">#1cae85</color>
+       <color name="white_smoke">#ECECEC</color>
+        <color name="PUMICE">#D2D7D3</color>
+          <color name="EDWARD">#ABB7B7</color>
+              <color name="toucan_red">#d25b55</color>
+              <color name="toucan_deep_red">#d55552</color>
+          <color name="toucan_white">#f9fffb</color>
+          <color name="toucan_yellow">#fdab19</color>
+          <color name="asbestos">#7f8c8d</color>
+    
+
+
+</resources>

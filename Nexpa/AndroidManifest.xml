@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lpoezy.nexpa"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="21" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".configuration.AppController"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
+
+        <activity
+            android:name=".activities.SplashScreen"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.SampActivity" />
+        <activity android:name=".activities.PeopleActivity" />
+        <activity
+            android:name=".activities.TabHostActivity"
+            android:theme="@style/MyNoActionBarShadowTheme"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activities.SearchActivity" />
+        <activity android:name=".activities.MapActivity" />
+        <activity android:name=".activities.ChatActivity" >
+            android:parentActivityName=".activities.TabHostActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.TabHostActivity" />
+        </activity>
+        <activity android:name=".activities.CreateAccountActivity" />
+        <activity android:name=".activities.PeopleProfileActivity" />
+        <activity android:name=".activities.RegisterActivity" />
+        <activity android:name=".activities.LogInActivity" />
+        <activity android:name=".activities.GroupChatHomeActivity" />
+        <activity android:name=".activities.GroupChatMainActivity" />
+        <activity android:name=".activities.ProfileActivity" />
+        <activity
+            android:name=".activities.UserProfileActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activities.MainSignInActivity" />
+        <activity android:name=".activities.GroupActivity" />
+        <activity android:name=".activities.AroundMeActivity" />
+        <activity
+            android:name="com.facebook.LoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
+
+        <activity
+            android:name=".activities.ChatHistoryActivity"
+            android:label="@string/title_activity_chat_history" >
+        </activity>
+
+        <service
+            android:name=".chatservice.ChatMessagesService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <activity
+            android:name=".TestActivity"
+            android:label="@string/title_activity_test" >
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    android:orientation="vertical" 
+   >
+   	<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_alignParentBottom="true"
+    android:padding="20dp"
+    >	
+    <Button android:id="@+id/btn_mes"
+		     android:layout_width="50dp" 
+		     android:layout_height="50dp" 
+		     android:background="@drawable/btn_mes"
+		      />
+		<Button android:id="@+id/btn_photos"
+		     android:layout_width="50dp" 
+		     android:layout_height="50dp" 
+		     android:background="@drawable/btn_images"
+		      android:padding="5dp" />
+		<Button android:id="@+id/btn_block"
+		     android:layout_width="50dp" 
+		     android:layout_height="50dp" 
+		     android:background="@drawable/btn_block"
+		      android:padding="5dp" />
+	</LinearLayout>
+	
+	<LinearLayout android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:gravity="center" 
+	    android:orientation="vertical" 
+	    android:padding="20dp">
+	
+		<ImageView android:id="@+id/img_profile" 
+		    android:layout_width="fill_parent" 
+		    android:layout_height="wrap_content" 
+		    android:padding="20dp"
+		    />
+		
+		<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    >
+    
+    <TextView android:id="@+id/user_fname" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="center" 
+		    android:layout_margin="5dp"
+		    android:textStyle="bold" 
+		    android:text="Janine,"
+		    android:textSize="30sp" />
+		
+		<TextView android:id="@+id/user_age" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="center" 
+		    android:text="29"
+		 
+		    android:textSize="30sp" />
+		</LinearLayout>
+		
+		<TextView android:id="@+id/user_status" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="center" 
+		    android:text="Single"
+		    android:layout_margin="5dp"
+		    android:textStyle="italic" 
+		    android:textSize="12sp" />
+		
+		<TextView android:id="@+id/user_seen" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="center" 
+		    android:text="Seen 12 minutes ago"
+		    android:textStyle="italic" 
+		    android:textSize="12sp" />
+		
+		<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    >
+    
+    <TextView android:id="@+id/user_gender" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="center" 
+		    android:layout_margin="5dp"
+		    android:textStyle="bold" 
+		    android:text="Female,"
+		    android:textSize="12sp" />
+		
+		<TextView android:id="@+id/user_looking_for" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="center" 
+		    android:text="Looking for friendship"
+		    android:textSize="12sp"/>
+		
+		</LinearLayout>
+		
+		<TextView android:id="@+id/user_about" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="center" 
+		    android:gravity="center_vertical|center"
+		    android:padding="25dp"
+		    android:layout_marginTop="20dip"
+		    android:fontFamily="sans-serif-light" 
+		    android:text="No status yet"
+		    android:textSize="12sp" />
+    </LinearLayout>
+    
+</RelativeLayout>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="fill_parent" android:layout_height="match_parent"
+android:orientation="vertical">
+	<LinearLayout android:id="@+id/linearLayout1" android:layout_width="fill_parent"
+	android:layout_height="wrap_content" android:background="@color/toucan_green"
+	android:padding="15dp">
+		<TextView android:layout_width="200dp" android:layout_height="match_parent"
+		android:text="@string/user_profile_ui_distance" android:textSize="18dp"
+		android:textAllCaps="true" android:textColor="@color/white" />
+		<View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"
+		/>
+		<Button android:id="@+id/dialogButtonOK1" android:layout_width="30dp" android:layout_height="30dp"
+		android:background="@drawable/btn_ok" /> </LinearLayout>
+	<com.nirhart.parallaxscroll.views.ParallaxScrollView android:layout_width="match_parent"
+	android:layout_height="match_parent" app:inner_parallax_factor="2" app:parallax_factor="5"
+	app:parallax_views_num="2">
+		<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+		android:orientation="vertical" android:background="@color/white" android:padding="15dp">
+			<LinearLayout android:id="@+id/linearLayout3" android:layout_width="fill_parent"
+			android:orientation="vertical" android:layout_height="wrap_content"
+			android:background="@color/white" android:padding="10dp" tools:ignore="HardcodedText">
+				<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="@string/user_profile_header_distance" android:textSize="18dp"
+				android:gravity="center" android:layout_marginBottom="1dp" android:background="@color/white_smoke"
+				android:textAllCaps="true" android:textColor="@color/EDWARD" android:padding="1dp"
+				/>
+				<LinearLayout android:orientation="vertical" android:padding="1dp" android:background="@color/white_smoke"
+				android:layout_width="fill_parent" android:layout_height="130dp" android:layout_marginBottom="10dp">
+					<com.appyvet.rangebar.RangeBar xmlns:custom="http://schemas.android.com/apk/res-auto"
+					android:id="@+id/rbDistance" android:paddingTop="120dp" android:layout_width="match_parent"
+					android:layout_height="72dp" custom:tickStart="100" custom:rangeBar="false"
+					custom:tickInterval="200" custom:tickEnd="1000" android:layout_marginTop="10dp"
+					android:layout_marginLeft="10dp" android:layout_marginRight="10dp"
+					/>
+					<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+					android:text="@string/user_profile_distance_bar" android:textSize="16dp"
+					android:gravity="center" android:layout_marginBottom="3dp" android:background="@color/white_smoke"
+					android:textColor="@color/EDWARD" android:padding="3dp" /> </LinearLayout>
+				<Button android:id="@+id/dialogButtonOK" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:background="@color/toucan_green"
+				android:textAllCaps="true" android:textColor="@color/flat_white" android:layout_marginBottom="1dp"
+				android:text="Ok" /> </LinearLayout>
+		</LinearLayout>
+	</com.nirhart.parallaxscroll.views.ParallaxScrollView>
+</LinearLayout>

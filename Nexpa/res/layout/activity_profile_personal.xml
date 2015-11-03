@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent" android:layout_height="fill_parent"
+android:orientation="vertical" android:layout_weight="1"
+android:isScrollContainer="false">
+    
+    <LinearLayout android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent" android:layout_height="wrap_content"
+    android:background="@color/toucan_green"
+    android:padding="10dp">
+        
+        <TextView android:layout_width="200dp" android:layout_height="match_parent"
+        android:text="Personal Details" android:textSize="18dp"
+        android:textAllCaps="true" android:textColor="@color/white"
+        android:padding="10dp" /> 
+        
+    </LinearLayout>
+    
+    <LinearLayout android:id="@+id/linearLayout2"
+    android:layout_width="fill_parent" android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:background="@color/white" android:paddingTop="10dp"
+    android:paddingLeft="10dp" android:paddingRight="10dp">
+        
+        <EditText android:id="@+id/edtName" android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:maxLength="20"
+        android:background="@color/white_smoke"
+        android:inputType="textPersonName|textCapWords"
+        android:hint="Your Name Here" android:padding="10dp"
+        android:singleLine="true" android:textColor="@color/old_black"
+        />
+        
+        <RadioGroup android:id="@+id/radioSex" android:padding="10dp"
+        android:background="@color/white_smoke"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+            
+            <RadioButton android:id="@+id/radioUnspecified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_unspecified"
+            android:textColor="@color/old_black"
+            android:textAllCaps="true" android:button="@drawable/flat_btn_radio"
+            android:checked="true" />
+            
+            <RadioButton android:id="@+id/radioMale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_male"
+            android:textColor="@color/old_black"
+            android:textAllCaps="true" android:button="@drawable/flat_btn_radio"
+            android:checked="true" />
+            
+            <RadioButton android:id="@+id/radioFemale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true" android:textColor="@color/old_black"
+            android:button="@drawable/flat_btn_radio"
+            android:text="@string/radio_female"
+            /> </RadioGroup>
+    
+    </LinearLayout>
+    
+    <LinearLayout android:id="@+id/linearLayout3"
+    android:layout_width="fill_parent" android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:background="@color/white" android:padding="10dp">
+        
+        <TextView android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="birthday" android:textSize="18dp"
+        android:gravity="center" android:layout_marginBottom="1dp"
+        android:background="@color/white_smoke"
+        android:textAllCaps="true" android:textColor="@color/EDWARD"
+        android:padding="1dp" />
+        
+        <DatePicker android:id="@+id/dbBirthday"
+        android:padding="1dp" android:background="@color/white_smoke"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:calendarViewShown="false"
+        />
+       
+        <Button android:id="@+id/dialogButtonOK"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/toucan_green"
+        android:textAllCaps="true" android:textColor="@color/flat_white"
+        android:layout_marginBottom="1dp"
+        android:text="Ok" />
+        
+      <!--   <Button android:id="@+id/dialogButtonCancel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Cancel" android:background="@color/pubescent_white"
+        android:textAllCaps="true" android:textColor="@color/flat_white"
+        />  -->
+        
+	</LinearLayout>
+    
+</LinearLayout>
