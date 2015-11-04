@@ -18,6 +18,7 @@ import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.DateUtils;
+import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.LocationName;
 import com.lpoezy.nexpa.utility.StringFormattingUtils;
 
@@ -628,7 +629,10 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		btnStartChat = (Button) dialogBroadcast.findViewById(R.id.btnStartLocChat);
 		btnStartChat.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
+				
+				
 				connection = XMPPLogic.getInstance().getConnection();
+				
 				if (connection == null) {
 					Account ac = new Account();
 					ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), null);

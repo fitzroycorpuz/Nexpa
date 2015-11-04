@@ -512,6 +512,16 @@ public class SQLiteHandler{
 		//db.close();
 		Log.e(TAG, "Broadcast inserted to sqlite: message " + id);
 	}
+	
+	public void downloadPersonalBroadcasts() {
+//		sqLiteDatabase.query(
+//				table, 
+//				columns, 
+//				selection, 
+//				selectionArgs, 
+//				null, nu, orderBy)
+	}
+	
 	public void insertBroadcast(int broad_type, String broad_from, String broad_message, float loc_long, float loc_lat, String local, int reach) {
 		String dateNow = requestDate();
 		//SQLiteDatabase db = this.getWritableDatabase();

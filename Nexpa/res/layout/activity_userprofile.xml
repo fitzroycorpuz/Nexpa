@@ -85,7 +85,7 @@
             android:layout_height="1dp" 
             android:background="@android:color/white"/>
         
-        <LinearLayout android:id="@+id/ln_personal" 
+        <!-- <LinearLayout android:id="@+id/ln_personal" 
             android:layout_width="match_parent" 
             android:layout_height="wrap_content" 
             android:background="@color/flat_white" 
@@ -248,7 +248,7 @@
          
            <TextView android:layout_width="match_parent" 
             android:layout_height="5dp" 
-           />
+           /> -->
        
       	
     </LinearLayout>
