@@ -30,14 +30,16 @@ android:orientation="vertical">
 		android:layout_height="wrap_content" android:gravity="center"
 		android:weightSum="7" android:orientation="horizontal"  android:padding="5dp">
 		
-		    <Button
+		    <EditText
 			    android:id="@+id/btnOptions"
 			    android:layout_width="wrap_content"
  				android:layout_weight="5"
  				android:paddingTop="-50dp"
+ 				android:paddingLeft="10dp"
+ 				android:paddingRight="1dp"
 			    android:scaleType="center"
 			    android:background="@drawable/radiused_button"
-			    android:text="Broadcast Options"
+			    android:hint="Search"
 			    android:textColor="@color/white_smoke"
 			    android:layout_height="30dp"
 				android:layout_centerHorizontal="true" 
@@ -46,8 +48,24 @@ android:orientation="vertical">
 		    <TextView		   
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
- 				android:layout_weight="1"
+ 				android:layout_weight="0.5"
 			     />
+		    <ImageView
+			    android:id="@+id/img_search"
+			    android:layout_width="40dp"
+			    android:layout_height="40dp"
+			    android:layout_centerInParent="true"
+			 
+			     android:layout_weight="0"
+			    android:padding="5dp"
+			    
+			    android:scaleType="center"
+			    android:background="@drawable/btn_search" />
+		       <TextView		   
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+ 				android:layout_weight="0.2"
+			     />	
 			<ImageView
 			    android:id="@+id/img_megaphone"
 			    android:layout_width="40dp"

@@ -27,7 +27,10 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -70,10 +73,11 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	LinearLayout btnDel;
 	TextView txBroad;
 	Dialog dialogBroadcast;
-	Button btnOptions;
+	EditText btnOptions;
 	Button btnRefresher;
 	static TextView txtConnection;
 	static Animation animFade;
+	Animation animTremor;
 	
 	TextView txtReply;
 	TextView txtUser;
@@ -95,6 +99,8 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	int broadCount;
 	int limit_listen_maker;
 	
+	ImageView btnSearch;
+	ImageView btnPost;
 	
 	private PacketListener packetListener;
 	
@@ -278,13 +284,15 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		dialogBroadcast.setContentView(R.layout.activity_group_chat_main);
 		edBroad = (EditText) dialogBroadcast.findViewById(R.id.txtBroadcast);
 		btnCancel = (Button) dialogBroadcast.findViewById(R.id.btnClose);
-		btnRefresher = (Button) findViewById(R.id.btnOptions);
-		btnOptions = (Button) findViewById(R.id.btnOptions);
+		btnOptions = (EditText) findViewById(R.id.btnOptions);
 		txtConnection = (TextView) findViewById(R.id.txt_broad_stat);
 		btnOptions.setOnClickListener(buttonAddOnClickListener);
+		btnOptions.setHintTextColor(getResources().getColor(R.color.white_smoke));
 		mListView = (ListView) findViewById(R.id.listview);
 		// mListView.setOnItemClickListener(this);
 		 mListView.setOnItemClickListener(onItemClickListener);
+		 btnSearch = (ImageView) findViewById(R.id.img_search);
+		 btnPost = (ImageView) findViewById(R.id.img_megaphone);
 
 		/*btnReply = (LinearLayout) findViewById(R.id.btnReply);
 		btnReply.setOnClickListener(new View.OnClickListener() {@Override
@@ -298,7 +306,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		
 		//btnReply.setOnClickListener(myButtonClickListener);
 		animFade =  AnimationUtils.loadAnimation(GroupChatHomeActivity.this, R.anim.anim_fade_in_r);
-		
+		animTremor =  AnimationUtils.loadAnimation(GroupChatHomeActivity.this, R.anim.anim_shake);
 		
 		WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 		lp.copyFrom(dialogBroadcast.getWindow().getAttributes());
@@ -306,12 +314,36 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 		dialogBroadcast.getWindow().setAttributes(lp);
 		
-		lnBroadcastMini.setOnClickListener(new View.OnClickListener() {@Override
+		btnPost.setOnClickListener(new View.OnClickListener() {@Override
 			public void onClick(View arg0) {
 				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputMethodManager.toggleSoftInputFromWindow(lnBroadcast.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
 				openBroadcastDialog();
 			}
+		});
+		
+		btnSearch.setOnClickListener(new View.OnClickListener() {@Override
+			public void onClick(View arg0) {
+			
+			Intent iv = new Intent(GroupChatHomeActivity.this,
+                    SearchPostActivity.class);
+
+            if (iv != null) {
+            	iv.putExtra("TYPE", "hashtag"); 
+            	
+            	String txtSearch = btnOptions.getText().toString();
+            	if (txtSearch.equals(null) || txtSearch.equals("")){
+            		
+            		btnOptions.startAnimation(animTremor);
+            	}
+            	else{
+            		iv.putExtra("SEARCH", txtSearch); 
+                    // startActivity(iv);
+            		startActivity(iv);
+            	}
+            
+            }
+            }
 		});
 		
 		lnBroadcast.setOnClickListener(new View.OnClickListener() {@Override
