@@ -7,10 +7,12 @@ import java.util.Map;
 
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.Announcement;
 import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.L;
+import com.lpoezy.nexpa.utility.StringFormattingUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -27,11 +29,11 @@ public class SQLiteHandler{
 	private static final String DATABASE_NAME = "db_kookaboora";
 	
 	private static final String TABLE_LOGIN = "user";
-	private static final String KEY_ID = "_id";
+	private static final String KEY_ID = "_id";//offline id
 	private static final String KEY_PASS = "password";
 	private static final String KEY_NAME = "username";
 	private static final String KEY_EMAIL = "email";
-	private static final String KEY_UTYPE = "utype";
+	private static final String KEY_UTYPE = "utype"; //online  id
 	private static final String KEY_CREATED_AT = "created_at";
 	private static final String KEY_FNAME = "fname";
 	private static final String KEY_AGE = "age";
@@ -311,7 +313,7 @@ public class SQLiteHandler{
 		Cursor cursor = sqLiteDatabase.query(
 				TABLE_MESSAGES, 
 				new String[]{MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_IS_UNREAD}, 
-				MSG_USER_ID+"=? AND "+MSG_IS_UNREAD+"=?", new String[]{Long.toString(id), Boolean.toString(true)}, null, null, null);
+				MSG_USER_ID+"=? AND "+MSG_IS_UNREAD+"=?", new String[]{Long.toString(id), Integer.toString(1)}, null, null, null);
 		int count = 0;
 		if(cursor.moveToFirst()){
 			do{
@@ -330,10 +332,9 @@ public class SQLiteHandler{
 		
 		ContentValues values = new ContentValues();
 		
-		values.put(MSG_IS_UNREAD, ""+false);
+		values.put(MSG_IS_UNREAD, "0");
 		
 		long id = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_CORRESPONDENT_ID+"= ?", new String[]{Long.toString(correspondentId)});
-		
 		
 		
 	}
@@ -410,13 +411,18 @@ public class SQLiteHandler{
 		if(cursor.moveToFirst()){
 			do{
 				
-				String left 		= cursor.getString(cursor.getColumnIndex(MSG_LEFT));
+				int left 		= cursor.getInt(cursor.getColumnIndex(MSG_LEFT));
 				String msg			= cursor.getString(cursor.getColumnIndex(MSG_BODY));
-				String success		= cursor.getString(cursor.getColumnIndex(MSG_SUCCESS));
+				int success		= cursor.getInt(cursor.getColumnIndex(MSG_SUCCESS));
 				String date			= cursor.getString(cursor.getColumnIndex(MSG_DATE));
-				String isUnread			= cursor.getString(cursor.getColumnIndex(MSG_IS_UNREAD));
+				int isUnread			= cursor.getInt(cursor.getColumnIndex(MSG_IS_UNREAD));
 				
-				OneComment comment 	= new OneComment(Boolean.parseBoolean(left), msg, Boolean.parseBoolean(success), date, Boolean.parseBoolean(isUnread));
+				OneComment comment 	= new OneComment(
+						StringFormattingUtils.getBoolean(left), 
+						msg, 
+						StringFormattingUtils.getBoolean(success), 
+						date, 
+						StringFormattingUtils.getBoolean(isUnread));
 				L.debug(id+", left: "+comment.left+", msg: "+comment.comment+", success: "+comment.success);
 				conversation.add(comment);
 				
@@ -469,11 +475,11 @@ public class SQLiteHandler{
 		//String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "+ MSG_CORRESPONDENT_ID + " INTEGER, "+  MSG_LEFT + " TEXT, " +   MSG_BODY + " TEXT," +   MSG_SUCCESS + " TEXT," + MSG_DATE + " TEXT );";
 		values.put(MSG_USER_ID, userId);
 		values.put(MSG_CORRESPONDENT_ID, correspondentId);
-		values.put(MSG_LEFT, ""+left);
+		values.put(MSG_LEFT, StringFormattingUtils.getBoolean(left));
 		values.put(MSG_BODY, comment);
-		values.put(MSG_SUCCESS, ""+success);
+		values.put(MSG_SUCCESS, StringFormattingUtils.getBoolean(success));
 		values.put(MSG_DATE, date);
-		values.put(MSG_IS_UNREAD, ""+isUnread);
+		values.put(MSG_IS_UNREAD, StringFormattingUtils.getBoolean(isUnread));
 	
 		long id = sqLiteDatabase.insert(TABLE_MESSAGES, null, values);
 		
@@ -512,11 +518,51 @@ public class SQLiteHandler{
 		//db.close();
 		Log.e(TAG, "Broadcast inserted to sqlite: message " + id);
 	}
+	
+	public List<Announcement> downloadPersonalBroadcasts() {
+		L.debug("downloadPersonalBroadcasts");
+		String uid = getLoggedInID();
+		Cursor c = sqLiteDatabase.query(
+				DATABASE_TABLE_3, 
+				new String[]{BROAD_ID, BROADCAST_TYPE, BROADCAST_FROM, 
+						BROADCAST_MESSAGE, BROADCAST_DATE, BROADCAST_LOCATION_LONG, 
+						BROADCAST_LOCATION_LAT, BROADCAST_LOCATION_LOCAL, BROADCAST_REACH,
+						BROADCAST_STATUS}, 
+				BROADCAST_FROM+" = ?", 
+				new String[]{uid+"0"}, 
+				null, null, null);
+		List<Announcement> announcements = new ArrayList<Announcement>();;
+		if(c.moveToFirst()){
+			
+			do{
+				
+				long id = c.getLong(c.getColumnIndex(BROAD_ID));
+				int type = c.getInt(c.getColumnIndex(BROADCAST_TYPE));
+				int from = c.getInt(c.getColumnIndex(BROADCAST_FROM));
+				String message = c.getString(c.getColumnIndex(BROADCAST_MESSAGE));
+				String date = c.getString(c.getColumnIndex(BROADCAST_DATE));
+				long locLongitude = c.getLong(c.getColumnIndex(BROADCAST_LOCATION_LONG));
+				long locLatitude = c.getLong(c.getColumnIndex(BROADCAST_LOCATION_LAT));
+				String locLocal = c.getString(c.getColumnIndex(BROADCAST_LOCATION_LOCAL));
+				int reach = c.getInt(c.getColumnIndex(BROADCAST_REACH));
+				int status = c.getInt(c.getColumnIndex(BROADCAST_STATUS));
+				
+				Announcement ann = new Announcement(id, type, from, message, date, locLongitude, locLatitude, locLocal, reach, status);
+				
+				announcements.add(ann);
+				
+			}while(c.moveToNext());
+		}
+		c.close();
+		
+		return announcements;
+	}
+	
 	public void insertBroadcast(int broad_type, String broad_from, String broad_message, float loc_long, float loc_lat, String local, int reach) {
 		String dateNow = requestDate();
 		//SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		Log.e("BROADCASTING:","BROAD TYPE: "+broad_type+ " BROAD FROM: "+broad_from);
+		Log.e("BROADCASTING:","BROAD TYPE: "+broad_type+ " BROAD FROM: "+broad_from+" BROADCAST_LOCATION_LOCAL: "+local);
 		values.put(BROADCAST_TYPE, broad_type);
 		values.put(BROADCAST_FROM, broad_from+ "");
 		values.put(BROADCAST_MESSAGE, broad_message + "");
@@ -525,7 +571,8 @@ public class SQLiteHandler{
 		values.put(BROADCAST_LOCATION_LONG, loc_long);
 		values.put(BROADCAST_LOCATION_LAT, loc_lat);
 		values.put(BROADCAST_REACH, reach);
-		values.put(BROADCAST_STATUS, "1");
+		values.put(BROADCAST_STATUS, "1");//delete = 0, existing 1
+		
 		
 		long id = sqLiteDatabase.insert(DATABASE_TABLE_3, null, values);
 		//db.close();

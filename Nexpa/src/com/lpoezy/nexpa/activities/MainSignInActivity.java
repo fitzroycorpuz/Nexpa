@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.jivesoftware.smack.XMPPConnection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -282,7 +283,7 @@ public class MainSignInActivity extends Activity {
 							ac.LogInChatAccount(server_name, password, server_email, new OnXMPPConnectedListener() {
 								
 								@Override
-								public void onXMPPConnected() {
+								public void onXMPPConnected(XMPPConnection connection) {
 									
 									hideDialog();
 									Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);

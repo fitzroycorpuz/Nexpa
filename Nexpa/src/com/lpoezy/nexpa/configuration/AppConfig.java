@@ -12,5 +12,6 @@ public class AppConfig {
     
     public static int MSG_NOTIFICATION_ID = 1000;
     
-    public static String ACTION_RECEIVED_MSG = "com.toucan.actions.ACTION_RECEIVED_MSG";
+    public static String ACTION_RECEIVED_MSG = "com.lpoezy.nexpa.actions.ACTION_RECEIVED_MSG";
+   
 }

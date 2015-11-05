@@ -24,6 +24,8 @@ import com.lpoezy.nexpa.activities.TabHostActivity;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.openfire.Account;
+import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.L;
@@ -83,20 +85,47 @@ public class ChatMessagesService extends Service {
 	
 	//create a connection with xmpp,
 	//and listen to any incoming messages
-	public void onReceiveChatMessages() {
+	private void onReceiveChatMessages() {
 		
 		L.debug("onReceiveChatMessages");
-		SQLiteHandler db = new SQLiteHandler(this);
-		db.openToWrite();
-		db.updateBroadcasting(0);
-		db.updateBroadcastTicker(0);
 		
-		
-		
+		//called from NetworkChangeReceiver whenever the user is logged in
+		//will always be called whenever there is a change in network state,
+		//will always check if the app is connected to server,
 		XMPPConnection connection = XMPPLogic.getInstance().getConnection();
 		
+		if(connection==null || !connection.isConnected()){
+			SQLiteHandler db = new SQLiteHandler(getApplicationContext());
+			db.openToWrite();
+			
+			//db.updateBroadcasting(0);
+			//db.updateBroadcastTicker(0);
+			
+			Account ac = new Account();
+			ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
+				
+				@Override
+				public void onXMPPConnected(XMPPConnection con) {
+					
+					addPacketListener(con);
+					
+				}
+			});
+			
+			db.close();
+		}else{
+			
+			addPacketListener(connection);
+		}
+		
+	}
+	
+	//will handle all the received messages,
+	//and send messages to all waiting activities via BroadcastReceiver
+	private void addPacketListener(XMPPConnection connection) {
+		
 		PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-		if(connection!=null){
+		
 			connection.addPacketListener(new PacketListener() {
 				@Override
 				public void processPacket(Packet packet) {
@@ -201,27 +230,10 @@ public class ChatMessagesService extends Service {
 					}
 				}
 			}, filter);
-		}
-		
-		
-		
-		
-//		Account ac = new Account();
-//		ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
-//			
-//			@Override
-//			public void onXMPPConnected() {
-//				
-//				onTabHostActivtyReadyListener.onTabHostActivtyReady();
-//				
-//				
-//				
-//			}
-//		});
 		
 		
 	}
-	
+
 	private void saveMesageOffline(Correspondent correspondent) {
 		
 		//save only the message,

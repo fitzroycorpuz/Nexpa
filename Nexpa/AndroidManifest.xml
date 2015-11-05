@@ -82,6 +82,18 @@
             android:name=".TestActivity"
             android:label="@string/title_activity_test" >
         </activity>
+        
+        <receiver
+            android:name="com.lpoezy.nexpa.chatservice.NetworkChangeReceiver"
+            android:label="NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <activity android:name=".activities.SettingsActivity"></activity>
+        
+        
     </application>
 
 </manifest>
