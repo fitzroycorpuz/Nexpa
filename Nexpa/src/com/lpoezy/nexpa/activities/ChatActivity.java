@@ -173,10 +173,12 @@ public class ChatActivity extends Activity {
 				
 
 				Log.e("XMPPChatDemoActivity", "Sending text " + text + " to " + to);
-				Message msg = new Message(to, Message.Type.chat);
+				final Message msg = new Message(to, Message.Type.chat);
 				msg.setBody(text);	
 				
 					connection = XMPPLogic.getInstance().getConnection();
+					
+				
 					 if ((connection == null)||(!connection.isConnected()))  {	
 				       		Account ac = new Account();
 				       		
@@ -186,17 +188,20 @@ public class ChatActivity extends Activity {
 				            ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
 								
 								@Override
-								public void onXMPPConnected() {
+								public void onXMPPConnected(XMPPConnection connection) {
 									Log.e("ADDING AFTER LOGIN","g");
 						            runOnUiThread(new Runnable() {
 										
 										@Override
 										public void run() {
-											// connection.sendPacket(msg);
+											
+											 //connection.sendPacket(msg);
 											// messages.add(connection.getUser() + ":");
-											adapter.add(new OneComment(true, text, false));
+											OneComment comment = new OneComment(true, text, false);
+											 
+											adapter.add(comment);
 											listview.setAdapter(adapter);
-			
+											mCorrespondent.addMessage(comment);
 											db.close();
 											
 										}
@@ -217,7 +222,7 @@ public class ChatActivity extends Activity {
 							adapter.add(comment);
 							
 							listview.setAdapter(adapter);
-							Log.e("ADD","ayayay");
+							//Log.e("ADD","ayayay");
 							
 							mCorrespondent.addMessage(comment);
 

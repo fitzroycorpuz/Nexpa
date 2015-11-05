@@ -6,6 +6,24 @@ import java.util.regex.Pattern;
 import android.util.Log;
 
 public class StringFormattingUtils {
+	
+	public static int getBoolean(boolean value){
+		
+		return (!value)?0:1;
+		
+	}
+	
+	public static boolean getBoolean(int value){
+		
+		return (value==0)?false:true;
+		
+	}
+	
+	public static boolean getBoolean(String value){
+		
+		return (value.equalsIgnoreCase("0"))?false:true;
+		
+	}
 
 	public static String setBroadcastChatEquivalent(String msg, String localArea){
 		String newChat = "";

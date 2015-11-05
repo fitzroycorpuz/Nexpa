@@ -279,7 +279,7 @@ public class Account {
 							if (type == Presence.Type.available) Log.e("XMPPChatDemoActivity", "Presence AVIALABLE");
 							Log.d("XMPPChatDemoActivity", "Presence : " + entryPresence);
 						}
-						if(callback!=null)callback.onXMPPConnected();
+						if(callback!=null)callback.onXMPPConnected(connection);
 						
 					} catch (XMPPException ex) {
 						Log.e("XMPPChatDemoActivity", "Failed to log in as " + email);

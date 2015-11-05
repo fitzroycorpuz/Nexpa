@@ -4,9 +4,12 @@ import android.content.Context;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.L;
+import com.lpoezy.nexpa.utility.StringFormattingUtils;
 import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 
 public class OneComment {
@@ -67,11 +70,12 @@ public class OneComment {
 		Map<String, String>map = db.downloadLatestMsgOffline(userId, correspondentId);
 		
 		if(map.size()>0){
-			this.left = Boolean.parseBoolean(map.get(SQLiteHandler.MSG_LEFT));
+			
+			this.left = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_LEFT));
 			this.comment = map.get(SQLiteHandler.MSG_BODY);
-			this.success = Boolean.parseBoolean(map.get(SQLiteHandler.MSG_SUCCESS));
+			this.success = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_SUCCESS));
 			this.date = map.get(SQLiteHandler.MSG_DATE);
-			this.isUnread = Boolean.parseBoolean(map.get(SQLiteHandler.MSG_IS_UNREAD));
+			this.isUnread = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_UNREAD));
 		}
 		
 		db.close();

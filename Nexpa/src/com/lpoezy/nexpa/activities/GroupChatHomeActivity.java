@@ -98,7 +98,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	
 	private PacketListener packetListener;
 	
-	private String displayName(String fname, String user) {
+	public static String displayName(String fname, String user) {
 		if ((fname.equals("")) || (fname == null) || (fname.equals("null"))) {
 			return user;
 		} else {
@@ -399,8 +399,10 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		
 		crBroadcast = db.getAllBroadCast(limit_loader);
 		Log.e("BROADCOUNT: ",broadCount + "");
+		L.debug("BROADCOUNT, "+broadCount + "");
 		if (broadCount != 0) {
 			Log.e("BROADCOUNT showing: ",broadCount + "");
+			L.debug("BROADCOUNT showing: "+broadCount + "");
 			lnEmpty.setEnabled(false);
 			lnEmpty.setVisibility(LinearLayout.GONE);
 			lnBroadcast.setVisibility(LinearLayout.GONE);
@@ -415,6 +417,8 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 			mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
 				 @Override
 				public boolean setViewValue(View view, Cursor cursor, int column) {
+					 
+					
 					String broadType = "";
 					String statVal = "";
 					broadType = cursor.getString(cursor.getColumnIndex("broad_type_of"));
@@ -630,6 +634,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		btnStartChat.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				
+				L.debug("CroupChatHomeActivity, start chat");
 				
 				connection = XMPPLogic.getInstance().getConnection();
 				
@@ -651,6 +656,8 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 					ArrayList < Users > us = new ArrayList < Users > ();
 					us = db.getNearByUserDetails();
 					strUser = "";
+					
+					L.debug("CroupChatHomeActivity, us.size() "+us.size());
 					for (int j = 0; j < us.size(); j++) {
 						strUser = us.get(j).getUserName();
 						msg = new Message(strUser + "@vps.gigapros.com/Smack", Message.Type.normal);
@@ -658,8 +665,10 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 						connection.sendPacket(msg);
 						Log.e("XMPPChatDemoActivity", "Sending broadcast to: " + strUser);
 						if (j + 1 == us.size()) {
+							
 							db.insertBroadcast(1, db.getLoggedInID() + "" + 0, edBroad.getText().toString(), longitude, latitude, locationName, j);
 							mHandler.sendEmptyMessage(2);
+							
 						}
 					}
 					

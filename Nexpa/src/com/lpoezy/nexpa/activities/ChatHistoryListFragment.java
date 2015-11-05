@@ -139,7 +139,7 @@ public class ChatHistoryListFragment extends Fragment {
 		@Override
 		public int getItemCount() {
 			
-			return this.buddys.size();
+			return buddys.size();
 		}
 
 		@Override
@@ -155,6 +155,7 @@ public class ChatHistoryListFragment extends Fragment {
 				vh.tvMsg.setTypeface(null,Typeface.NORMAL);
 			
 			vh.tvMsg.setText(buddys.get(position).getConversation().get(0).comment);
+			vh.tvMsg.setText("sdfasfas");
 		}
 
 		@Override
