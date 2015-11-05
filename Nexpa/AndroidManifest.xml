@@ -49,6 +49,7 @@
         <activity android:name=".activities.CreateAccountActivity" />
         <activity android:name=".activities.PeopleProfileActivity" />
         <activity android:name=".activities.RegisterActivity" />
+        <activity android:name=".activities.SearchPostActivity" />
         <activity android:name=".activities.LogInActivity" />
         <activity android:name=".activities.GroupChatHomeActivity" />
         <activity android:name=".activities.GroupChatMainActivity" />
