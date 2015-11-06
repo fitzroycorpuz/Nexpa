@@ -3,6 +3,7 @@ package com.lpoezy.nexpa.chatservice;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -17,6 +18,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.devspark.appmsg.AppMsg;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.activities.ChatActivity;
 import com.lpoezy.nexpa.activities.ChatHistoryActivity;
@@ -30,6 +32,7 @@ import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.L;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -79,10 +82,13 @@ public class ChatMessagesService extends Service {
 		super.onCreate();
 		
 		isRunning = true;
+		
 		onReceiveChatMessages();
+		
 	}
 	
 	
+
 	//create a connection with xmpp,
 	//and listen to any incoming messages
 	private void onReceiveChatMessages() {
@@ -108,7 +114,7 @@ public class ChatMessagesService extends Service {
 				public void onXMPPConnected(XMPPConnection con) {
 					
 					addPacketListener(con);
-					
+					addConnectionListener(con);
 				}
 			});
 			
@@ -116,7 +122,48 @@ public class ChatMessagesService extends Service {
 		}else{
 			
 			addPacketListener(connection);
+			addConnectionListener(connection);
 		}
+		
+		
+		
+	}
+	
+	private void addConnectionListener(final XMPPConnection connection) {
+		
+		connection.addConnectionListener(new ConnectionListener() {
+			
+			@Override
+			public void reconnectionSuccessful() {
+				
+				L.makeText((Activity)getApplicationContext(), "The connection has reconnected successfully to the server.", AppMsg.STYLE_INFO);
+				L.debug("The connection has reconnected successfully to the server.");
+			}
+			
+			@Override
+			public void reconnectionFailed(Exception arg0) {
+				L.error("The connection has reconnected successfully to the server. Connections will reconnect to the server when the previous socket connection was abruptly closed.");
+				
+			}
+			
+			@Override
+			public void reconnectingIn(int arg0) {
+				L.error("The connection will retry to reconnect in the specified number of "+arg0+" seconds.");
+				
+			}
+			
+			@Override
+			public void connectionClosedOnError(Exception arg0) {
+				L.makeText((Activity)getApplicationContext(), "The connection will retry to reconnect to the server.", AppMsg.STYLE_INFO);
+				L.error("The connection will retry to reconnect to the server.");
+			}
+			
+			@Override
+			public void connectionClosed() {
+				L.debug("Notification that the connection was closed normally or that the reconnection process has been aborted.");
+				
+			}
+		});
 		
 	}
 	
