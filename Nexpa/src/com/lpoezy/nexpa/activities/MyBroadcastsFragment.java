@@ -74,6 +74,8 @@ public class MyBroadcastsFragment extends Fragment {
 		 
 	       
 		mAdapter = new ParallaxRecyclerAdapter<Announcement>(mAnouncements) {
+			
+			
 
 			@Override
 			public void onBindViewHolderImpl(android.support.v7.widget.RecyclerView.ViewHolder viewHolder,

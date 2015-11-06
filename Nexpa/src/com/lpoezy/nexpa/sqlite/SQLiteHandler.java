@@ -530,8 +530,8 @@ public class SQLiteHandler{
 						BROADCAST_STATUS}, 
 				BROADCAST_FROM+" = ?", 
 				new String[]{uid+"0"}, 
-				null, null, null);
-		List<Announcement> announcements = new ArrayList<Announcement>();;
+				null, null, BROAD_ID+" DESC");
+		List<Announcement> announcements = new ArrayList<Announcement>();
 		if(c.moveToFirst()){
 			
 			do{

@@ -179,12 +179,13 @@
         android:layout_width="match_parent"
         android:layout_height="30dp" />
 
-    <ImageView
+   <!--  <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_margin="16dp"
         android:gravity="center_vertical|center"
-        android:src="@drawable/pic_toucan" />
+        android:src="@drawable/img_logo" /> -->
 
     <TextView
         android:layout_width="match_parent"
