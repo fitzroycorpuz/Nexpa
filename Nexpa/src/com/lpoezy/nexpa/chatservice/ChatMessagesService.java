@@ -114,56 +114,19 @@ public class ChatMessagesService extends Service {
 				public void onXMPPConnected(XMPPConnection con) {
 					
 					addPacketListener(con);
-					addConnectionListener(con);
+					
 				}
+
 			});
 			
 			db.close();
 		}else{
 			
 			addPacketListener(connection);
-			addConnectionListener(connection);
+			
 		}
 		
 		
-		
-	}
-	
-	private void addConnectionListener(final XMPPConnection connection) {
-		
-		connection.addConnectionListener(new ConnectionListener() {
-			
-			@Override
-			public void reconnectionSuccessful() {
-				
-				L.makeText((Activity)getApplicationContext(), "The connection has reconnected successfully to the server.", AppMsg.STYLE_INFO);
-				L.debug("The connection has reconnected successfully to the server.");
-			}
-			
-			@Override
-			public void reconnectionFailed(Exception arg0) {
-				L.error("The connection has reconnected successfully to the server. Connections will reconnect to the server when the previous socket connection was abruptly closed.");
-				
-			}
-			
-			@Override
-			public void reconnectingIn(int arg0) {
-				L.error("The connection will retry to reconnect in the specified number of "+arg0+" seconds.");
-				
-			}
-			
-			@Override
-			public void connectionClosedOnError(Exception arg0) {
-				L.makeText((Activity)getApplicationContext(), "The connection will retry to reconnect to the server.", AppMsg.STYLE_INFO);
-				L.error("The connection will retry to reconnect to the server.");
-			}
-			
-			@Override
-			public void connectionClosed() {
-				L.debug("Notification that the connection was closed normally or that the reconnection process has been aborted.");
-				
-			}
-		});
 		
 	}
 	
@@ -210,13 +173,17 @@ public class ChatMessagesService extends Service {
 										comment.isUnread = true;
 										correspondent.addMessage(comment);
 										
+										//save mesage offline
+										//if ChatHistoryActivity is running
+										if(!ChatActivity.isRunning){
+											saveMesageOffline(correspondent);
+										}
+										
 										//check if there is an available activity to,
 										//receive the brodacast
 										if(!TabHostActivity.isRunning 
 												&& !ChatHistoryActivity.isRunning 
 												&& !ChatActivity.isRunning){
-											
-											saveMesageOffline(correspondent);
 											
 											L.debug("sending nottification!");
 											
@@ -225,11 +192,7 @@ public class ChatMessagesService extends Service {
 											
 										}else{
 											
-											//save mesage offline
-											//if ChatHistoryActivity is running
-											if(!ChatActivity.isRunning){
-												saveMesageOffline(correspondent);
-											}
+											
 											//send broadcast
 											Intent broadcast = new Intent(AppConfig.ACTION_RECEIVED_MSG);
 											broadcast.putExtra("email", correspondent.getEmail());

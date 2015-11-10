@@ -4,10 +4,14 @@ import com.lpoezy.nexpa.activities.ChatHistoryListFragment.OnShowChatHistoryList
 import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 
 public class ChatHistoryActivity extends Activity implements OnShowChatHistoryListener{
@@ -27,7 +31,8 @@ public class ChatHistoryActivity extends Activity implements OnShowChatHistoryLi
    					true);
 		}
 	}
-
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,6 +43,16 @@ public class ChatHistoryActivity extends Activity implements OnShowChatHistoryLi
 			.add(R.id.frag_container, chatHistoryList, "ChatHistoryList")
 			.commit();
 		}
+		
+//		if (android.os.Build.VERSION.SDK_INT>=android.os.Build.VERSION_CODES.HONEYCOMB) {
+//			 ActionBar actionBar = getActionBar();
+//			 actionBar.setHomeButtonEnabled(true);
+//			 actionBar.setDisplayHomeAsUpEnabled(true);
+//		}
+//		else{
+//			 Log.e("NOTICE","Device cannot handle ActionBar");
+//		}
+		
 		
 		//RecyclerView
 	}

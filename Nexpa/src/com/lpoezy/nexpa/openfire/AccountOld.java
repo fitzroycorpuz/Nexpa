@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -28,12 +27,11 @@ import com.lpoezy.nexpa.activities.GroupChatHomeActivity;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.utility.L;
 
 import android.content.Context;
 import android.util.Log;
 
-public class Account {
+public class AccountOld {
 	public static final String HOST = "198.154.106.139";
 	public static final int PORT = 5222;
 	public static final String SERVICE = "198.154.106.139";
@@ -247,57 +245,41 @@ public class Account {
 		}
 		catch(Exception e){
 			Log.e("XMPP STATUS", "Trying to log-in... "+ e.getLocalizedMessage());
-			L.debug("XMPP STATUS, Trying to log-in... "+ e.getLocalizedMessage());
 		}
 		Log.e("XMPP STATUS", "Trying to log-in...");
-		L.debug("XMPP STATUS, Trying to log-in...");
 		Thread t = new Thread(new Runnable() {@Override
 			public void run() {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, email + SERVICE_LOGIN);
-					
+					connConfig.setReconnectionAllowed(true);
 					XMPPConnection connection = new XMPPConnection(connConfig);
 					Log.e("user", username);
 					Log.e("password", password);
 					Log.e("email", email);
-					
-					
-					L.debug("user "+username);
-					L.debug("password "+ password);
-					L.debug("email "+ email);
-					//connection.disconnect();
-					
+					connection.disconnect();
 					connection.connect();
 					Log.e("XMPPChatDemoActivity", "Connected to " + connection.getHost());
-					L.debug("XMPPChatDemoActivity, Connected to " + connection.getHost());
+					
 					try {
-						
 						connection.login(username, password);
 						Log.i("XMPPChatDemoActivity", "Logged in as " + connection.getUser());
-						L.debug("XMPPChatDemoActivity, Logged in as " + connection.getUser());
 						Presence presence = new Presence(Presence.Type.available);
 						connection.sendPacket(presence);
 						setConnection(connection);
 						XMPPLogic.getInstance().setConnection(connection);
-						
-//						Roster roster = connection.getRoster();
-//						Collection < RosterEntry > entries = roster.getEntries();						
-//						L.debug("XMPPChatDemoActivity, entries: " + entries.size());
-//						
-//						for (RosterEntry entry: entries) {
-//							Log.e("XMPPChatDemoActivity", "--------------------------------------");
-//							Log.e("XMPPChatDemoActivity", "RosterEntry " + entry);
-//							Log.e("XMPPChatDemoActivity", "User: " + entry.getUser());
-//							
-//							L.debug("XMPPChatDemoActivity, User: " + entry.getUser());
-//							Presence entryPresence = roster.getPresence(entry.getUser());
-//							Log.e("XMPPChatDemoActivity", "Presence Status: " + entryPresence.getStatus());
-//							Log.e("XMPPChatDemoActivity", "Presence Type: " + entryPresence.getType());
-//							Presence.Type type = entryPresence.getType();
-//							if (type == Presence.Type.available) Log.e("XMPPChatDemoActivity", "Presence AVIALABLE");
-//							Log.d("XMPPChatDemoActivity", "Presence : " + entryPresence);
-//						}
-						
+						Roster roster = connection.getRoster();
+						Collection < RosterEntry > entries = roster.getEntries();
+						for (RosterEntry entry: entries) {
+							Log.e("XMPPChatDemoActivity", "--------------------------------------");
+							Log.e("XMPPChatDemoActivity", "RosterEntry " + entry);
+							Log.e("XMPPChatDemoActivity", "User: " + entry.getUser());
+							Presence entryPresence = roster.getPresence(entry.getUser());
+							Log.e("XMPPChatDemoActivity", "Presence Status: " + entryPresence.getStatus());
+							Log.e("XMPPChatDemoActivity", "Presence Type: " + entryPresence.getType());
+							Presence.Type type = entryPresence.getType();
+							if (type == Presence.Type.available) Log.e("XMPPChatDemoActivity", "Presence AVIALABLE");
+							Log.d("XMPPChatDemoActivity", "Presence : " + entryPresence);
+						}
 						if(callback!=null)callback.onXMPPConnected(connection);
 						
 					} catch (XMPPException ex) {
@@ -307,7 +289,6 @@ public class Account {
 					}
 				} catch (XMPPException ex) {
 					Log.e("XMPPChatDemoActivity", "Chat server failed: " + ex.getLocalizedMessage());
-					L.error("XMPPChatDemoActivity, Chat server failed: " + ex.getLocalizedMessage());
 					setConnection(null);
 				}
 			}

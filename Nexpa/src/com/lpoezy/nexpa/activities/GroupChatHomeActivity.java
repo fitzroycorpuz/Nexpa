@@ -148,6 +148,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	}
 	
 	private void makeRepeatingChecker() {
+		
 		if (db.getBroadcastTickerStatus().equals("0")) {
 			db.updateBroadcastTicker(1);
 			mRepeater = new Handler();
@@ -163,13 +164,16 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	}
 	
 	private void resetInteractor(){
+		
 		try {
 			//packet listener closes on idle at (76 (24 x 30 seconds), so close it and create another one to make the listener alive
 			connection.removePacketListener(packetListener);
 			packetListener = null;
 			interactor = 99;
+			
 			Log.e("XMPP Interactor", "Interactor killed old packetlistener, counter has been reset.");
-		} catch (Exception e) {}
+			
+		} catch (Exception e) { }
 	}
 	
 	@Override
@@ -358,6 +362,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		
 		showList();
 	}
+	
 	TextView txtBroadId;
 	String br_id;
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {

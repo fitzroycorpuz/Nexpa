@@ -83,5 +83,6 @@
     <string name="user_profile_ui_distance">Distance Settings</string>
     <string name="user_profile_distance_bar">Range to broadcast and catch users (in meters)</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="delete">delete</string>
 
 </resources>

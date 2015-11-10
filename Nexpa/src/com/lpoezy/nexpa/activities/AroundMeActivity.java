@@ -26,6 +26,7 @@ import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.DateUtils;
+import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.MyLocation;
 import com.lpoezy.nexpa.utility.MyLocation.LocationResult;
 
@@ -574,5 +575,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		//locationManager.removeUpdates(locationListener);
 		isRunning = false;
 		Log.e("ON PAUSE", "APP PAUSE");
+		
+		
 	}
 }

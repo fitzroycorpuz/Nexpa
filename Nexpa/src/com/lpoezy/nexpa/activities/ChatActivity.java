@@ -1,5 +1,6 @@
 package com.lpoezy.nexpa.activities;
 
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -108,26 +109,7 @@ public class ChatActivity extends Activity {
 		final String fname = getIntent().getStringExtra("fname");
 		
 		
-		mCorrespondent = new Correspondent(userId, username, email, fname);
 		
-		if(mCorrespondent.isExisting(this)){	//check if current correspondent exists in db
-			
-			//get all existing messages frm db
-			mCorrespondent.downloadOfflineMessages(this);
-			
-			
-			for(OneComment comment : mCorrespondent.getConversation()){
-				
-				
-				adapter.add(comment);
-			}
-			//clear conversation, 
-			//so only newly send and accepted messages will be save later
-			mCorrespondent.clearExistingConversation();
-			
-		}else{
-			//1st time chatting with correspondent
-		}
 		
 		
 		int_mes = "";
@@ -161,9 +143,13 @@ public class ChatActivity extends Activity {
         else{
         	textMessage.setText("");
         }
+        
+        
 		// Set a listener to send a chat text message
 		Button send = (Button) this.findViewById(R.id.sendBtn);
 		send.setOnClickListener(new View.OnClickListener() {
+			private boolean isReconnecting;
+
 			public void onClick(View view) {
 				//String to = username + "@vps.gigapros.com/Smack";
 				final String to = recipient.getText().toString();
@@ -172,50 +158,48 @@ public class ChatActivity extends Activity {
 				
 				
 
-				Log.e("XMPPChatDemoActivity", "Sending text " + text + " to " + to);
+				
 				final Message msg = new Message(to, Message.Type.chat);
 				msg.setBody(text);	
 				
 					connection = XMPPLogic.getInstance().getConnection();
 					
-				
-					 if ((connection == null)||(!connection.isConnected()))  {	
-				       		Account ac = new Account();
+					
+					 if ((connection == null)||(!connection.isConnected()))  {
+						 L.debug("XMPPChatDemoActivity, reconnecting...");
+						 	
+						 	OneComment comment = new OneComment(true, text, false);
+						 
+							adapter.add(comment);
+							listview.setAdapter(adapter);
+							mCorrespondent.addMessage(comment);
+							
 				       		
-				        	final SQLiteHandler db = new SQLiteHandler(getApplicationContext());
-				    		db.openToWrite();
-				    		
-				            ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
-								
-								@Override
-								public void onXMPPConnected(XMPPConnection connection) {
-									Log.e("ADDING AFTER LOGIN","g");
-						            runOnUiThread(new Runnable() {
+				       		if(!isReconnecting)
+				       		{
+				       			isReconnecting = true;
+				       			Account ac = new Account();
+				       			final SQLiteHandler db = new SQLiteHandler(getApplicationContext());
+					    		db.openToWrite();
+					    		
+					            ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
+									
+									@Override
+									public void onXMPPConnected(XMPPConnection connection) {
 										
-										@Override
-										public void run() {
-											
-											 //connection.sendPacket(msg);
-											// messages.add(connection.getUser() + ":");
-											OneComment comment = new OneComment(true, text, false);
-											 
-											adapter.add(comment);
-											listview.setAdapter(adapter);
-											mCorrespondent.addMessage(comment);
-											db.close();
-											
-										}
-									});
-									
-									
-								}
-							});
-				            
-				            
+										isReconnecting = false;
+										
+									}
+								});
+					            
+					            db.close();
+				       		}
+				        	
 							
 				       }
 				      
 				       else{
+				    	   L.debug("XMPPChatDemoActivity, Sending text " + text + " to " + to);
 				    		connection.sendPacket(msg);
 							//messages.add(connection.getUser() + ":");
 				    		OneComment comment = new OneComment(true, text, true);
@@ -321,6 +305,30 @@ public class ChatActivity extends Activity {
 		isRunning = true;
 		
 		registerReceiver(mReceivedMessage, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
+		
+		final long userId=-1;
+		final String username = getIntent().getStringExtra("username");
+		final String email = getIntent().getStringExtra("email");
+		final String fname = getIntent().getStringExtra("fname");
+		
+		mCorrespondent = new Correspondent(userId, username, email, fname);
+		
+		if(mCorrespondent.isExisting(this)){	//check if current correspondent exists in db
+			
+			//get all existing messages frm db
+			mCorrespondent.downloadOfflineMessages(this);
+			
+			
+			for(OneComment comment : mCorrespondent.getConversation()){
+				
+				
+				adapter.add(comment);
+			}
+			//clear conversation, 
+			//so only newly send and accepted messages will be save later
+			mCorrespondent.clearExistingConversation();
+			
+		}
 		
 	}
 	

@@ -64,6 +64,8 @@ public class TabHostActivity extends TabActivity {
 		unregisterReceiver(mUpdateMsgCount);
 		isRunning = false;
 		
+		L.debug("TabHost, onPause");
+		
 	}
 	
 	@Override

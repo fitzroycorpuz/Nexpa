@@ -26,6 +26,7 @@ import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
+import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.NiceDialog;
 
 import android.app.Activity;
@@ -35,6 +36,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -72,6 +75,8 @@ public class MainSignInActivity extends Activity {
 	String server_email;
 	String server_created_at;
 	String public_pass;
+	
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -290,6 +295,7 @@ public class MainSignInActivity extends Activity {
 									startActivity(intent);
 									finish();
 								}
+
 							});
 							
 										
