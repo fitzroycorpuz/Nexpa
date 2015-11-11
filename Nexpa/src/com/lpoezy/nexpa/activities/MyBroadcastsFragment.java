@@ -5,13 +5,16 @@ import java.util.List;
 
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.objects.Announcement;
+import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.parallaxrecyclerview.HeaderLayoutManagerFixed;
 import com.lpoezy.nexpa.parallaxrecyclerview.ParallaxRecyclerAdapter;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.BmpFactory;
 import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.DividerItemDecoration;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
+import com.lpoezy.nexpa.utility.Utilz;
 
 import android.app.Fragment;
 import android.app.ActionBar.LayoutParams;
@@ -59,6 +62,7 @@ public class MyBroadcastsFragment extends Fragment {
 	
 	
 	ParallaxRecyclerAdapter<Announcement> mAdapter;
+	private ImageView mImgProfile;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_my_broadcasts, container, false);
@@ -134,14 +138,10 @@ public class MyBroadcastsFragment extends Fragment {
         mAdapter.setData(mAnouncements);
         mRvBroadcasts.setAdapter(mAdapter);
         
+       
+        mImgProfile = (ImageView) header.findViewById(R.id.img_profile);
         
         
-        RoundedImageView riv = new RoundedImageView(getActivity());
-        Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
-        R.drawable.pic_sample_girl);
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
-        ImageView imgProfile = (ImageView) header.findViewById(R.id.img_profile);
-        imgProfile.setImageBitmap(circImage);
         
         
         ((ImageView)header.findViewById(R.id.img_settings)).setOnClickListener(new View.OnClickListener() {
@@ -158,8 +158,10 @@ public class MyBroadcastsFragment extends Fragment {
 	
 	@Override
 	public void onResume() {
-		// TODO Auto-generated method stub
+		
 		super.onResume();
+		
+		resetProfilePic();
 		
 		new Thread(new Runnable() {
 			
@@ -195,6 +197,44 @@ public class MyBroadcastsFragment extends Fragment {
 				
 			}
 		}).start();
+	}
+	
+	private void resetProfilePic(){
+		
+		String imgDecodableString = Utilz.getDataFrmSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, "");
+		
+		RoundedImageView riv = new RoundedImageView(getActivity());
+        Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
+        R.drawable.pic_sample_girl);
+       
+        if(imgDecodableString!=null && !imgDecodableString.isEmpty()){
+        	
+        	// Get the dimensions of the View
+            int targetW = mImgProfile.getWidth();
+            int targetH = mImgProfile.getHeight();
+
+//            // First decode with inJustDecodeBounds=true to check dimensions
+//            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+//            bmOptions.inJustDecodeBounds = true;
+//            BitmapFactory.decodeFile(imgDecodableString, bmOptions);
+//           
+//            // Determine how much to scale down the image
+//            bmOptions.inSampleSize = Utilz.calculateInSampleSize(bmOptions, targetW, targetH);
+//
+//            // Decode bitmap with inSampleSize set
+//            bmOptions.inJustDecodeBounds = false;
+//        	
+//            
+//        	rawImage = BitmapFactory.decodeFile(imgDecodableString, bmOptions);
+            
+            BmpFactory  bmpFactory = new BmpFactory();
+        	rawImage = bmpFactory.getBmp(imgDecodableString, targetW, targetH);
+        	
+        }
+        
+        L.debug("imgDecodableString "+imgDecodableString+", rawImage "+rawImage);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        mImgProfile.setImageBitmap(circImage);
 	}
 	
 //	private class MyBroascastsAdapter extends RecyclerView.Adapter<MyBroascastsAdapter.ViewHolder>{

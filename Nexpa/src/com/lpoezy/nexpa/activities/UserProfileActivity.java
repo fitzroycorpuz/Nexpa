@@ -21,6 +21,7 @@ import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.NiceDialog;
 import com.lpoezy.nexpa.utility.RoundedImageView;
+import com.lpoezy.nexpa.utility.Utilz;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -185,6 +186,8 @@ public class UserProfileActivity extends Activity
         db.deleteAllPeople();
         db.updateAccountValidate(0);
         XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+        
+        Utilz.clearSharedPref(context);
        
         if(connection != null && connection.isConnected()) 
         {
@@ -206,7 +209,7 @@ public class UserProfileActivity extends Activity
 	       
        // }
         
-	        
+	   
 	     
         ((Activity)context).finish();
     }

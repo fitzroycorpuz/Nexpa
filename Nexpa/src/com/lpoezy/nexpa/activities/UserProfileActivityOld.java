@@ -245,7 +245,7 @@ public class UserProfileActivityOld extends Activity
                 
                 final RadioButton radBoy;
                 final RadioButton radGirl;
-                final RadioButton radUnspec;
+                //final RadioButton radUnspec;
                 
                 dpBDay = (DatePicker) dialog.findViewById(R.id.dbBirthday);
                 Calendar c = Calendar.getInstance();
@@ -256,7 +256,7 @@ public class UserProfileActivityOld extends Activity
                 
                 radBoy = (RadioButton) dialog.findViewById(R.id.radioMale);
                 radGirl = (RadioButton) dialog.findViewById(R.id.radioFemale);
-                radUnspec = (RadioButton) dialog.findViewById(R.id.radioUnspecified);
+                //radUnspec = (RadioButton) dialog.findViewById(R.id.radioUnspecified);
                 
                 Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
                 edtName.setText(db.getName());
@@ -280,9 +280,9 @@ public class UserProfileActivityOld extends Activity
                 else if (db.getGender().equals("F")){
                     radGirl.setChecked(true);
                 }
-                else{
-                    radUnspec.setChecked(true);
-                }
+//                else{
+//                    radUnspec.setChecked(true);
+//                }
                 dialogButton.setOnClickListener(new OnClickListener()
                 {
                     @Override
