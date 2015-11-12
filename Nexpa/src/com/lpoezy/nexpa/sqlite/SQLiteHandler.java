@@ -87,6 +87,7 @@ public class SQLiteHandler{
 	public static final String PROFILE_LOOKING_TYPE = "looking_type";
 	public static final String PROFILE_STATUS = "status";
 	public static final String PROFILE_EMAIL = "email";
+	public static final String PROFILE_VALID = "is_valid";
 	
 	public static final String DATABASE_TABLE_3 = "broadcast";
 	public static final String BROAD_ID = "_id";
@@ -149,7 +150,7 @@ public class SQLiteHandler{
 				String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "+ MSG_USER_ID +" INTEGER, "+ MSG_CORRESPONDENT_ID + " INTEGER, "+  MSG_LEFT + " TEXT, " +   MSG_BODY + " TEXT," +   MSG_SUCCESS + " TEXT," + MSG_DATE + " TEXT, "+ MSG_IS_UNREAD + " TEXT );";
 				db.execSQL(CREATE_TABLE_MESSAGES);
 				
-				String DATABASE_CREATE_2 = "create table " + DATABASE_TABLE_2 + "(" + PROFILE_ID + " integer PRIMARY KEY AUTOINCREMENT UNIQUE, " + PROFILE_USER_ID + " integer," + PROFILE_USERNAME + " TEXT," + PROFILE_DISTANCE + " integer," + PROFILE_FNAME + " TEXT," + PROFILE_LNAME + " TEXT," + PROFILE_AGE + " integer," + PROFILE_GENDER + " TEXT," + PROFILE_LOOKING_FOR + " TEXT," + PROFILE_DATE_SEEN + " date, " + PROFILE_SHOWN + " integer, " + PROFILE_ABOUTME + " TEXT, " + PROFILE_LOOKING_TYPE + " TEXT, " + PROFILE_STATUS + " TEXT, " + PROFILE_EMAIL + " TEXT );";
+				String DATABASE_CREATE_2 = "create table " + DATABASE_TABLE_2 + "(" + PROFILE_ID + " integer PRIMARY KEY AUTOINCREMENT UNIQUE, " + PROFILE_USER_ID + " integer," + PROFILE_USERNAME + " TEXT," + PROFILE_DISTANCE + " integer," + PROFILE_FNAME + " TEXT," + PROFILE_LNAME + " TEXT," + PROFILE_AGE + " integer," + PROFILE_GENDER + " TEXT," + PROFILE_LOOKING_FOR + " TEXT," + PROFILE_DATE_SEEN + " date, " + PROFILE_SHOWN + " integer, " + PROFILE_ABOUTME + " TEXT, " + PROFILE_LOOKING_TYPE + " TEXT, " + PROFILE_STATUS + " TEXT, " + PROFILE_EMAIL + " TEXT, " + PROFILE_VALID +" TEXT);";
 				db.execSQL(DATABASE_CREATE_2);
 				
 				String DATABASE_CREATE_3 = "create table " + DATABASE_TABLE_3 + "(" + BROAD_ID + " integer PRIMARY KEY AUTOINCREMENT UNIQUE, " + BROADCAST_TYPE + " integer," + BROADCAST_FROM + " TEXT," + BROADCAST_MESSAGE + " TEXT," + BROADCAST_DATE + " date," + BROADCAST_LOCATION_LONG + " float, "+ BROADCAST_LOCATION_LAT + " float, "+ BROADCAST_LOCATION_LOCAL + " TEXT, " + BROADCAST_REACH + " TEXT, "+ BROADCAST_STATUS  + " TEXT );";
@@ -486,26 +487,27 @@ public class SQLiteHandler{
 		L.debug("SqliteHandler, new msg inserted into sqlite: " + correspondentId + " left: "+left+", msg: "+comment+", success: "+success+", isUnread: "+isUnread);
 	}
 	
-	public void insertNearbyUser(String userid, String username, int distance, String fname, String lname, String age, String gender, String looking_for, String date_seen, int shown, String about_me, String looking_type, String status, String email) {
-	//	SQLiteDatabase db = this.getWritableDatabase();
-		ContentValues values = new ContentValues();
-		values.put(PROFILE_USER_ID, userid);
-		values.put(PROFILE_USERNAME, username);
-		values.put(PROFILE_DISTANCE, distance);
-		values.put(PROFILE_FNAME, fname);
-		values.put(PROFILE_LNAME, lname);
-		values.put(PROFILE_AGE, age);
-		values.put(PROFILE_GENDER, gender);
-		values.put(PROFILE_LOOKING_FOR, looking_for);
-		values.put(PROFILE_DATE_SEEN, date_seen);
-		values.put(PROFILE_SHOWN, shown);
-		values.put(PROFILE_ABOUTME, about_me);
-		values.put(PROFILE_LOOKING_TYPE, looking_type);
-		values.put(PROFILE_STATUS, status);
-		values.put(PROFILE_EMAIL, email);
-		long id = sqLiteDatabase.insert(DATABASE_TABLE_2, null, values);
-		//db.close();
-		Log.e(TAG, "Nearby user inserted into sqlite: " + id + ",fname: " + fname+",lname: " + lname+", username: "+username);
+	public void insertNearbyUser(String userid, String username, int distance, String fname, String lname, String age, String gender, String looking_for, String date_seen, int shown, String about_me, String looking_type, String status, String email, String val) {
+		//	SQLiteDatabase db = this.getWritableDatabase();
+			ContentValues values = new ContentValues();
+			values.put(PROFILE_USER_ID, userid);
+			values.put(PROFILE_USERNAME, username);
+			values.put(PROFILE_DISTANCE, distance);
+			values.put(PROFILE_FNAME, fname);
+			values.put(PROFILE_LNAME, lname);
+			values.put(PROFILE_AGE, age);
+			values.put(PROFILE_GENDER, gender);
+			values.put(PROFILE_LOOKING_FOR, looking_for);
+			values.put(PROFILE_DATE_SEEN, date_seen);
+			values.put(PROFILE_SHOWN, shown);
+			values.put(PROFILE_ABOUTME, about_me);
+			values.put(PROFILE_LOOKING_TYPE, looking_type);
+			values.put(PROFILE_STATUS, status);
+			values.put(PROFILE_EMAIL, email);
+			values.put(PROFILE_VALID, val);
+			long id = sqLiteDatabase.insert(DATABASE_TABLE_2, null, values);
+			//db.close();
+			Log.e(TAG, "Nearby user inserted into sqlite: " + id + " : " + lname);
 	}
 	public void insertLocation(float longitude, float latitude) {
 		String dateNow = requestLocalDate();
@@ -643,7 +645,7 @@ public class SQLiteHandler{
 
 		 }
 	
-	public void updateUser(String userid, String username, int distance, String fname, String lname, String age, String gender, String looking_for, String date_seen, int shown, String about_me, String looking_type, String status, String email) {
+	public void updateUser(String userid, String username, int distance, String fname, String lname, String age, String gender, String looking_for, String date_seen, int shown, String about_me, String looking_type, String status, String email, String val) {
 		//SQLiteDatabase db = this.getReadableDatabase();
 		ContentValues contentValues = new ContentValues();
 		contentValues.put(PROFILE_DISTANCE, distance);
@@ -656,10 +658,11 @@ public class SQLiteHandler{
 		contentValues.put(PROFILE_DATE_SEEN, date_seen);
 		contentValues.put(PROFILE_SHOWN, shown);
 		contentValues.put(PROFILE_ABOUTME, about_me);
-		Log.e("upfate", looking_type);
+		//Log.e("upfate", looking_type);
 		contentValues.put(PROFILE_LOOKING_TYPE, looking_type);
 		contentValues.put(PROFILE_STATUS, status);
 		contentValues.put(PROFILE_EMAIL, email);
+		contentValues.put(PROFILE_VALID, val);
 		sqLiteDatabase.update(DATABASE_TABLE_2, contentValues, PROFILE_USER_ID + "=" + userid, null);
 	}
 	public void updateUserPersonal(String fname, String age, String gender) {
@@ -1024,8 +1027,8 @@ public class SQLiteHandler{
 	}
 	public ArrayList < Users > getNearByUserDetails() {
 		ArrayList < Users > userlist = new ArrayList < Users > ();
-		String selectQuery = "SELECT * FROM " + DATABASE_TABLE_2;
-	//	SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT * FROM " + DATABASE_TABLE_2 + " WHERE "+ PROFILE_VALID + " = '1'" ;
+		//	SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = sqLiteDatabase.rawQuery(selectQuery, null);
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();

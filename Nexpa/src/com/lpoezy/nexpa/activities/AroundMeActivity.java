@@ -16,6 +16,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.lpoezy.nexpa.activities.CustomGrid;
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
@@ -44,6 +45,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
@@ -76,6 +79,9 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	ArrayList < String > arr_email = new ArrayList < String > ();
 	ArrayList < String > arr_status = new ArrayList < String > ();
 
+	ArrayList < Users > us = new ArrayList < Users > ();
+	ArrayList<Users> list = new ArrayList<Users>();
+	
 	SwipeRefreshLayout mSwipeRefreshLayout;
 
 	boolean gps_enabled = false;
@@ -124,7 +130,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	private static final String TAG_GEO_EMAIL = "email_address";
 	
 	public static boolean isRunning = false;
-	
+	private int dst;
 	@Override
 	public void onBackPressed() {
 		
@@ -282,58 +288,84 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	}
 	
 	private void updateGrid(String sentType) {
-		ArrayList < Users > us = new ArrayList < Users > ();
-		ArrayList<Users> list = new ArrayList<Users>();
+		us = null;
+		us = new ArrayList < Users > ();
+		list = new ArrayList < Users > ();
+		int dst = 100;
+		
+		try {
+			dst = Integer.parseInt(db.getBroadcastDist());
+		} catch (Exception e) {
+			dst = 100;
+		}
+		
+		grid.invalidateViews();
 		list = db.getNearByUserDetails();
-		Comparator<Users> comparator = new Comparator<Users>() {
-			@Override
+		
+		Comparator < Users > comparator = new Comparator < Users > () {@Override
 			public int compare(Users lhs, Users rhs) {
-				// TODO Auto-generated method stub
-				return lhs.getDistance() - rhs.getDistance(); // use your logic
+				return lhs.getDistance() - rhs.getDistance();
 			}
 		};
-		Collections.sort(list, comparator); 
-		
+		Collections.sort(list, comparator);
 		
 		us = list;
+		
+		Animation in = AnimationUtils.loadAnimation(this, R.anim.anim_fade_in_r);
+		Animation out = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_r);
+		
+		int userSize = us.size();
+		int disSize = distance.size();
+		
+		try {
+			if (userSize < disSize) {
+				for (int i = disSize; i > userSize; i--) {
+					adapter.removeItem(i - 1);
+				}
+			}
+			if (sentType.equals("1")) {
+				if (userSize > disSize) {
+					for (int i = disSize; i < userSize; i++) {
+						imageId.add(i - 1, R.drawable.pic_sample_girl);
+						availabilty.add(i - 1, "");
+						web.add(i - 1, "");
+						distance.add(i - 1, 9999);
+					}
+				}
+			}
+		} catch (Exception e) {}
 		for (int j = 0; j < us.size(); j++) {
-			
 			if (sentType.equals("1")) {
 				if (us.get(j).getShown().equals("0")) {
 					imageId.add(j, R.drawable.pic_sample_girl);
-					availabilty.add(j, "GG1");
+					availabilty.add(j, "INSERTED");
 					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
 					distance.add(j, us.get(j).getDistance());
-
 					arr_uname.add(j, us.get(j).getUserName());
-					arr_fname.add(j, displayGridCellName(us.get(j).getFName(),  us.get(j).getUserName()));
+					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
 					arr_age.add(j, us.get(j).getAge());
 					arr_gender.add(j, us.get(j).getGender());
 					arr_looking_type.add(j, us.get(j).getLookingType());
-					//	arr_date_seen= new ArrayList<String>();
 					arr_about.add(j, us.get(j).getAboutMe());
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
-
-					//break;
-				} else {
-					availabilty.set(j, "GG2");
-					web.set(j, displayGridCellName(us.get(j).getFName(),us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
+				} else if (us.get(j).getShown().equals("1")) {
+					us.get(j).setShown("1");
+					availabilty.set(j, "UPDATED");
+					web.set(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
 					distance.set(j, us.get(j).getDistance());
 					arr_uname.add(j, us.get(j).getUserName());
 					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
 					arr_age.add(j, us.get(j).getAge());
 					arr_gender.add(j, us.get(j).getGender());
 					arr_looking_type.add(j, us.get(j).getLookingType());
-					//	arr_date_seen= new ArrayList<String>();
 					arr_about.add(j, us.get(j).getAboutMe());
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
 				}
-			}
-			else if (sentType.equals("0")) {
+			} else if (sentType.equals("0")) {
 				imageId.add(j, R.drawable.pic_sample_girl);
-				availabilty.add(j, "Busy");
+				availabilty.add(j, "ADDED");
 				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
 				distance.add(j, us.get(j).getDistance());
 				arr_uname.add(j, us.get(j).getUserName());
@@ -341,14 +373,11 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 				arr_age.add(j, us.get(j).getAge());
 				arr_gender.add(j, us.get(j).getGender());
 				arr_looking_type.add(j, us.get(j).getLookingType());
-				//	arr_date_seen= new ArrayList<String>();
 				arr_about.add(j, us.get(j).getAboutMe());
 				arr_email.add(j, us.get(j).getEmail());
 				arr_status.add(j, us.get(j).getStatus());
 			}
-			
 		}
-	
 		adapter.notifyDataSetChanged();
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
@@ -502,11 +531,17 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 								
 								boolean containerContainsContent = org.apache.commons.lang.StringUtils.containsIgnoreCase(existingUsers, "." + id + ".");
 								if (containerContainsContent == true) {
-									db.updateUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 1, about_me, looking_type, status, email_address);
-									Log.e("Log", "Updated");
+									if (distance <= dst){
+										db.updateUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 1, about_me, looking_type, status, email_address,"1");
+									}
+									else{
+										db.updateUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,"0");
+									}
 								} else {
-									db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address);
-									Log.e("Log", "Inserted");
+									if (distance <= dst){
+										
+									db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,"1");
+									}
 								}
 
 								if (i == nearby_users.length() - 1) {
@@ -567,6 +602,16 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		
 		super.onResume();
 		isRunning = true;
+		
+		dst = 100;
+		try{
+			dst = Integer.parseInt(db.getBroadcastDist());
+		}
+		catch (Exception e){
+			dst = 100;
+		}
+		
+		adapter.notifyDataSetChanged();
 		
 	}
 	

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="bg_splashscreen">#87d37c</color>
     <color name="bg_login">#e9eef0</color>
     <color name="bg_register">#f3f7df</color>
     <color name="bg_main">#428bca</color>

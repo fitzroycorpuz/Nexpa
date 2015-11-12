@@ -8,6 +8,7 @@
         android:id="@+id/splash"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:src="@drawable/splashscreen" />
+        android:src="@drawable/splashscreen" 
+        android:background="@color/bg_splashscreen"/>
 
 </LinearLayout>

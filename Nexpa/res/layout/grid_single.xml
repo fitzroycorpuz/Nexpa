@@ -3,14 +3,15 @@
    android:id="@+id/layout_practitioner" 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+     android:animateLayoutChanges="true">
 
     <ImageView 
         android:id="@+id/grid_image" 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        
+         android:animateLayoutChanges="true"
     />  
 
     <LinearLayout
@@ -73,13 +74,13 @@
          android:layout_marginTop="3dp" 
          android:textColor="@color/flat_gray"    
          android:gravity="bottom|center"
-         android:paddingBottom="0dp"
+         android:paddingBottom="2dp"
          android:textAllCaps="false"
          android:textSize="15dp" 
             
       />
 
-     <TextView
+     <!--  <TextView
          android:id="@+id/txtAvail"
          android:layout_width="match_parent"
          android:layout_height="match_parent"
@@ -88,7 +89,7 @@
          android:gravity="bottom|center"
          android:textAllCaps="true"
           android:textSize="10dp" 
-     />
+     />-->
 
 </LinearLayout>
 

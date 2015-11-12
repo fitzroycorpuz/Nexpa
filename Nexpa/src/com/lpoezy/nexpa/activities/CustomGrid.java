@@ -47,6 +47,14 @@ public class CustomGrid extends BaseAdapter{
            return 0;
        }
 
+       public void removeItem(int position){
+       	
+           web.remove(position);
+           Imageid.remove(position);
+           availabilty.remove(position);
+           distance.remove(position);
+        }
+       
        @Override
        public View getView(int position, View convertView, ViewGroup parent) {
            // TODO Auto-generated method stub
@@ -68,11 +76,11 @@ public class CustomGrid extends BaseAdapter{
            
            TextView textView = (TextView) grid.findViewById(R.id.grid_text);
            ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
-           TextView txtAvailView = (TextView) grid.findViewById(R.id.txtAvail);
+           //TextView txtAvailView = (TextView) grid.findViewById(R.id.txtAvail);
            
            textView.setText(web.get(position)+ " | " + distance.get(position) +"m");
            imageView.setImageResource(Imageid.get(position));
-           txtAvailView.setText(availabilty.get(position));
+          // txtAvailView.setText(availabilty.get(position));
            
            return grid;
        }
