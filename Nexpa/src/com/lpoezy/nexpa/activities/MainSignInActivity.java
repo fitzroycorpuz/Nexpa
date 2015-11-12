@@ -104,6 +104,10 @@ public class MainSignInActivity extends Activity {
 		db = new SQLiteHandler(this);
 		db.openToWrite();
 		final CreateAccountActivity cAct;
+		
+		
+		
+		
 		if (session.isLoggedIn()) {
 			Intent intent = new Intent(MainSignInActivity.this, ProfileActivity.class);
 			startActivity(intent);
@@ -133,6 +137,7 @@ public class MainSignInActivity extends Activity {
 					}
 				}
 			});*/
+			
 			btnLogin.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					String email = inputEmail.getText().toString();

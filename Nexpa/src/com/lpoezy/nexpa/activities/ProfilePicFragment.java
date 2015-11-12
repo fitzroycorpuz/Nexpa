@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.provider.ContactsContract.Profile;
 import android.provider.MediaStore;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+
+import org.jivesoftware.smack.util.Base64;
 
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.R.layout;
@@ -145,6 +148,8 @@ public class ProfilePicFragment extends DialogFragment {
 			if(resultCode == Activity.RESULT_OK)Utilz.saveToSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, mCurrentPhotoPath);
 			
 			dismiss();
+			
+
 
 		} catch (Exception e) {
 		}

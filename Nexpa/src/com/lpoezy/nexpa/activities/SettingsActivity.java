@@ -1,45 +1,53 @@
 package com.lpoezy.nexpa.activities;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.util.Base64;
 
 import com.appyvet.rangebar.RangeBar;
 import com.devspark.appmsg.AppMsg;
-import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.Profile;
-import com.lpoezy.nexpa.chatservice.ChatMessagesService;
-import com.lpoezy.nexpa.objects.Announcement;
+import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.UserProfile;
-import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.BmpFactory;
 import com.lpoezy.nexpa.utility.DateUtils;
+import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
+import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.NiceDialog;
-import com.lpoezy.nexpa.utility.RoundedImageView;
+import com.lpoezy.nexpa.utility.SystemUtilz;
 import com.lpoezy.nexpa.utility.Utilz;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -178,6 +186,8 @@ public class SettingsActivity extends Activity {
 		db.close();
 		db = null;
 	}
+	
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -195,6 +205,8 @@ public class SettingsActivity extends Activity {
 
 		db = new SQLiteHandler(this);
 		db.openToWrite();
+		
+		
 
 		ln_personal = (LinearLayout) findViewById(R.id.ln_personal);
 		ln_personal.setOnClickListener(new View.OnClickListener() {
@@ -220,6 +232,84 @@ public class SettingsActivity extends Activity {
 
 					}
 				});
+				
+				
+				
+				((Button)dialog.findViewById(R.id.dialogButtonOK)).setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						
+						
+						//check internet connection before performing http request
+						if(!SystemUtilz.isNetworkAvailable(SettingsActivity.this)){
+							
+							String msg = getResources().getString(R.string.msg_no_internet);
+							L.error(msg);
+							//L.makeText(SettingsActivity.this, msg, AppMsg.STYLE_INFO);
+							return;
+						}
+						
+						final String imgDecodableString = Utilz.getDataFrmSharedPref(SettingsActivity.this, UserProfile.PROFILE_PIC_LOC, "");
+						
+						if (imgDecodableString!=null && !imgDecodableString.isEmpty()) {
+							
+							final ImageView profilePic = (ImageView) dialog.findViewById(R.id.img_profile_pic);
+							// Get the dimensions of the View
+				            int targetW = profilePic.getWidth();
+				            int targetH = profilePic.getHeight();
+							BmpFactory bmpFactory = new BmpFactory();
+							final int MAX_SIZE = 100;
+							Bitmap bmp = bmpFactory.getBmpWithTargetWTargetHFrm(
+									MAX_SIZE , 
+									MAX_SIZE , 
+									imgDecodableString);
+							
+							ByteArrayOutputStream stream = new ByteArrayOutputStream();
+							
+							bmp.compress(Bitmap.CompressFormat.PNG, 90, stream); //compress to which format you want.
+							
+					        byte [] byte_arr = stream.toByteArray();
+					        
+					        final String imageStr = Base64.encodeBytes(byte_arr);
+					        
+				        	new Thread(new Runnable() {
+								
+								@Override
+								public void run() {
+									L.debug("started sending profile pic to server directory...");
+									final String spec = AppConfig.URL_PROFILE_PIC;
+									
+									SQLiteHandler db = new SQLiteHandler(SettingsActivity.this);
+							         db.openToRead();
+							         String userId = db.getLoggedInID();
+							         db.close();
+							         
+							         Uri uri = Uri.parse(imgDecodableString);
+							         final String imgFile = SystemUtilz.getDeviceUniqueId(getApplicationContext())+userId+uri.getLastPathSegment().replace(" ", "");
+							         L.debug("imgFile "+imgFile);
+							        
+							         long now = System.currentTimeMillis();
+							         final String dateCreated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+							         
+							         HashMap<String, String> postDataParams = new HashMap<String, String>();
+							         postDataParams.put("tag", "upload");
+							         postDataParams.put("image", imageStr);
+							         postDataParams.put("img_file", imgFile);
+							         postDataParams.put("user_id", userId);
+							         postDataParams.put("date_created", dateCreated);
+									
+							         String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+							         
+									L.debug("webPage: "+ webPage );
+									
+									
+								}
+							}).start();
+						}
+						
+					}
+				});
 
 				final RadioButton radBoy;
 				final RadioButton radGirl;
@@ -237,7 +327,7 @@ public class SettingsActivity extends Activity {
 				// radUnspec = (RadioButton)
 				// dialog.findViewById(R.id.radioUnspecified);
 
-				Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+				//Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
 				edtName.setText(db.getName());
 
 				if ((db.getBDate().equals("")) || (db.getBDate().equals("null"))) {
@@ -257,45 +347,7 @@ public class SettingsActivity extends Activity {
 				} else if (db.getGender().equals("F")) {
 					radGirl.setChecked(true);
 				}
-				// else{
-				// radUnspec.setChecked(true);
-				// }
-				dialogButton.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						// String name = edtName.getText().toString();
-						// String gender = "";
-						// String dateBday = "";
-						// if (radGirl.isChecked()){
-						// gender = "F";
-						// }
-						// else if (radBoy.isChecked()){
-						// gender = "M";
-						// }
-						// else {
-						// gender = "U";
-						// }
-						// int day = dpBDay.getDayOfMonth();
-						// int month= dpBDay.getMonth();
-						// int year = dpBDay.getYear();
-						// SimpleDateFormat sdf = new
-						// SimpleDateFormat("dd-MM-yy");
-						// @SuppressWarnings("deprecation")
-						// String formatedDate = sdf.format(new Date(year,
-						// month, day));
-						//
-						// try{
-						// Date date = sdf.parse(formatedDate);
-						// dateBday = du.convertDateToStringToLocalTime(date);
-						// } catch (ParseException e){
-						// // TODO Auto-generated catch block
-						// e.printStackTrace();
-						// }
-						// db.updateUserPersonal(name, dateBday, gender);
-						// jsonProfile.updateBasicOnServer(SettingsActivity.this);
-						// dialog.dismiss();
-					}
-				});
+
 				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 				lp.copyFrom(dialog.getWindow().getAttributes());
 				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -836,7 +888,7 @@ public class SettingsActivity extends Activity {
 		ImageView profilePic = (ImageView) dialog.findViewById(R.id.img_profile_pic);
 
 		if (profilePic != null) {
-			String imgDecodableString = Utilz.getDataFrmSharedPref(this, UserProfile.PROFILE_PIC_LOC, "");
+			String imgDecodableString = Utilz.getDataFrmSharedPref(SettingsActivity.this, UserProfile.PROFILE_PIC_LOC, "");
 			
 			 Bitmap rawImage = BitmapFactory.decodeResource(getResources(),
 				        R.drawable.pic_sample_girl);
@@ -847,23 +899,9 @@ public class SettingsActivity extends Activity {
 				// Get the dimensions of the View
 	            int targetW = profilePic.getWidth();
 	            int targetH = profilePic.getHeight();
-
-	            // First decode with inJustDecodeBounds=true to check dimensions
-//	            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//	            bmOptions.inJustDecodeBounds = true;
-//	            BitmapFactory.decodeFile(imgDecodableString, bmOptions);
-//	            
-//	            // Determine how much to scale down the image
-//	            bmOptions.inSampleSize = Utilz.calculateInSampleSize(bmOptions, targetW, targetH);
-//
-//	            // Decode bitmap with inSampleSize set
-//	            bmOptions.inJustDecodeBounds = false;
-//	        	
-//	            
-//	        	rawImage = BitmapFactory.decodeFile(imgDecodableString, bmOptions);
-	        	
+	            
 	            BmpFactory  bmpFactory = new BmpFactory();
-	        	rawImage = bmpFactory.getBmp(imgDecodableString, targetW, targetH);
+	        	rawImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
 			}
 			
 			profilePic.setImageBitmap(rawImage);

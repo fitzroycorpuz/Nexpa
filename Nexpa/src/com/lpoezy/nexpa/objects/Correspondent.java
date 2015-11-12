@@ -1,13 +1,19 @@
 package com.lpoezy.nexpa.objects;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 public class Correspondent {
@@ -16,6 +22,10 @@ public class Correspondent {
 	private String username 				= "";
 	private String email 					= "";
 	private String fname 					= "";
+	
+	private Bitmap profilePic;
+	
+	public static final String ACTION_UPDATE = "com.lpoezy.nexpa.actions.CORRESPONDENT_UPDATE";
 	
 	private List<OneComment> conversation 	= new ArrayList<OneComment>();
 	
@@ -62,6 +72,14 @@ public class Correspondent {
 		this.fname = fname;
 	}
 	
+	public Bitmap getProfilePic() {
+		return profilePic;
+	}
+
+	public void setProfilePic(Bitmap profilePic) {
+		this.profilePic = profilePic;
+	}
+
 	public void addMessage(OneComment msg){
 		
 		conversation.add(msg);
@@ -152,6 +170,28 @@ public class Correspondent {
 		}
 		
 		db.close();
+	}
+	
+	public void downloadProfilePicOnline(final Context context){
+		
+		if(profilePic!=null)return;
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				String spec = "http://www.lpoezy.com/happn/profile_pictures/ef75a17963e785522CAM00007.jpg";
+				
+				//InputStream is = ;
+				
+				profilePic =HttpUtilz.downloadImage("http://www.lpoezy.com/happn/profile_pictures/ef75a17963e785522CAM00007.jpg");
+				 L.debug("profilePic_ "+profilePic);
+				context.sendBroadcast(new Intent(ACTION_UPDATE));
+				
+			}
+			
+		}).start();
+		
 	}
 
 	public static List<Correspondent> downloadAllOffline(Context context){

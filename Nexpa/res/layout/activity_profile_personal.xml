@@ -9,6 +9,7 @@
     <LinearLayout android:id="@+id/linearLayout1"
 	android:layout_width="fill_parent" android:layout_height="wrap_content"
 	android:background="@color/toucan_green"
+	
 	android:padding="15dp">
 
 		<TextView
@@ -22,9 +23,11 @@
 		<View android:layout_width="0dp" android:layout_height="0dp"
 		android:layout_weight="1" />
 
-		<Button android:id="@+id/dialogButtonOK"
-		android:layout_width="30dp" android:layout_height="30dp"
-		android:background="@drawable/btn_ok" />
+		<Button
+		    android:id="@+id/dialogButtonOK"
+		    android:layout_width="30dp"
+		    android:layout_height="30dp"
+		    android:background="@drawable/btn_ok" />
 
 	</LinearLayout>
 

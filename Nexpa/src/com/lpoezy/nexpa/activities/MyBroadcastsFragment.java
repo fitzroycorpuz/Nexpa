@@ -1,7 +1,11 @@
 package com.lpoezy.nexpa.activities;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jivesoftware.smack.util.Base64;
 
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.objects.Announcement;
@@ -26,6 +30,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -199,11 +204,12 @@ public class MyBroadcastsFragment extends Fragment {
 		}).start();
 	}
 	
+	
 	private void resetProfilePic(){
 		
 		String imgDecodableString = Utilz.getDataFrmSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, "");
 		
-		RoundedImageView riv = new RoundedImageView(getActivity());
+		
         Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
         R.drawable.pic_sample_girl);
        
@@ -212,27 +218,16 @@ public class MyBroadcastsFragment extends Fragment {
         	// Get the dimensions of the View
             int targetW = mImgProfile.getWidth();
             int targetH = mImgProfile.getHeight();
-
-//            // First decode with inJustDecodeBounds=true to check dimensions
-//            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//            bmOptions.inJustDecodeBounds = true;
-//            BitmapFactory.decodeFile(imgDecodableString, bmOptions);
-//           
-//            // Determine how much to scale down the image
-//            bmOptions.inSampleSize = Utilz.calculateInSampleSize(bmOptions, targetW, targetH);
-//
-//            // Decode bitmap with inSampleSize set
-//            bmOptions.inJustDecodeBounds = false;
-//        	
-//            
-//        	rawImage = BitmapFactory.decodeFile(imgDecodableString, bmOptions);
             
             BmpFactory  bmpFactory = new BmpFactory();
-        	rawImage = bmpFactory.getBmp(imgDecodableString, targetW, targetH);
+        	rawImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
+        	
+        	
         	
         }
         
         L.debug("imgDecodableString "+imgDecodableString+", rawImage "+rawImage);
+        RoundedImageView riv = new RoundedImageView(getActivity());
         Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
         mImgProfile.setImageBitmap(circImage);
 	}

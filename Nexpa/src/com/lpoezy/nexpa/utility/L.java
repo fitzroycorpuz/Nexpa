@@ -6,6 +6,7 @@ import com.devspark.appmsg.AppMsg.Style;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 public class L {
 	
@@ -21,6 +22,10 @@ public class L {
 	
 	public static void makeText(Activity context, CharSequence msg, Style style) {
 		AppMsg.makeText(context, msg, style).show();
+	}
+	
+	public static void toast(Context context, String msg) {
+		Toast.makeText(context, msg, Toast.LENGTH_SHORT);
 	}
 
 }
