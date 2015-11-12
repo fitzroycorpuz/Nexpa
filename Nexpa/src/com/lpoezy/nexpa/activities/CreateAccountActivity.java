@@ -142,7 +142,9 @@ public class CreateAccountActivity extends Activity {
 						timer.scheduleAtFixedRate(showMainPageIntent, 1000, 2000);
 					} else {
 						String errorMsg = jObj.getString("error_msg");
-						Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+						makeNotify(errorMsg, AppMsg.STYLE_ALERT);
+						//Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+						hideDialog();
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
