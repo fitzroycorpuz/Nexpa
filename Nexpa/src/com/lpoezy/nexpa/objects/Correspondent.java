@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.lpoezy.nexpa.chatservice.OneComment;
+import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
@@ -101,20 +102,19 @@ public class Correspondent {
 		//don't save this session if there is no conversation happen 
 		if(conversation.size()== 0 || conversation.isEmpty())return;
 		
-		
 		SQLiteHandler db = new SQLiteHandler(context);
-		db.openToRead();
+		db.openToWrite();
 		
 		//correspondent does not exist in db
-		if(id == -1){
+		if(!isExisting(context)){
 			//save correspondent 
-			id = db.saveCorrespondentOffline(username, email, fname);
+			db.saveCorrespondent(Long.toString(id), username, email, fname);
 			
 		}
 		db.close();
 		
 		//save messages to db
-		Log.e("Correspondent", "id: " + id);
+		L.debug("Correspondent id: " + id);
 		for(OneComment comment : conversation){
 			comment.saveOffline(context, id);
 		}
@@ -129,7 +129,7 @@ public class Correspondent {
 		
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToRead();
-		Correspondent result = db.downloadCorrespondentByEmail(email);
+		Correspondent result = db.downloadCorrespondentByUserId(id);
 		db.close();
 		
 		if(result!=null){
@@ -180,13 +180,24 @@ public class Correspondent {
 			
 			@Override
 			public void run() {
-				String spec = "http://www.lpoezy.com/happn/profile_pictures/ef75a17963e785522CAM00007.jpg";
 				
-				//InputStream is = ;
+				ProfilePicture profilePicture = new ProfilePicture();
+				profilePicture.setUserId(id);
+				L.debug("downloadProfilePicOnline of userId: "+id);
+				//download profile pic info offline
+				profilePicture.downloadOffline(context);
 				
-				profilePic =HttpUtilz.downloadImage("http://www.lpoezy.com/happn/profile_pictures/ef75a17963e785522CAM00007.jpg");
-				 L.debug("profilePic_ "+profilePic);
-				context.sendBroadcast(new Intent(ACTION_UPDATE));
+				if((profilePicture.getImgDir()!=null && !profilePicture.getImgDir().isEmpty()) &&
+						(profilePicture.getImgFile()!=null && !profilePicture.getImgFile().isEmpty())){
+					
+					String spec = AppConfig.URL+"/"+profilePicture.getImgDir()+"/"+profilePicture.getImgFile();
+					
+					profilePic =HttpUtilz.downloadImage(spec);
+					 
+					context.sendBroadcast(new Intent(ACTION_UPDATE));
+					
+					
+				}
 				
 			}
 			

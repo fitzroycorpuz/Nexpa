@@ -43,6 +43,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -188,7 +189,7 @@ public class SettingsActivity extends Activity {
 	}
 	
 	
-
+	private ProgressDialog pDialog;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -237,6 +238,8 @@ public class SettingsActivity extends Activity {
 				
 				((Button)dialog.findViewById(R.id.dialogButtonOK)).setOnClickListener(new View.OnClickListener() {
 					
+					
+
 					@Override
 					public void onClick(View v) {
 						
@@ -250,6 +253,10 @@ public class SettingsActivity extends Activity {
 							return;
 						}
 						
+						pDialog = new ProgressDialog(SettingsActivity.this);
+						pDialog.setCancelable(false);
+						pDialog.setMessage("Saving ...");
+						pDialog.show();
 						final String imgDecodableString = Utilz.getDataFrmSharedPref(SettingsActivity.this, UserProfile.PROFILE_PIC_LOC, "");
 						
 						if (imgDecodableString!=null && !imgDecodableString.isEmpty()) {
@@ -300,7 +307,14 @@ public class SettingsActivity extends Activity {
 							         postDataParams.put("date_created", dateCreated);
 									
 							         String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-							         
+							         ln_personal.post(new Runnable() {
+										
+										@Override
+										public void run() {
+											pDialog.dismiss();
+											pDialog = null;
+										}
+									});
 									L.debug("webPage: "+ webPage );
 									
 									

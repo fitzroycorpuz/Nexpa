@@ -103,7 +103,7 @@ public class ChatActivity extends Activity {
 	
 		intentMes = getIntent(); 
 		//String email = intentMes.getStringExtra("email");
-		final long userId=-1;
+		final long userId=getIntent().getLongExtra("userid", -1);
 		final String username = intentMes.getStringExtra("username");
 		final String email = getIntent().getStringExtra("email");
 		final String fname = getIntent().getStringExtra("fname");
@@ -306,11 +306,11 @@ public class ChatActivity extends Activity {
 		
 		registerReceiver(mReceivedMessage, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
 		
-		final long userId=-1;
-		final String username = getIntent().getStringExtra("username");
-		final String email = getIntent().getStringExtra("email");
-		final String fname = getIntent().getStringExtra("fname");
-		
+		final long userId		= getIntent().getLongExtra("userid", -1);
+		final String username 	= getIntent().getStringExtra("username");
+		final String email 		= getIntent().getStringExtra("email");
+		final String fname 		= getIntent().getStringExtra("fname");
+		L.debug("ChatActivity, getting msg of user_id: "+userId);
 		mCorrespondent = new Correspondent(userId, username, email, fname);
 		
 		if(mCorrespondent.isExisting(this)){	//check if current correspondent exists in db

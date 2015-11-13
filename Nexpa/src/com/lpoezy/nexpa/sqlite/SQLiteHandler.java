@@ -54,9 +54,19 @@ public class SQLiteHandler{
 	
 	private static final String TABLE_CORRESPONDENTS = "correspondents";
 	public static final String CORRESPONDENT_ID = "_id";
+	public static final String CORRESPONDENT_USER_ID = "user_id";
 	public static final String CORRESPONDENT_USERNAME = "correspondent_username";
 	public static final String CORRESPONDENT_EMAIL = "correspondent_email";
 	public static final String CORRESPONDENT_FNAME = "correspondent_fname";
+	
+	private static final String TABLE_PROFILE_PICTURES = "profile_pictures";
+	public static final String IMG_ID = "_id";//KEY_ID
+	public static final String IMG_USER_ID = "user_id";
+	public static final String IMG_DIR = "img_dir";
+	public static final String IMG_FILE = "img_file";
+	public static final String IMG_DATE_CREATED = "date_created";
+	public static final String IMG_DATE_UPDATED = "date_updated";
+	
 	
 	//boolean left, String comment,boolean success, String date
 	private static final String TABLE_MESSAGES = "messages";
@@ -143,9 +153,12 @@ public class SQLiteHandler{
 			  	String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_LOGIN + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_PASS + " TEXT," + KEY_EMAIL + " TEXT UNIQUE," + KEY_UTYPE + " TEXT," + KEY_CREATED_AT + " TEXT," + KEY_FNAME + " TEXT," + KEY_AGE + " TEXT," + KEY_GENDER + " TEXT," + KEY_ABOUTME + " TEXT, " + KEY_LOOKING_FOR_STATUS + " TEXT, " + KEY_SEX_ORIEN + " TEXT, " + KEY_LOOKING_FOR_GENDER + " TEXT," + KEY_ORIEN_TO_SHOW + " TEXT, " + KEY_REL_STATUS + " TEXT, " + KEY_PRIVACY_IN_CHAT + " TEXT, " + KEY_PRIVACY_COM_CHAT + " TEXT, " + KEY_UPDATE_BASIC + " TEXT, " + KEY_UPDATE_PREF + " TEXT, " + KEY_UPDATE_PASS + " TEXT, " + KEY_UPDATE_STATUS_MES + " TEXT, " + KEY_LAST_UPDATE + " TEXT );";
 				db.execSQL(CREATE_LOGIN_TABLE);
 				
-				String CREATE_TABLE_CORRESPONDENTS = "CREATE TABLE " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_ID + " INTEGER PRIMARY KEY, "+  CORRESPONDENT_USERNAME + " TEXT, " +   CORRESPONDENT_EMAIL + " TEXT," +   CORRESPONDENT_FNAME + " TEXT);";
+				String CREATE_TABLE_CORRESPONDENTS = "CREATE TABLE " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_ID + " INTEGER PRIMARY KEY, "+CORRESPONDENT_USER_ID+" INTEGER, "+  CORRESPONDENT_USERNAME + " TEXT, " +   CORRESPONDENT_EMAIL + " TEXT," +   CORRESPONDENT_FNAME + " TEXT);";
 				Log.e("CREATE_TABLE_CORRESPONDENTS", CREATE_TABLE_CORRESPONDENTS);
 				db.execSQL(CREATE_TABLE_CORRESPONDENTS);
+				
+				String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID + " INTEGER PRIMARY KEY, "+ IMG_USER_ID +" INTEGER, "+  IMG_DIR + " TEXT, " +   IMG_FILE + " TEXT," +   IMG_DATE_CREATED + " TEXT," + IMG_DATE_UPDATED + " TEXT);";
+				db.execSQL(CREATE_TABLE_PROFILE_PICTURES);
 				
 				String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "+ MSG_USER_ID +" INTEGER, "+ MSG_CORRESPONDENT_ID + " INTEGER, "+  MSG_LEFT + " TEXT, " +   MSG_BODY + " TEXT," +   MSG_SUCCESS + " TEXT," + MSG_DATE + " TEXT, "+ MSG_IS_UNREAD + " TEXT );";
 				db.execSQL(CREATE_TABLE_MESSAGES);
@@ -309,6 +322,51 @@ public class SQLiteHandler{
 		onCreate(db);
 	}*/
 	
+	public HashMap<String, String> downloadProfilePicture(long userId){
+		
+		Cursor c = sqLiteDatabase.query(
+				TABLE_PROFILE_PICTURES, 
+				new String[]{ IMG_USER_ID, IMG_DIR, IMG_FILE, IMG_DATE_CREATED, IMG_DATE_UPDATED }, 
+				IMG_USER_ID+"=?", 
+				new String[]{Long.toString(userId)}, 
+				null, null, null);
+		
+		if(c.moveToFirst()){
+			
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put(IMG_USER_ID, 		c.getString(c.getColumnIndex(IMG_USER_ID)));
+			map.put(IMG_DIR, 			c.getString(c.getColumnIndex(IMG_DIR)));
+			map.put(IMG_FILE, 			c.getString(c.getColumnIndex(IMG_FILE)));
+			map.put(IMG_DATE_CREATED, 	c.getString(c.getColumnIndex(IMG_DATE_CREATED)));
+			map.put(IMG_DATE_UPDATED, 	c.getString(c.getColumnIndex(IMG_DATE_UPDATED)));
+			
+			return map;
+		}
+		return null;
+		
+	}
+	
+	public void saveProfilePicture(long userId, String imgDir, String imgFile, String dateCreated, String dateUpdated) {
+		
+		ContentValues values = new ContentValues();
+		values.put(IMG_USER_ID, userId);
+		values.put(IMG_DIR, imgDir);
+		values.put(IMG_FILE, imgFile);
+		values.put(IMG_DATE_CREATED, dateCreated);
+		values.put(IMG_DATE_UPDATED, dateUpdated);
+		
+		if(downloadProfilePicture(userId)==null){
+			sqLiteDatabase.insert(TABLE_PROFILE_PICTURES, null, values);
+			L.debug(TAG+" new picture inserted into sqlite:" + imgFile);
+		}else{
+			sqLiteDatabase.update(TABLE_PROFILE_PICTURES, values, IMG_USER_ID+"=?", new String[]{Long.toString(userId)});
+			L.debug(TAG +" picture updated into sqlite: " + imgFile);
+		}
+		
+		
+		
+	}
+	
 	public int getUnReadMsgCount(long id) {
 		
 		Cursor cursor = sqLiteDatabase.query(
@@ -377,17 +435,18 @@ public class SQLiteHandler{
 		
 		Cursor cursor = sqLiteDatabase.query(
 				TABLE_CORRESPONDENTS, 
-				new String[]{CORRESPONDENT_ID, CORRESPONDENT_USERNAME, CORRESPONDENT_EMAIL, CORRESPONDENT_FNAME}, 
+				new String[]{CORRESPONDENT_USER_ID, CORRESPONDENT_USERNAME, CORRESPONDENT_EMAIL, CORRESPONDENT_FNAME}, 
 				null, null, null, null, null);
 		
 		List<Correspondent> correspondents = new ArrayList<Correspondent>();
 		if(cursor.moveToFirst()){
 			do{
-				long userId = cursor.getLong(cursor.getColumnIndex(CORRESPONDENT_ID));
+				long userId = cursor.getLong(cursor.getColumnIndex(CORRESPONDENT_USER_ID));
+				
 				String username = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
 				String email = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_EMAIL));
 				String fname = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_FNAME));
-				Log.e("SQLiteHandler",username + ", "+email+", "+fname);
+				
 				Correspondent correspondent = new Correspondent(userId, username, email, fname);
 				correspondents.add(correspondent);
 			}while(cursor.moveToNext());
@@ -436,18 +495,18 @@ public class SQLiteHandler{
 	
 	
 	
-	public Correspondent downloadCorrespondentByEmail(String email) {
-		
+	public Correspondent downloadCorrespondentByUserId(long userId) {
 		Cursor cursor = sqLiteDatabase.query(
 				TABLE_CORRESPONDENTS, 
-				new String[]{CORRESPONDENT_ID, CORRESPONDENT_USERNAME, CORRESPONDENT_EMAIL, CORRESPONDENT_FNAME}, 
-				CORRESPONDENT_EMAIL+" = ?", 
-				new String[]{ email}, 
+				new String[]{CORRESPONDENT_USER_ID, CORRESPONDENT_USERNAME, CORRESPONDENT_EMAIL, CORRESPONDENT_FNAME}, 
+				CORRESPONDENT_USER_ID+" = ?", 
+				new String[]{ Long.toString(userId)}, 
 				null, null, null);
 		Correspondent correspondent = null;
 		if(cursor.moveToFirst()){
 			 
-			long id = cursor.getInt(cursor.getColumnIndex(CORRESPONDENT_ID));
+			long id = cursor.getInt(cursor.getColumnIndex(CORRESPONDENT_USER_ID));
+			String email = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_EMAIL));
 			String username = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
 			String fname = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_FNAME));
 			
@@ -458,18 +517,19 @@ public class SQLiteHandler{
 		
 	}
 	
-	public long saveCorrespondentOffline(String username, String email, String fname) {
+	public long saveCorrespondent(String userId, String username, String email, String fname) {
 		ContentValues values = new ContentValues();
+		values.put(CORRESPONDENT_USER_ID, userId);
 		values.put(CORRESPONDENT_USERNAME, username);
 		values.put(CORRESPONDENT_EMAIL, email);
 		values.put(CORRESPONDENT_FNAME, fname);
 		
 		long id = sqLiteDatabase.insert(TABLE_CORRESPONDENTS, null, values);
-		Log.e(TAG, "new correspondent inserted into sqlite: " + id + " : " + fname);
+		L.debug(TAG+" new correspondent inserted into sqlite: " + userId + " : " + fname);
 		return id;
 	}
 	
-	public void saveMessageOffline(long userId, long correspondentId,  boolean left, String comment, boolean success, String date, boolean isUnread){
+	public void saveMessage(long userId, long correspondentId,  boolean left, String comment, boolean success, String date, boolean isUnread){
 		ContentValues values = new ContentValues();
 		
 		
@@ -1104,4 +1164,6 @@ public class SQLiteHandler{
 	//	db.close();
 		Log.d(TAG, "Deleted all user info from sqlite");
 	}
+
+	
 }

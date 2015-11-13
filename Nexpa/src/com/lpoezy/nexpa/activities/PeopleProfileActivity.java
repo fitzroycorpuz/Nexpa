@@ -1,6 +1,7 @@
 package com.lpoezy.nexpa.activities;
 
 import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
 
 import android.app.ActionBar;
@@ -38,6 +39,7 @@ public class PeopleProfileActivity extends Activity {
 	String about_me;
 	String looking_type;
 	String status;
+	private long userId;
 	public static boolean isRunning = false;
 
 	@Override
@@ -82,6 +84,7 @@ public class PeopleProfileActivity extends Activity {
 		txtAboutMe = (TextView) findViewById(R.id.user_about);
 
 		Intent intent = getIntent();
+		userId = intent.getLongExtra("TAG_GEO_USER_ID", -1);
 		username = intent.getStringExtra("TAG_GEO_USER");
 		email = intent.getStringExtra("TAG_GEO_EMAIL");
 		fname = intent.getStringExtra("TAG_GEO_FNAME");
@@ -134,6 +137,9 @@ public class PeopleProfileActivity extends Activity {
 
 			public void onClick(View view) {
 				Intent intentMes = new Intent(PeopleProfileActivity.this, ChatActivity.class);
+				
+				L.debug("sending msg to user_id: "+userId);
+				intentMes.putExtra("userid", userId);
 				intentMes.putExtra("email", email);
 				intentMes.putExtra("username", username);
 				intentMes.putExtra("fname", fname);

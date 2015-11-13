@@ -1,6 +1,8 @@
 package com.lpoezy.nexpa.configuration;
 
 public class AppConfig {
+	
+	public static final String URL = "http://www.lpoezy.com/happn";
 	 // Server user login url
     public static String URL_LOGIN = "http://www.lpoezy.com/happn/json/user.php/";
  
@@ -14,6 +16,8 @@ public class AppConfig {
     public static int MSG_NOTIFICATION_ID = 1000;
     
     public static final String ACTION_RECEIVED_MSG = "com.lpoezy.nexpa.actions.ACTION_RECEIVED_MSG";
+
+	
     
    
 }

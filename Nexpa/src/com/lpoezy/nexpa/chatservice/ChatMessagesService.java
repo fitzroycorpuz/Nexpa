@@ -166,6 +166,7 @@ public class ChatMessagesService extends Service {
 										String email = user.getString("email");
 										
 										Correspondent correspondent = new Correspondent();
+										correspondent.setId(Long.parseLong(uid));
 										correspondent.setUsername(name);
 										correspondent.setEmail(email);
 										
@@ -192,13 +193,13 @@ public class ChatMessagesService extends Service {
 											
 										}else{
 											
-											
 											//send broadcast
 											Intent broadcast = new Intent(AppConfig.ACTION_RECEIVED_MSG);
-											broadcast.putExtra("email", correspondent.getEmail());
-											broadcast.putExtra("username", correspondent.getUsername());
-											broadcast.putExtra("fname", correspondent.getFname());
-											broadcast.putExtra("msg", message.getBody());
+											broadcast.putExtra("userid", 	correspondent.getId());
+											broadcast.putExtra("email", 	correspondent.getEmail());
+											broadcast.putExtra("username", 	correspondent.getUsername());
+											broadcast.putExtra("fname", 	correspondent.getFname());
+											broadcast.putExtra("msg", 		message.getBody());
 											L.debug("sending broadcast!");
 											sendBroadcast(broadcast);
 										}
@@ -260,7 +261,8 @@ public class ChatMessagesService extends Service {
 	
 	 private PendingIntent getNotificationPendingIntent(Correspondent correspondent) {
 			// Creates an explicit intent for an Activity in your app
-		 Intent resultIntent = new Intent(this, ChatActivity.class);
+		 	Intent resultIntent = new Intent(this, ChatActivity.class);
+		 	resultIntent.putExtra("userid", correspondent.getId());
 			resultIntent.putExtra("email", correspondent.getEmail());
 			resultIntent.putExtra("username", correspondent.getUsername());
 			resultIntent.putExtra("fname", correspondent.getFname());

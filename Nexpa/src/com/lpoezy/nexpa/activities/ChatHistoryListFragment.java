@@ -133,9 +133,10 @@ public class ChatHistoryListFragment extends Fragment {
 	private void updateList() {
 		
 		List<Correspondent> correspondents = Correspondent.downloadAllOffline(getActivity());
-		L.debug("ChatHistory, updateList");
+		
 		for (Correspondent correspondent : correspondents) {
 			correspondent.downloadProfilePicOnline(getActivity());
+			L.debug("ChatHistory, updateList "+correspondent.getId());
 			correspondent.downloadLatestMsgOffline(getActivity());
 		}
 
@@ -179,7 +180,7 @@ public class ChatHistoryListFragment extends Fragment {
             if(mBuddys.get(position).getProfilePic()!=null){
             	
             	RoundedImageView riv = new RoundedImageView(getActivity());
-                Bitmap circImage = riv.getCroppedBitmap(mBuddys.get(position).getProfilePic(), 100);
+                Bitmap circImage = riv.getCroppedBitmap(mBuddys.get(position).getProfilePic(), 68);
                
             	vh.imgProfilePic.setImageBitmap(circImage);
             	

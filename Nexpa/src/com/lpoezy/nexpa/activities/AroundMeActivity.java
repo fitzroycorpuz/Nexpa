@@ -23,6 +23,7 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.JSONParser;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
+import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -68,7 +69,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	ArrayList < String > availabilty = new ArrayList < String > ();
 	ArrayList < Integer > distance = new ArrayList < Integer > ();
 	ArrayList < Integer > imageId = new ArrayList < Integer > ();
-
+	ArrayList < Long > 	arr_user_id = new ArrayList < Long > ();
 	ArrayList < String > arr_fname = new ArrayList < String > ();
 	ArrayList < String > arr_age = new ArrayList < String > ();
 	ArrayList < String > arr_uname = new ArrayList < String > ();
@@ -213,9 +214,10 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					Intent intent = new Intent(AroundMeActivity.this, PeopleProfileActivity.class);
 					Log.e("ccc", arr_about.get(position));
 					//intent.putExtra("TAG_GEO_PID", us.get(position).getId());
+					intent.putExtra("TAG_GEO_USER_ID", arr_user_id.get(position));
 					intent.putExtra("TAG_GEO_USER", arr_uname.get(position));
 					intent.putExtra("TAG_GEO_EMAIL", arr_email.get(position));
-
+					L.debug("AroundMeActivity, arr_user_id.get(position) "+arr_user_id.get(position));
 					intent.putExtra("TAG_GEO_FNAME", arr_fname.get(position));
 					intent.putExtra("TAG_GEO_AGE", arr_age.get(position));
 					intent.putExtra("TAG_GEO_GENDER", arr_gender.get(position));
@@ -527,7 +529,21 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 								String age = du.getAge(bday);
 								int distance = Math.round(Float.parseFloat(c.getString(TAG_GEO_DISTANCE)));
 								String sex = c.getString(TAG_GEO_GENDER);
-
+								
+								//profile pic info
+								long userId 		= Long.parseLong(c.getString("user_id"));
+								String imgDir 		= c.getString("img_dir");
+								String imgFile 		= c.getString("img_file");
+								String dateCreated 	= c.getString("date_created");
+								String dateUpdated 	= c.getString("date_updated");
+								arr_user_id.add(userId);
+								
+								if(imgDir!=null && imgFile!=null){
+									L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir+", imgFile "+imgFile);
+									ProfilePicture profilePic = new ProfilePicture(userId, imgDir, imgFile, dateCreated, dateUpdated);
+									profilePic.saveOffline(AroundMeActivity.this);
+								}
+								
 								
 								boolean containerContainsContent = org.apache.commons.lang.StringUtils.containsIgnoreCase(existingUsers, "." + id + ".");
 								if (containerContainsContent == true) {

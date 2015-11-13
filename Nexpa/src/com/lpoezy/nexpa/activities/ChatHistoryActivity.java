@@ -75,14 +75,9 @@ public class ChatHistoryActivity extends Activity implements OnShowChatHistoryLi
 
 	@Override
 	public void onShowChatHistory(Correspondent buddy) {
-//		Fragment chatHistoryDetailsFragment = ChatHistoryDetailsFragment.newInstance();
-//		getFragmentManager().beginTransaction()
-//		.add(R.id.frag_container, chatHistoryDetailsFragment, "ChatHistoryDetails")
-//		.addToBackStack(null)
-//		.commit();
-		
-		
+
 		Intent intentMes = new Intent(this, ChatActivity.class);
+		intentMes.putExtra("userid", buddy.getId());
 		intentMes.putExtra("email", buddy.getEmail());
 		intentMes.putExtra("username", buddy.getUsername());
 		intentMes.putExtra("fname", buddy.getFname());

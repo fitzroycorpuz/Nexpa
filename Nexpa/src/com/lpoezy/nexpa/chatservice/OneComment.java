@@ -47,7 +47,7 @@ public class OneComment {
 		
 		long userId = Long.valueOf(db.getUserDetails().get("uid"));
 		
-		db.saveMessageOffline(userId, correspondentId, left, comment,success, date, isUnread);
+		db.saveMessage(userId, correspondentId, left, comment,success, date, isUnread);
 		db.close();
 		
 	}
