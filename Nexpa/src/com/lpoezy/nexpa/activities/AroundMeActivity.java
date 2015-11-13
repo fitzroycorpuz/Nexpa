@@ -130,6 +130,8 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	
 	public static boolean isRunning = false;
 	private int dst;
+	private int oldDst;
+	
 	@Override
 	public void onBackPressed() {
 		
@@ -149,6 +151,8 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_around_me);
 
+		oldDst = 0;
+		
 		du = new DateUtils();
 		db = new SQLiteHandler(this);
 		db.openToWrite();
@@ -610,10 +614,29 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 			dst = 100;
 		}
 		
+		if (oldDst != dst){
+			//force grid update when new distance detected
+			tryGridToUpdate();
+			oldDst = dst;
+		}
 		adapter.notifyDataSetChanged();
 		
 	}
 	
+	private void tryGridToUpdate(){
+		mSwipeRefreshLayout.post(new Runnable() {
+		    @Override
+		    public void run() {
+		        mSwipeRefreshLayout.setRefreshing(true);
+		    }
+		});
+		new Handler().postDelayed(new Runnable() {@Override
+			public void run() {	
+			mSwipeRefreshLayout.setRefreshing(true);
+				getNewLoc();
+			}
+		}, 2000);
+	}
 	protected void onPause() {
 		super.onPause();
 		//locationManager.removeUpdates(locationListener);
