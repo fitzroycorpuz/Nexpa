@@ -28,11 +28,22 @@
         
     </RelativeLayout>
     
-
-    <ListView
+      <android.support.v7.widget.RecyclerView
         android:id="@+id/listMessages"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+       
+        android:textColor="@color/txt_color"
+        >
+        
+    </android.support.v7.widget.RecyclerView>  
+    
+
+     <!-- <ListView
+        android:id="@+id/listMessages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_above="@+id/form"
         android:layout_alignParentTop="true" 
         android:layout_weight="1"
@@ -41,7 +52,7 @@
         android:stackFromBottom="true"
         android:listSelector="@android:color/transparent"
         android:transcriptMode="alwaysScroll"
-        android:divider="@null" />
+        android:divider="@null" /> -->
 
     <LinearLayout
         android:id="@+id/linearLayout2"

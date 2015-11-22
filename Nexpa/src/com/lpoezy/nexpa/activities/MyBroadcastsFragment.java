@@ -9,6 +9,7 @@ import org.jivesoftware.smack.util.Base64;
 
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.objects.Announcement;
+import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.parallaxrecyclerview.HeaderLayoutManagerFixed;
 import com.lpoezy.nexpa.parallaxrecyclerview.ParallaxRecyclerAdapter;
@@ -207,8 +208,25 @@ public class MyBroadcastsFragment extends Fragment {
 	
 	private void resetProfilePic(){
 		
-		String imgDecodableString = Utilz.getDataFrmSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, "");
+		//String imgDecodableString = Utilz.getDataFrmSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, "");
 		
+//		long userId = -1;
+//		SQLiteHandler db = new SQLiteHandler(getActivity());
+//		db.openToRead();
+//		userId = Long.parseLong(db.getLoggedInID());
+//		db.close();
+//		
+//		ProfilePicture pic = new ProfilePicture();
+//		pic.setUserId(userId);
+//		pic.downloadOffline(getActivity());
+//		
+//		String imgDecodableString = null;
+//		if((pic.getImgDir()!=null && !pic.getImgDir().isEmpty()) && (pic.getImgFile()!=null && !pic.getImgFile().isEmpty())){
+//			imgDecodableString = 
+//					pic.getImgDir()+"/"+pic.getImgFile();
+//		}
+		
+		String imgDecodableString = ProfilePicture.getUserImgDecodableString(getActivity());
 		
         Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
         R.drawable.pic_sample_girl);
@@ -221,8 +239,6 @@ public class MyBroadcastsFragment extends Fragment {
             
             BmpFactory  bmpFactory = new BmpFactory();
         	rawImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
-        	
-        	
         	
         }
         

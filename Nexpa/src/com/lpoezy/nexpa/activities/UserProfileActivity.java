@@ -182,9 +182,14 @@ public class UserProfileActivity extends Activity
         //LogoutFB(this);
         SQLiteHandler db = new SQLiteHandler(context);
         db.openToWrite();
+        db.deleteCorrespondents();
+        db.deleteMessages();
+        db.deleteProfilePictures();
         db.deleteUsers();
         db.deleteAllPeople();
         db.updateAccountValidate(0);
+        
+        db.close();
         XMPPConnection connection = XMPPLogic.getInstance().getConnection();
         
         Utilz.clearSharedPref(context);

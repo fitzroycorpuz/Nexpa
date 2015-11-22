@@ -6,10 +6,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.jivesoftware.smack.XMPPConnection;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,10 +29,12 @@ import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
+import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
+import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.NiceDialog;
 
@@ -295,10 +304,117 @@ public class MainSignInActivity extends Activity {
 								@Override
 								public void onXMPPConnected(XMPPConnection connection) {
 									
-									hideDialog();
-									Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
-									startActivity(intent);
-									finish();
+									new Thread(new Runnable() {
+										
+										private ProfilePicture profilePicture;
+
+										@Override
+										public void run() {
+											//download user profile pic info
+											ExecutorService exec = Executors.newCachedThreadPool();
+											Future<ProfilePicture> f = exec.submit(new Callable<ProfilePicture>() {
+
+												@Override
+												public ProfilePicture call() throws Exception {
+													
+													
+													 HashMap<String, String> postDataParams = new HashMap<String, String>();
+											         postDataParams.put("tag", "download");
+											         postDataParams.put("user_id", server_uid);
+											        
+											         final String spec = AppConfig.URL_PROFILE_PIC;
+											         String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+//													 {"tag":"download",
+//											         "error":false,
+//											         "profile_picture":
+//											        	 [{"user_id":"2",
+//											        		 "img_dir":"profile_pictures",
+//											        		 "img_file":"ef75a17963e785522PeterKaiserSimpson-13.jpg",
+//											        		 "date_uploaded":"2015-11-12 08:19:22"}],
+//											        	 "msg":"Profile picture found!"}
+											         
+											         if((webPage!=null && !webPage.isEmpty())){
+											        	 JSONObject jResult = new JSONObject(webPage);
+												         JSONObject profilePicture = jResult.getJSONArray("profile_picture").getJSONObject(0);
+												         long userId = profilePicture.getLong("user_id");
+												         String imgDir = profilePicture.getString("img_dir");
+												         String imgFile = profilePicture.getString("img_file");
+												         String dateUploaded = profilePicture.getString("date_uploaded");
+												         return new ProfilePicture(userId, imgDir, imgFile, dateUploaded);
+											         }
+											         
+													return null;
+												}
+											});
+											exec.shutdown();
+											
+											try {
+												
+												//AppConfig.URL+"/"+imgDir+"/"+imgFile
+												profilePicture = f.get();
+												
+												//L.debug("MainSigninACtivity, imgUrl: "+imgUrl);
+												
+											
+											} catch (InterruptedException e) {
+												L.error(""+e);
+											} catch (ExecutionException e) {
+												L.error(""+e);
+											}
+											
+											//download the profile pic img
+											if(profilePicture!=null){
+												ExecutorService newExec = Executors.newCachedThreadPool();
+												Future<String> newF = newExec.submit(new Callable<String>() {
+
+													@Override
+													public String call() throws Exception {
+														
+														String uri = profilePicture.downloadImageOnline();
+														profilePicture.saveOffline(MainSignInActivity.this);
+														
+														
+														
+														return uri;
+													}
+												});	
+												
+												newExec.shutdown();
+												
+												try {
+													String imgUri = newF.get();
+													
+//													hideDialog();
+//													Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
+//													startActivity(intent);
+//													finish();
+													btnLogin.post(new Runnable() {
+														
+														@Override
+														public void run() {
+															
+															Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
+															startActivity(intent);
+															
+															finish();
+															
+															hideDialog();
+														}
+													});
+													
+													
+												} catch (InterruptedException e) {
+													L.error(""+e);
+												} catch (ExecutionException e) {
+													L.error(""+e);
+												}
+											}
+											
+											
+										}
+									}).start();
+									
+									
 								}
 
 							});

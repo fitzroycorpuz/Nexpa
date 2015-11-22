@@ -36,6 +36,7 @@ import com.lpoezy.nexpa.utility.MyLocation.LocationResult;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -69,6 +70,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	ArrayList < String > availabilty = new ArrayList < String > ();
 	ArrayList < Integer > distance = new ArrayList < Integer > ();
 	ArrayList < Integer > imageId = new ArrayList < Integer > ();
+	ArrayList < Bitmap > images = new ArrayList < Bitmap > ();
 	ArrayList < Long > 	arr_user_id = new ArrayList < Long > ();
 	ArrayList < String > arr_fname = new ArrayList < String > ();
 	ArrayList < String > arr_age = new ArrayList < String > ();
@@ -184,7 +186,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		distance.add(0, 0);
 		imageId.add(0, R.drawable.pic_sample_girl);
 		availabilty.add(0, "Online");
-		adapter = new CustomGrid(AroundMeActivity.this, web, imageId, availabilty, distance);
+		adapter = new CustomGrid(AroundMeActivity.this, web, arr_user_id/*imageId*/, availabilty, distance);
 		 mHandler = new Handler()
 			{
 			    public void handleMessage(android.os.Message msg)
@@ -221,7 +223,6 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					intent.putExtra("TAG_GEO_USER_ID", arr_user_id.get(position));
 					intent.putExtra("TAG_GEO_USER", arr_uname.get(position));
 					intent.putExtra("TAG_GEO_EMAIL", arr_email.get(position));
-					L.debug("AroundMeActivity, arr_user_id.get(position) "+arr_user_id.get(position));
 					intent.putExtra("TAG_GEO_FNAME", arr_fname.get(position));
 					intent.putExtra("TAG_GEO_AGE", arr_age.get(position));
 					intent.putExtra("TAG_GEO_GENDER", arr_gender.get(position));
@@ -229,7 +230,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					intent.putExtra("TAG_GEO_ABOUTME", arr_about.get(position));
 					intent.putExtra("TAG_GEO_LOOKING_TYPE", arr_looking_type.get(position));
 					intent.putExtra("TAG_GEO_STATUS", arr_status.get(position));
-
+					
 					startActivity(intent);
 				} catch (Exception e) {}
 				// finish();
@@ -340,12 +341,18 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 				}
 			}
 		} catch (Exception e) {}
+		
+		
 		for (int j = 0; j < us.size(); j++) {
-			if (sentType.equals("1")) {
-				if (us.get(j).getShown().equals("0")) {
+			if (sentType.equals("1")) {//user is already added
+				
+				if (us.get(j).getShown().equals("0")) {//
 					imageId.add(j, R.drawable.pic_sample_girl);
 					availabilty.add(j, "INSERTED");
 					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
+					
+					
+					arr_user_id.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
 					distance.add(j, us.get(j).getDistance());
 					arr_uname.add(j, us.get(j).getUserName());
 					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
@@ -355,10 +362,12 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					arr_about.add(j, us.get(j).getAboutMe());
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
+					
 				} else if (us.get(j).getShown().equals("1")) {
 					us.get(j).setShown("1");
 					availabilty.set(j, "UPDATED");
 					web.set(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
+					arr_user_id.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
 					distance.set(j, us.get(j).getDistance());
 					arr_uname.add(j, us.get(j).getUserName());
 					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
@@ -369,11 +378,13 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
 				}
-			} else if (sentType.equals("0")) {
+			} else if (sentType.equals("0")) {//
 				imageId.add(j, R.drawable.pic_sample_girl);
 				availabilty.add(j, "ADDED");
 				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
 				distance.add(j, us.get(j).getDistance());
+				arr_user_id.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
+				
 				arr_uname.add(j, us.get(j).getUserName());
 				arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
 				arr_age.add(j, us.get(j).getAge());
@@ -528,23 +539,22 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 								String about_me = c.getString(TAG_GEO_ABOUTME);
 								String looking_type = c.getString(TAG_GEO_LOOKING_TYPE);
 								String email_address = c.getString(TAG_GEO_EMAIL);
-
+								
 								Date bday = du.convertStringToDateToLocal(c.getString(TAG_GEO_BIRTHDAY));
 								String age = du.getAge(bday);
 								int distance = Math.round(Float.parseFloat(c.getString(TAG_GEO_DISTANCE)));
 								String sex = c.getString(TAG_GEO_GENDER);
 								
 								//profile pic info
-								long userId 		= Long.parseLong(c.getString("user_id"));
+								long userId 		= Long.parseLong(id);
 								String imgDir 		= c.getString("img_dir");
 								String imgFile 		= c.getString("img_file");
-								String dateCreated 	= c.getString("date_created");
-								String dateUpdated 	= c.getString("date_updated");
-								arr_user_id.add(userId);
+								String dateCreated 	= c.getString("date_uploaded");
 								
-								if(imgDir!=null && imgFile!=null){
+								//L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir.equalsIgnoreCase("null")+", imgFile "+imgFile);
+								if((imgDir!=null && !imgDir.isEmpty() && !imgDir.equalsIgnoreCase("null")) && (imgFile!=null && !imgFile.isEmpty() && !imgFile.equalsIgnoreCase("null"))){
 									L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir+", imgFile "+imgFile);
-									ProfilePicture profilePic = new ProfilePicture(userId, imgDir, imgFile, dateCreated, dateUpdated);
+									ProfilePicture profilePic = new ProfilePicture(userId, imgDir, imgFile, dateCreated);
 									profilePic.saveOffline(AroundMeActivity.this);
 								}
 								

@@ -82,6 +82,8 @@ public class TabHostActivity extends TabActivity {
 		
 	
 		if (!session.isLoggedIn()) {
+			UserProfileActivity.logoutUser(TabHostActivity.this, true, null);
+			
 			intent = new Intent(TabHostActivity.this, MainSignInActivity.class);
 			startActivity(intent);
 			finish();

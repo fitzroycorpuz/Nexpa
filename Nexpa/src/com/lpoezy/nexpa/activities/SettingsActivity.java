@@ -27,6 +27,7 @@ import com.devspark.appmsg.AppMsg;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.Profile;
 import com.lpoezy.nexpa.configuration.AppConfig;
+import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -285,7 +286,7 @@ public class SettingsActivity extends Activity {
 								@Override
 								public void run() {
 									L.debug("started sending profile pic to server directory...");
-									final String spec = AppConfig.URL_PROFILE_PIC;
+									
 									
 									SQLiteHandler db = new SQLiteHandler(SettingsActivity.this);
 							         db.openToRead();
@@ -305,7 +306,8 @@ public class SettingsActivity extends Activity {
 							         postDataParams.put("img_file", imgFile);
 							         postDataParams.put("user_id", userId);
 							         postDataParams.put("date_created", dateCreated);
-									
+							         
+							         final String spec = AppConfig.URL_PROFILE_PIC;
 							         String webPage = HttpUtilz.makeRequest(spec, postDataParams);
 							         ln_personal.post(new Runnable() {
 										
@@ -410,341 +412,7 @@ public class SettingsActivity extends Activity {
 				dialogPref.getWindow().setAttributes(lp);
 			}
 		});
-		// //////////////
-		// ln_preference = (LinearLayout) findViewById(R.id.ln_preference);
-		// ln_preference.setOnClickListener(new View.OnClickListener()
-		// {
-		// public void onClick(View arg0)
-		// {
-		// dialogPref = new Dialog(SettingsActivity.this);
-		// dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		// dialogPref.setContentView(R.layout.activity_profile_preferences);
-		// rad_lookingfor_friends = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_lookingfor_friends);
-		// rad_lookingfor_date = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_lookingfor_date);
-		// rad_lookingfor_serious_relationship = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_lookingfor_serious_relationship);
-		// rad_lookingfor_networking = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_lookingfor_networking);
-		// //Looking for
-		// if
-		// ((db.getLookingForStatus().equals(""))||(db.getLookingForStatus().equals("null"))){
-		// rad_lookingfor_friends.setChecked(true);
-		// }
-		// else if (db.getLookingForStatus().equals("DA")){
-		// rad_lookingfor_date.setChecked(true);
-		// }
-		// else if (db.getLookingForStatus().equals("SE")){
-		// rad_lookingfor_serious_relationship.setChecked(true);
-		// }
-		// else if (db.getLookingForStatus().equals("NE")){
-		// rad_lookingfor_networking.setChecked(true);
-		// }
-		// else{
-		// rad_lookingfor_friends.setChecked(true);
-		// }
-		// //Sexual Orientation
-		// rad_sexual_orientation_unspecified = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_sexual_orientation_unspecified);
-		// rad_sexual_orientation_straight = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_sexual_orientation_straight);
-		// rad_sexual_orientation_gay_lesbian = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_sexual_orientation_gay_lesbian);
-		// rad_sexual_orientation_bisexual = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_sexual_orientation_bisexual);
-		// rad_sexual_orientation_transgendered = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_sexual_orientation_transgendered);
-		// if
-		// ((db.getSexOrien().equals(""))||(db.getSexOrien().equals("null"))){
-		// rad_sexual_orientation_unspecified.setChecked(true);
-		// }
-		// else if (db.getSexOrien().equals("ST")){
-		// rad_sexual_orientation_straight.setChecked(true);
-		// }
-		// else if (db.getSexOrien().equals("LB")){
-		// rad_sexual_orientation_gay_lesbian.setChecked(true);
-		// }
-		// else if (db.getSexOrien().equals("BI")){
-		// rad_sexual_orientation_bisexual.setChecked(true);
-		// }
-		// else if (db.getSexOrien().equals("TR")){
-		// rad_sexual_orientation_transgendered.setChecked(true);
-		// }
-		// else{
-		// rad_sexual_orientation_unspecified.setChecked(true);
-		// }
-		// //Show gender
-		// rad_looking_for_men = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_looking_for_men);
-		// rad_looking_for_women = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_looking_for_women);
-		// rad_looking_for_both = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_looking_for_both);
-		//
-		// String strLookingGender = db.getLookingGender();
-		// if
-		// ((strLookingGender.equals(""))||(strLookingGender.equals("null"))){
-		// rad_looking_for_both.setChecked(true);
-		// }
-		// else if (strLookingGender.equals("ML")){
-		// rad_looking_for_men.setChecked(true);
-		// }
-		// else if (strLookingGender.equals("FM")){
-		// rad_looking_for_women.setChecked(true);
-		// }
-		// else{
-		// rad_looking_for_both.setChecked(true);
-		// }
-		// //Show Profile Sexual Orientation
-		// cbx_orien_straight = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_straight);
-		// cbx_orien_gay = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_gay);
-		// cbx_orien_lesbian = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_lesbian);
-		// cbx_orien_bisexual = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_bisexual);
-		// cbx_orien_transgendered = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_transgendered);
-		// cbx_orien_unspecified = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_unspecified);
-		// String strOrien = db.getOrientationToShow();
-		//
-		// char ch_orien_straight = strOrien.charAt(0);
-		// char ch_orien_gay = strOrien.charAt(2);
-		// char ch_orien_lesbian = strOrien.charAt(4);
-		// char ch_orien_bisexual = strOrien.charAt(6);
-		// char ch_orien_transgendered = strOrien.charAt(8);
-		// char ch_orien_unspecified = strOrien.charAt(10);
-		//
-		// if
-		// ((db.getOrientationToShow().equals(""))||(db.getOrientationToShow().equals("null"))){
-		// // S-G-L-B-T-U
-		// cbx_orien_straight.setChecked(true);
-		// cbx_orien_gay.setChecked(true);
-		// cbx_orien_lesbian.setChecked(true);
-		// cbx_orien_bisexual.setChecked(true);
-		// cbx_orien_transgendered.setChecked(true);
-		// cbx_orien_unspecified.setChecked(true);
-		// }
-		// else{
-		// if (ch_orien_straight == '1'){
-		// cbx_orien_straight.setChecked(true);
-		// }
-		// else{
-		// cbx_orien_straight.setChecked(false);
-		// }
-		// if (ch_orien_gay == '1'){
-		// cbx_orien_gay.setChecked(true);
-		// }
-		// else{
-		// cbx_orien_gay.setChecked(false);
-		// }
-		// if (ch_orien_lesbian == '1'){
-		// cbx_orien_lesbian.setChecked(true);
-		// }
-		// else{
-		// cbx_orien_lesbian.setChecked(false);
-		// }
-		// if (ch_orien_bisexual == '1'){
-		// cbx_orien_bisexual.setChecked(true);
-		// }
-		// else{
-		// cbx_orien_bisexual.setChecked(false);
-		// }
-		// if (ch_orien_transgendered == '1'){
-		// cbx_orien_transgendered.setChecked(true);
-		// }
-		// else{
-		// cbx_orien_transgendered.setChecked(false);
-		// }
-		// if (ch_orien_unspecified == '1'){
-		// cbx_orien_unspecified.setChecked(true);
-		// }
-		// else{
-		// cbx_orien_unspecified.setChecked(false);
-		// }
-		// }
-		// //Relationship status
-		// rad_relationship_unspecified = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_relationship_unspecified);
-		// rad_relationship_single = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_relationship_single);
-		// rad_relationship_in_a_rel = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_relationship_in_a_rel);
-		// rad_relationship_married = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_relationship_married);
-		// rad_relationship_separated = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_relationship_separated);
-		// rad_relationship_widowed = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_relationship_widowed);
-		// rad_relationship_complicated = (RadioButton)
-		// dialogPref.findViewById(R.id.rad_relationship_complicated);
-		//
-		// String relStatus = db.getRelStatus();
-		// if ((relStatus.equals(""))||(relStatus.equals("null"))){
-		// rad_relationship_unspecified.setChecked(true);
-		// }
-		// else if (relStatus.equals("SI")){
-		// rad_relationship_single.setChecked(true);
-		// }
-		// else if (relStatus.equals("IN")){
-		// rad_relationship_in_a_rel.setChecked(true);
-		// }
-		// else if (relStatus.equals("MA")){
-		// rad_relationship_married.setChecked(true);
-		// }
-		// else if (relStatus.equals("SE")){
-		// rad_relationship_separated.setChecked(true);
-		// }
-		// else if (relStatus.equals("WI")){
-		// rad_relationship_widowed.setChecked(true);
-		// }
-		// else if (relStatus.equals("CO")){
-		// rad_relationship_complicated.setChecked(true);
-		// }
-		// else{
-		// rad_relationship_unspecified.setChecked(true);
-		// }
-		// Button dialogButton = (Button)
-		// dialogPref.findViewById(R.id.dialogButtonOK);
-		// dialogButton.setOnClickListener(new OnClickListener()
-		// {
-		// @Override
-		// public void onClick(View v)
-		// {
-		// //Save changes in 'Looking For'
-		// if (rad_lookingfor_date.isChecked()){
-		// strLookingForStat = "DA";
-		// }
-		// else if (rad_lookingfor_serious_relationship.isChecked()){
-		// strLookingForStat = "SE";
-		// }
-		// else if (rad_lookingfor_networking.isChecked()){
-		// strLookingForStat = "NE";
-		// }
-		// else {
-		// strLookingForStat = "FR";
-		// }
-		// //Save changes in 'Sexual Orientation'
-		// if (rad_sexual_orientation_straight.isChecked()){
-		// strSexOrien = "ST";
-		// }
-		// else if (rad_sexual_orientation_gay_lesbian.isChecked()){
-		// strSexOrien = "LB";
-		// }
-		// else if (rad_sexual_orientation_bisexual.isChecked()){
-		// strSexOrien = "BI";
-		// }
-		// else if (rad_sexual_orientation_transgendered.isChecked()){
-		// strSexOrien = "TR";
-		// }
-		// else {
-		// strSexOrien = "UN";
-		// }
-		// //Save changes in 'Gender Pref'
-		// if (rad_looking_for_men.isChecked()){
-		// strGenderPref = "ML";
-		// }
-		// else if (rad_looking_for_women.isChecked()){
-		// strGenderPref = "FM";
-		// }
-		// else {
-		// strGenderPref = "SB";
-		// }
-		// //Save changes in Show Sex Orien
-		// //Show Profile Sexual Orientation
-		// cbx_orien_straight = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_straight);
-		// cbx_orien_gay = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_gay);
-		// cbx_orien_lesbian = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_lesbian);
-		// cbx_orien_bisexual = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_bisexual);
-		// cbx_orien_transgendered = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_transgendered);
-		// cbx_orien_unspecified = (CheckBox)
-		// dialogPref.findViewById(R.id.cbx_orien_unspecified);
-		// strShowOrientation = "S-G-L-B-T-U";
-		// StringBuilder SBorien = new StringBuilder(strShowOrientation);
-		// SBorien.setCharAt(4, 'x');
-		// // S-G-L-B-T-U
-		// if (cbx_orien_straight.isChecked()){
-		// SBorien.setCharAt(0,'1');
-		// }
-		// else{
-		// SBorien.setCharAt(0, '0');
-		// }
-		// if (cbx_orien_gay.isChecked()){
-		// SBorien.setCharAt(2, '1');
-		// }
-		// else{
-		// SBorien.setCharAt(2, '0');
-		// }
-		// if (cbx_orien_lesbian.isChecked()){
-		// SBorien.setCharAt(4,'1');
-		// }
-		// else{
-		// SBorien.setCharAt(4,'0');
-		// }
-		// if (cbx_orien_bisexual.isChecked()){
-		// SBorien.setCharAt(6, '1');
-		// }
-		// else{
-		// SBorien.setCharAt(6,'0');
-		// }
-		// if (cbx_orien_transgendered.isChecked()){
-		// SBorien.setCharAt(8, '1');
-		// }
-		// else{
-		// SBorien.setCharAt(8,'0');
-		// }
-		// if (cbx_orien_unspecified.isChecked()){
-		// SBorien.setCharAt(10,'1');
-		// }
-		// else{
-		// SBorien.setCharAt(10, '0');
-		// }
-		// Log.e("SBORIEN",SBorien.toString());
-		// //Save changes in 'Relationship status'
-		// if (rad_relationship_single.isChecked()){
-		// strRelStat = "SI";
-		// }
-		// else if (rad_relationship_in_a_rel.isChecked()){
-		// strRelStat = "IN";
-		// }
-		// else if (rad_relationship_married.isChecked()){
-		// strRelStat = "MA";
-		// }
-		// else if (rad_relationship_separated.isChecked()){
-		// strRelStat = "SE";
-		// }
-		// else if (rad_relationship_widowed.isChecked()){
-		// strRelStat = "WI";
-		// }
-		// else if (rad_relationship_complicated.isChecked()){
-		// strRelStat = "CO";
-		// }
-		// else {
-		// strRelStat = "UN";
-		// }
-		//
-		// db.updateUserPreference(strLookingForStat, strSexOrien,
-		// strGenderPref, strRelStat, SBorien.toString());
-		// jsonProfile.updateProfileOnServer(SettingsActivity.this);
-		// dialogPref.dismiss();
-		// }
-		// });
-		// WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-		// lp.copyFrom(dialogPref.getWindow().getAttributes());
-		// lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-		// lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-		// dialogPref.show();
-		// dialogPref.getWindow().setAttributes(lp);
-		// }
-		// });
+
 		ln_settings = (LinearLayout) findViewById(R.id.ln_settings);
 		ln_settings.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
@@ -902,7 +570,20 @@ public class SettingsActivity extends Activity {
 		ImageView profilePic = (ImageView) dialog.findViewById(R.id.img_profile_pic);
 
 		if (profilePic != null) {
-			String imgDecodableString = Utilz.getDataFrmSharedPref(SettingsActivity.this, UserProfile.PROFILE_PIC_LOC, "");
+			//String imgDecodableString = Utilz.getDataFrmSharedPref(SettingsActivity.this, UserProfile.PROFILE_PIC_LOC, "");
+			
+			long userId = -1;
+			SQLiteHandler db = new SQLiteHandler(SettingsActivity.this);
+			db.openToRead();
+			userId = Long.parseLong(db.getLoggedInID());
+			db.close();
+			
+			ProfilePicture pic = new ProfilePicture();
+			pic.setUserId(userId);
+			pic.downloadOffline(SettingsActivity.this);
+			
+			
+			String imgDecodableString = pic.getImgDir()+"/"+pic.getImgFile();
 			
 			 Bitmap rawImage = BitmapFactory.decodeResource(getResources(),
 				        R.drawable.pic_sample_girl);

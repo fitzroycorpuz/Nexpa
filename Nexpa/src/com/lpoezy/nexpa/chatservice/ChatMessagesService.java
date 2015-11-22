@@ -159,12 +159,12 @@ public class ChatMessagesService extends Service {
 									boolean error = jObj.getBoolean("error");
 									L.debug("msg? "+message.getBody());
 									if (!error) {
-										L.debug("getting sender's credential");
+										
 										String uid = jObj.getString("uid");
 										JSONObject user = jObj.getJSONObject("user");
 										String name = user.getString("name");
 										String email = user.getString("email");
-										
+										L.debug("getting sender's credential "+uid);
 										Correspondent correspondent = new Correspondent();
 										correspondent.setId(Long.parseLong(uid));
 										correspondent.setUsername(name);

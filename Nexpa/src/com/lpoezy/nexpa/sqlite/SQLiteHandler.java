@@ -64,8 +64,8 @@ public class SQLiteHandler{
 	public static final String IMG_USER_ID = "user_id";
 	public static final String IMG_DIR = "img_dir";
 	public static final String IMG_FILE = "img_file";
-	public static final String IMG_DATE_CREATED = "date_created";
-	public static final String IMG_DATE_UPDATED = "date_updated";
+	public static final String IMG_DATE_UPLOADED = "date_uploaded";
+	
 	
 	
 	//boolean left, String comment,boolean success, String date
@@ -157,7 +157,7 @@ public class SQLiteHandler{
 				Log.e("CREATE_TABLE_CORRESPONDENTS", CREATE_TABLE_CORRESPONDENTS);
 				db.execSQL(CREATE_TABLE_CORRESPONDENTS);
 				
-				String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID + " INTEGER PRIMARY KEY, "+ IMG_USER_ID +" INTEGER, "+  IMG_DIR + " TEXT, " +   IMG_FILE + " TEXT," +   IMG_DATE_CREATED + " TEXT," + IMG_DATE_UPDATED + " TEXT);";
+				String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID + " INTEGER PRIMARY KEY, "+ IMG_USER_ID +" INTEGER, "+  IMG_DIR + " TEXT, " +   IMG_FILE + " TEXT," +   IMG_DATE_UPLOADED + " TEXT);";
 				db.execSQL(CREATE_TABLE_PROFILE_PICTURES);
 				
 				String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "+ MSG_USER_ID +" INTEGER, "+ MSG_CORRESPONDENT_ID + " INTEGER, "+  MSG_LEFT + " TEXT, " +   MSG_BODY + " TEXT," +   MSG_SUCCESS + " TEXT," + MSG_DATE + " TEXT, "+ MSG_IS_UNREAD + " TEXT );";
@@ -322,14 +322,17 @@ public class SQLiteHandler{
 		onCreate(db);
 	}*/
 	
+	
+	//will always return the latest profile pic info 
 	public HashMap<String, String> downloadProfilePicture(long userId){
 		
 		Cursor c = sqLiteDatabase.query(
 				TABLE_PROFILE_PICTURES, 
-				new String[]{ IMG_USER_ID, IMG_DIR, IMG_FILE, IMG_DATE_CREATED, IMG_DATE_UPDATED }, 
+				new String[]{ IMG_USER_ID, IMG_DIR, IMG_FILE, IMG_DATE_UPLOADED }, 
 				IMG_USER_ID+"=?", 
 				new String[]{Long.toString(userId)}, 
-				null, null, null);
+				null, null, 
+				IMG_DATE_UPLOADED+" DESC");
 		
 		if(c.moveToFirst()){
 			
@@ -337,24 +340,23 @@ public class SQLiteHandler{
 			map.put(IMG_USER_ID, 		c.getString(c.getColumnIndex(IMG_USER_ID)));
 			map.put(IMG_DIR, 			c.getString(c.getColumnIndex(IMG_DIR)));
 			map.put(IMG_FILE, 			c.getString(c.getColumnIndex(IMG_FILE)));
-			map.put(IMG_DATE_CREATED, 	c.getString(c.getColumnIndex(IMG_DATE_CREATED)));
-			map.put(IMG_DATE_UPDATED, 	c.getString(c.getColumnIndex(IMG_DATE_UPDATED)));
-			
+			map.put(IMG_DATE_UPLOADED, 	c.getString(c.getColumnIndex(IMG_DATE_UPLOADED)));
+			//L.debug("downloadProfilePicture, userId "+userId+", "+map.get(IMG_DIR)+", "+map.get(IMG_FILE));
 			return map;
 		}
 		return null;
 		
 	}
 	
-	public void saveProfilePicture(long userId, String imgDir, String imgFile, String dateCreated, String dateUpdated) {
+	public void saveProfilePicture(long userId, String imgDir, String imgFile, String dateUploaded) {
 		
 		ContentValues values = new ContentValues();
 		values.put(IMG_USER_ID, userId);
 		values.put(IMG_DIR, imgDir);
 		values.put(IMG_FILE, imgFile);
-		values.put(IMG_DATE_CREATED, dateCreated);
-		values.put(IMG_DATE_UPDATED, dateUpdated);
-		
+		values.put(IMG_DATE_UPLOADED, dateUploaded);
+
+		L.debug("saving "+userId+", "+imgDir+", "+imgFile+", "+dateUploaded);
 		if(downloadProfilePicture(userId)==null){
 			sqLiteDatabase.insert(TABLE_PROFILE_PICTURES, null, values);
 			L.debug(TAG+" new picture inserted into sqlite:" + imgFile);
@@ -1163,6 +1165,21 @@ public class SQLiteHandler{
 		sqLiteDatabase.delete(DATABASE_TABLE_4, null, null);
 	//	db.close();
 		Log.d(TAG, "Deleted all user info from sqlite");
+	}
+
+	public void deleteMessages() {
+		
+		sqLiteDatabase.delete(TABLE_MESSAGES, null, null);
+	}
+
+	public void deleteProfilePictures() {
+		sqLiteDatabase.delete(TABLE_PROFILE_PICTURES, null, null);
+		
+	}
+
+	public void deleteCorrespondents() {
+		sqLiteDatabase.delete(TABLE_CORRESPONDENTS, null, null);
+		
 	}
 
 	

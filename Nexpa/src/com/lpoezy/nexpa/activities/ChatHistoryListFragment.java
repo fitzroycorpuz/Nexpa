@@ -3,6 +3,9 @@ package com.lpoezy.nexpa.activities;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
@@ -34,7 +37,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ChatHistoryListFragment extends Fragment {
+public class ChatHistoryListFragment extends Fragment implements Correspondent.OnCorrespondentUpdateListener{
 
 	private OnShowChatHistoryListener mCallback;
 	private List<Correspondent> mBuddys;
@@ -99,24 +102,28 @@ public class ChatHistoryListFragment extends Fragment {
 	};
 
 	// receiving update from correspondent model
-	private BroadcastReceiver mReceivedCorrespondentUpdate = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(final Context context, final Intent intent) {
-			L.debug("ChatHistoryList, correspondent update "+mBuddys.get(0).getProfilePic());
-			
-			mAdapter.notifyDataSetChanged();
-
-		}
-	};
-
+//	private BroadcastReceiver mReceivedCorrespondentUpdate = new BroadcastReceiver() {
+//
+//		@Override
+//		public void onReceive(final Context context, final Intent intent) {
+//			L.debug("ChatHistoryList, correspondent update "+mBuddys.get(0).getProfilePic());
+//			
+//			mAdapter.notifyDataSetChanged();
+//
+//		}
+//	};
+	List<Correspondent> mCorrespondents;
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
 
 		getActivity().unregisterReceiver(mReceivedMessage);
-		getActivity().unregisterReceiver(mReceivedCorrespondentUpdate);
+		//getActivity().unregisterReceiver(mReceivedCorrespondentUpdate);
+		
+		for (final Correspondent correspondent : mCorrespondents) {
+			correspondent.removeListener(this);
+		}
 	}
 
 	@Override
@@ -125,23 +132,68 @@ public class ChatHistoryListFragment extends Fragment {
 		super.onResume();
 
 		getActivity().registerReceiver(mReceivedMessage, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
-		getActivity().registerReceiver(mReceivedCorrespondentUpdate, new IntentFilter(Correspondent.ACTION_UPDATE));
+		//getActivity().registerReceiver(mReceivedCorrespondentUpdate, new IntentFilter(Correspondent.ACTION_UPDATE));
 
 		updateList();
 	}
-
+	
 	private void updateList() {
 		
-		List<Correspondent> correspondents = Correspondent.downloadAllOffline(getActivity());
+		mCorrespondents = Correspondent.downloadAllOffline(getActivity());
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				final int MAX_THREAD = 5;
+				int n = mCorrespondents.size()<MAX_THREAD && mCorrespondents.size()!=0 ? mCorrespondents.size():MAX_THREAD;
+				ExecutorService exec = Executors.newFixedThreadPool(n);
+				for (int i=0;i<mCorrespondents.size();i++) {
+					final Correspondent correspondent = mCorrespondents.get(i);
+					correspondent.addListener(ChatHistoryListFragment.this);
+					exec.execute(new Runnable() {
+						
+						@Override
+						public void run() {
+							correspondent.downloadProfilePicOnline(getActivity());
+							L.debug("ChatHistory, updateList "+correspondent.getId());
+							correspondent.downloadLatestMsgOffline(getActivity());
+							
+						}
+					});
+					
+				}
+				
+				exec.shutdown();
+				try {
+					exec.awaitTermination(1, TimeUnit.HOURS);
+				} catch (InterruptedException e) {
+					
+				}
+				
+			}
+		}).start();
 		
-		for (Correspondent correspondent : correspondents) {
-			correspondent.downloadProfilePicOnline(getActivity());
-			L.debug("ChatHistory, updateList "+correspondent.getId());
-			correspondent.downloadLatestMsgOffline(getActivity());
-		}
-
+//		new Thread(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				for (int i=0;i<mCorrespondents.size();i++) {
+//					final Correspondent correspondent = mCorrespondents.get(i);
+//					correspondent.addListener(ChatHistoryListFragment.this);
+//					
+//					correspondent.downloadProfilePicOnline(getActivity());
+//					L.debug("ChatHistory, updateList "+correspondent.getId());
+//					correspondent.downloadLatestMsgOffline(getActivity());
+//							
+//				}
+//				
+//			}
+//		}).start();
+		
+		
+		
 		mBuddys.clear();
-		mBuddys.addAll(correspondents);
+		mBuddys.addAll(mCorrespondents);
 		mAdapter.notifyDataSetChanged();
 
 	}
@@ -176,7 +228,7 @@ public class ChatHistoryListFragment extends Fragment {
 															// style(only bold)
 			else
 				vh.tvMsg.setTypeface(null, Typeface.NORMAL);
-			L.debug("update view holder "+mBuddys.get(position).getProfilePic());
+			//L.debug("update view holder "+mBuddys.get(position).getProfilePic());
             if(mBuddys.get(position).getProfilePic()!=null){
             	
             	RoundedImageView riv = new RoundedImageView(getActivity());
@@ -223,6 +275,19 @@ public class ChatHistoryListFragment extends Fragment {
 	public interface OnShowChatHistoryListener {
 
 		public void onShowChatHistory(Correspondent buddy);
+	}
+
+	@Override
+	public void onCorrespondentUpdate() {
+		
+		L.debug("ChatHistoryList, correspondent update "+mBuddys.get(0).getProfilePic());
+		getActivity().runOnUiThread( new Runnable() {
+			public void run() {
+				mAdapter.notifyDataSetChanged();
+			}
+		});
+		
+		
 	}
 
 }

@@ -26,6 +26,8 @@ public class Correspondent {
 	
 	private Bitmap profilePic;
 	
+	private List<OnCorrespondentUpdateListener> listeners = new ArrayList<Correspondent.OnCorrespondentUpdateListener>();
+	
 	public static final String ACTION_UPDATE = "com.lpoezy.nexpa.actions.CORRESPONDENT_UPDATE";
 	
 	private List<OneComment> conversation 	= new ArrayList<OneComment>();
@@ -47,6 +49,8 @@ public class Correspondent {
 
 	public void setId(long id) {
 		this.id = id;
+		
+		notifyListeners();
 	}
 
 	public String getUsername() {
@@ -55,6 +59,8 @@ public class Correspondent {
 
 	public void setUsername(String username) {
 		this.username = username;
+		
+		notifyListeners();
 	}
 
 	public String getEmail() {
@@ -63,6 +69,8 @@ public class Correspondent {
 
 	public void setEmail(String email) {
 		this.email = email;
+		
+		notifyListeners();
 	}
 
 	public String getFname() {
@@ -71,6 +79,8 @@ public class Correspondent {
 
 	public void setFname(String fname) {
 		this.fname = fname;
+		
+		notifyListeners();
 	}
 	
 	public Bitmap getProfilePic() {
@@ -79,6 +89,8 @@ public class Correspondent {
 
 	public void setProfilePic(Bitmap profilePic) {
 		this.profilePic = profilePic;
+		
+		if(this.profilePic!=null)notifyListeners();
 	}
 
 	public void addMessage(OneComment msg){
@@ -176,32 +188,38 @@ public class Correspondent {
 		
 		if(profilePic!=null)return;
 		
-		new Thread(new Runnable() {
+		ProfilePicture profilePicture = new ProfilePicture();
+		profilePicture.setUserId(id);
+		
+		//download profile pic info offline
+		profilePicture.downloadOffline(context);
+		
+		if((profilePicture.getImgDir()!=null && !profilePicture.getImgDir().isEmpty()) &&
+				(profilePicture.getImgFile()!=null && !profilePicture.getImgFile().isEmpty())){
 			
-			@Override
-			public void run() {
-				
-				ProfilePicture profilePicture = new ProfilePicture();
-				profilePicture.setUserId(id);
-				L.debug("downloadProfilePicOnline of userId: "+id);
-				//download profile pic info offline
-				profilePicture.downloadOffline(context);
-				
-				if((profilePicture.getImgDir()!=null && !profilePicture.getImgDir().isEmpty()) &&
-						(profilePicture.getImgFile()!=null && !profilePicture.getImgFile().isEmpty())){
-					
-					String spec = AppConfig.URL+"/"+profilePicture.getImgDir()+"/"+profilePicture.getImgFile();
-					
-					profilePic =HttpUtilz.downloadImage(spec);
-					 
-					context.sendBroadcast(new Intent(ACTION_UPDATE));
-					
-					
-				}
-				
-			}
+			String spec = AppConfig.URL+"/"+profilePicture.getImgDir()+"/"+profilePicture.getImgFile();
+			L.debug("spec "+spec);
+			 setProfilePic(HttpUtilz.downloadImage(spec));
+			//context.sendBroadcast(new Intent(ACTION_UPDATE));
 			
-		}).start();
+		}
+	}
+	
+	public void removeListener(OnCorrespondentUpdateListener listener){
+		
+		int index = listeners.indexOf(listener);
+		listeners.remove(index);
+	}
+	
+	public void addListener(OnCorrespondentUpdateListener listener){
+		listeners.add(listener);
+	}
+	
+	private void notifyListeners(){
+		for(OnCorrespondentUpdateListener listener : listeners){
+			
+			listener.onCorrespondentUpdate();
+		}
 		
 	}
 
@@ -212,7 +230,16 @@ public class Correspondent {
 		List<Correspondent> correspondents = db.downloadAllCorrespondents();
 		db.close();
 		
+		for(Correspondent correspondent: correspondents){
+			correspondent.downloadOfflineMessages(context);
+		}
+		
 		return correspondents;
+	}
+	
+	public interface OnCorrespondentUpdateListener{
+		
+		public void onCorrespondentUpdate();
 	}
 	
 	

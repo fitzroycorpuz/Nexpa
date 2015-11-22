@@ -12,7 +12,11 @@ import org.jivesoftware.smack.util.Base64;
 
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.R.layout;
+import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
+import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.DateUtils;
+import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.SystemUtilz;
 import com.lpoezy.nexpa.utility.Utilz;
@@ -24,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -135,9 +140,6 @@ public class ProfilePicFragment extends DialogFragment {
 				mCurrentPhotoPath = cursor.getString(columnIndex);
 				cursor.close();
 
-				//L.debug("mCurrentPhotoPath: " + mCurrentPhotoPath);
-				//Utilz.saveToSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, mCurrentPhotoPath);
-				
 			} else if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK && null != data) {
 				Bundle extras = data.getExtras();
 				SystemUtilz.galleryAddPic(getActivity(), mCurrentPhotoPath);
@@ -145,12 +147,33 @@ public class ProfilePicFragment extends DialogFragment {
 				
 			}
 			
-			if(resultCode == Activity.RESULT_OK)Utilz.saveToSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, mCurrentPhotoPath);
-			
+			if(resultCode == Activity.RESULT_OK){
+				//L.debug("ProfilePicFragment, mCurrentPhotoPath: "+mCurrentPhotoPath);
+				//Utilz.saveToSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, mCurrentPhotoPath);
+				
+				
+				 int pos = mCurrentPhotoPath.lastIndexOf("/");
+				 
+				String imgDir = mCurrentPhotoPath.substring(0 , pos);
+				String imgFile = Uri.parse(mCurrentPhotoPath).getLastPathSegment();
+				L.debug("ProfilePicFragment, imgDir: "+imgDir+", imgFile: "+imgFile+", pos "+pos);
+				
+				long userId = -1;
+				SQLiteHandler db = new SQLiteHandler(getActivity());
+				db.openToRead();
+				userId = Long.parseLong(db.getLoggedInID());
+				db.close();
+				
+				long now = System.currentTimeMillis();
+				
+				String dateCreated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+				ProfilePicture pic = new ProfilePicture(userId, imgDir, imgFile, dateCreated);
+				pic.saveOffline(getActivity());
+				
+			}
+		
 			dismiss();
 			
-
-
 		} catch (Exception e) {
 		}
 	}

@@ -97,7 +97,7 @@ public class PeopleProfileActivity extends Activity {
 
 
 		//txtLName = (TextView) findViewById(R.id.email);
-
+		
 		if (age.length() < 4) {
 			txtFName.setText(fname + ",");
 			txtAge.setText(age);

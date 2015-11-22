@@ -46,6 +46,8 @@ public class SystemUtilz {
 		Uri contentUri = Uri.fromFile(f);
 		mediaScanIntent.setData(contentUri);
 		context.getApplicationContext().sendBroadcast(mediaScanIntent);
+		L.debug("SystemgalleryAddPic, galleryAddPic: "+currentPhotoPath);
+		
 	}
 
 	// returns a unique file name for a new photo using a date-time stamp:

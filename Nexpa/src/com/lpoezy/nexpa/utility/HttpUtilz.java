@@ -32,7 +32,7 @@ public class HttpUtilz {
 	public static String makeRequest(final String spec, final HashMap<String, String> postDataParams) {
 
 		String webPage = "", data = "";
-		
+
 		Random random = new Random();
 		int rInt = random.nextInt(5);
 		for (int i = 0; i < 5; i++) {
@@ -40,7 +40,8 @@ public class HttpUtilz {
 			int delay = (2 << i);
 			try {
 				Thread.sleep((1000 * delay) + rInt);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+			}
 
 			try {
 				URL url = new URL(spec);
@@ -90,36 +91,36 @@ public class HttpUtilz {
 		return webPage;
 
 	}
-	
+
 	public static Bitmap downloadImage(String spec) {
 
 		Random random = new Random();
 		int rInt = random.nextInt(5);
 		Bitmap img = null;
-		
+
 		for (int i = 0; i < 5; i++) {
 
 			int delay = (2 << i);
 			try {
 				Thread.sleep((1000 * delay) + rInt);
-			} catch (InterruptedException e) {}
-			
-			
+			} catch (InterruptedException e) {
+			}
+
 			try {
 
-				L.debug("start file download");
+				L.debug("start file download ,delay "+delay);
 				URL url = new URL(spec); // you can write here any link
 				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 				conn.setConnectTimeout(10000);
-				
-				if(conn.getResponseCode()==200){
-					
+
+				if (conn.getResponseCode() == 200) {
+
 					try {
-						 InputStream is = conn.getInputStream();
-						 BufferedInputStream bis = new BufferedInputStream(is);
-						 
-						 img = BitmapFactory.decodeStream(bis);
-						 
+						InputStream is = conn.getInputStream();
+						BufferedInputStream bis = new BufferedInputStream(is);
+
+						img = BitmapFactory.decodeStream(bis);
+						
 					} finally {
 						if (conn != null) {
 							conn.disconnect();
@@ -128,62 +129,75 @@ public class HttpUtilz {
 					L.debug("file download complete");
 					break;
 				}
-				
+
 			} catch (IOException e) {
 				L.error("" + e);
 			}
-		
+
 		}
-		
+
 		return img;
 	}
 
 	public static String downloadFileFrmUrl(String spec, String dir) {
 
-		try {
+		Random random = new Random();
+		int rInt = random.nextInt(5);
+		for (int i = 0; i < 5; i++) {
 
-			L.debug("start file download");
-			URL url = new URL(spec); // you can write here any link
-
-			Uri uri = Uri.parse(spec);
-			String fileName = uri.getLastPathSegment();
-			File fileDir = new File(dir);
-
-			if (!fileDir.exists()) {
-				fileDir.mkdirs();
+			int delay = (2 << i);
+			try {
+				Thread.sleep((1000 * delay) + rInt);
+			} catch (InterruptedException e) {
 			}
-
-			File file = new File(fileDir, fileName);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
 			try {
-				InputStream is = conn.getInputStream();
-				BufferedInputStream bis = new BufferedInputStream(is);
-				/*
-				 * Read bytes to the Buffer until there is nothing more to
-				 * read(-1).
-				 */
-				ByteArrayBuffer baf = new ByteArrayBuffer(50);
-				int current = 0;
-				while ((current = bis.read()) != -1) {
-					baf.append((byte) current);
+
+				L.debug("start file download");
+				URL url = new URL(spec); // you can write here any link
+
+				Uri uri = Uri.parse(spec);
+				String fileName = uri.getLastPathSegment();
+				File fileDir = new File(dir);
+
+				if (!fileDir.exists()) {
+					fileDir.mkdirs();
 				}
 
-				FileOutputStream fos = new FileOutputStream(file);
-				fos.write(baf.toByteArray());
-				fos.close();
-			} finally {
-				if (conn != null) {
-					conn.disconnect();
+				File file = new File(fileDir, fileName);
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+				try {
+					InputStream is = conn.getInputStream();
+					BufferedInputStream bis = new BufferedInputStream(is);
+					/*
+					 * Read bytes to the Buffer until there is nothing more to
+					 * read(-1).
+					 */
+					ByteArrayBuffer baf = new ByteArrayBuffer(50);
+					int current = 0;
+					while ((current = bis.read()) != -1) {
+						baf.append((byte) current);
+					}
+
+					FileOutputStream fos = new FileOutputStream(file);
+					fos.write(baf.toByteArray());
+					fos.close();
+				} finally {
+					if (conn != null) {
+						conn.disconnect();
+					}
 				}
+
+				L.debug("file download complete");
+				return file.getAbsolutePath();
+
+			} catch (IOException e) {
+				L.error("" + e);
 			}
-			
-			L.debug("file download complete");
-			return file.getAbsolutePath();
-			
-		} catch (IOException e) {
-			L.error("" + e);
+
 		}
+
 		return null;
 
 	}
