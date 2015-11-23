@@ -1,13 +1,24 @@
 package com.lpoezy.nexpa.activities;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
+import com.android.volley.toolbox.StringRequest;
 
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
@@ -21,6 +32,10 @@ import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.LocationName;
 import com.lpoezy.nexpa.utility.StringFormattingUtils;
+import com.lpoezy.nexpa.configuration.AppConfig;
+import com.lpoezy.nexpa.configuration.AppController;
+import com.lpoezy.nexpa.utility.MyLocation;
+import com.lpoezy.nexpa.utility.MyLocation.LocationResult;
 
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
@@ -31,6 +46,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -51,7 +67,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GroupChatHomeActivity extends Activity implements OnItemClickListener{
 	Button btnStartChat;
@@ -78,6 +96,8 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	static TextView txtConnection;
 	static Animation animFade;
 	Animation animTremor;
+	Animation in ;
+	Animation out;
 	
 	TextView txtReply;
 	TextView txtUser;
@@ -101,6 +121,8 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	
 	ImageView btnSearch;
 	ImageView btnPost;
+	
+	int dst;
 	
 	private PacketListener packetListener;
 	
@@ -144,6 +166,13 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 			resetInteractor();
 			interactor = 31;
 		}
+		dst = 100;
+		try {
+			dst = Integer.parseInt(db.getBroadcastDist());
+		} catch (Exception e) {
+			dst = 100;
+		}
+		
 			
 	}
 	
@@ -266,6 +295,9 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		setContentView(R.layout.activity_group_chat_home);
 		Log.e("WINDOW", "CREATE ");
 		
+		in = AnimationUtils.loadAnimation(this, R.anim.anim_fade_in_r);
+		
+		out = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_r);
 		limit_listen_maker = 3;
 		interactor = 100;
 		db = new SQLiteHandler(this);
@@ -286,6 +318,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		dialogBroadcast = new Dialog(GroupChatHomeActivity.this);
 		dialogBroadcast.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialogBroadcast.setContentView(R.layout.activity_group_chat_main);
+		
 		edBroad = (EditText) dialogBroadcast.findViewById(R.id.txtBroadcast);
 		btnCancel = (Button) dialogBroadcast.findViewById(R.id.btnClose);
 		btnOptions = (EditText) findViewById(R.id.btnOptions);
@@ -293,6 +326,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		btnOptions.setOnClickListener(buttonAddOnClickListener);
 		btnOptions.setHintTextColor(getResources().getColor(R.color.white_smoke));
 		mListView = (ListView) findViewById(R.id.listview);
+		
 		// mListView.setOnItemClickListener(this);
 		 mListView.setOnItemClickListener(onItemClickListener);
 		 btnSearch = (ImageView) findViewById(R.id.img_search);
@@ -425,7 +459,6 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 			});
 			 txtBroadId= (TextView) arg1.findViewById(R.id.broad_id);
 			 br_id = txtBroadId.getText().toString();
-			 Log.e("cc","try "+br_id);
 		}
 	};
 	int broad_user_type = 0;
@@ -583,8 +616,7 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		                {
 		                	is_scrolled = false;
 		                    flag_loading = true;
-		                    loadItems();
-		                    Log.e("LAST","A");
+		                    loadItems();	                
 		                }
 		            	}
 		            }
@@ -663,51 +695,38 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	float ftLongitude = 0;
 	float latitude = 0;
 	float longitude = 0;
-	
+	Button btnDialogButtonOK;
+	ProgressBar pbBroadcast;
 	private void openBroadcastDialog() {
 		edBroad.setText("");
 		dialogBroadcast.show();
+		btnDialogButtonOK = (Button) dialogBroadcast.findViewById(R.id.dialogButtonOK);
+		pbBroadcast = (ProgressBar) dialogBroadcast.findViewById(R.id.pbBroadcast);
+		pbBroadcast.setVisibility(View.GONE);
+		btnDialogButtonOK.setVisibility(View.VISIBLE);
 		btnStartChat = (Button) dialogBroadcast.findViewById(R.id.btnStartLocChat);
 		btnStartChat.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				
-				L.debug("CroupChatHomeActivity, start chat");
-				
+				btnDialogButtonOK.setVisibility(View.GONE);
+				btnDialogButtonOK.startAnimation(out);
+				pbBroadcast.setVisibility(View.VISIBLE);
+				pbBroadcast.startAnimation( in );
 				connection = XMPPLogic.getInstance().getConnection();
 				
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				if (connection == null) {
 					Account ac = new Account();
 					ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), null);
 					Log.e("Null Chat", "ENTERED NULL CHAT");
-					makeNotify("Failed To Contact Server", AppMsg.STYLE_ALERT);
+					failedToBroadcast(6);
 				} else if (!connection.isConnected()) {
 					Account ac = new Account();
 					ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), null);
-					makeNotify("Not Connected To Server", AppMsg.STYLE_ALERT);
+					failedToBroadcast(6);
 				} else {
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-					dialogBroadcast.dismiss();
-					makeNotify("Message Successfully Broadcasted", AppMsg.STYLE_INFO);
 					
-					ArrayList < Users > us = new ArrayList < Users > ();
-					us = db.getNearByUserDetails();
-					strUser = "";
-					
-					L.debug("CroupChatHomeActivity, us.size() "+us.size());
-					for (int j = 0; j < us.size(); j++) {
-						strUser = us.get(j).getUserName();
-						msg = new Message(strUser + "@vps.gigapros.com/Smack", Message.Type.normal);
-						msg.setBody(StringFormattingUtils.setBroadcastChatEquivalent( locationName,  edBroad.getText().toString()));
-						connection.sendPacket(msg);
-						Log.e("XMPPChatDemoActivity", "Sending broadcast to: " + strUser);
-						if (j + 1 == us.size()) {
-							
-							db.insertBroadcast(1, db.getLoggedInID() + "" + 0, edBroad.getText().toString(), longitude, latitude, locationName, j);
-							mHandler.sendEmptyMessage(2);
-							
-						}
-					}
+					getReceivers();
 					
 					if (broadCount == 0){
 						broadCount = 1;
@@ -835,4 +854,132 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
         dialogStatusYN.show();
         dialogStatusYN.getWindow().setAttributes(lp);
     }
+    
+    
+    JSONArray nearby_users = null;
+	private static final String TAG_GEO_USER = "user";
+	private static final String TAG_GEO_DIS = "geo_distance";
+	int isSuccess;
+	private void getReceivers() {
+		LocationResult locationResult = new LocationResult() {
+			Boolean isLocAvail = false;@Override
+			public void gotLocation(Location location) {
+				if (location != null) {
+					ftLatitude = (float) location.getLatitude();
+					ftLongitude = (float) location.getLongitude();
+					latitude = ftLatitude;
+					longitude = ftLongitude;
+					db.insertLocation(longitude, latitude);
+					isLocAvail = true;
+					getNearbyUsersId();
+				}
+			}
+		};
+		MyLocation myLocation = new MyLocation();
+		boolean availLoc = myLocation.getLocation(this, locationResult);
+		if (availLoc == false) {
+			makeNotify("GPS Services Unavailable", AppMsg.STYLE_ALERT);
+			failedToBroadcast(5);
+		} else {
+			Log.e("LOCATION INTELLIGENCE", "Getting db location...");
+			ftLatitude = Float.parseFloat(db.getLocationLatitude());
+			ftLongitude = Float.parseFloat(db.getLocationLongitude());
+			latitude = ftLatitude;
+			longitude = ftLongitude;
+		}
+	}
+	int exactBroadCount;
+	private void getNearbyUsersId() {
+		isSuccess = 0;
+		exactBroadCount = 0;
+		final String tag_string_req = "collect_user_id";
+		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_NEARBY, new Response.Listener < String > () {@Override
+			public void onResponse(String response) {
+				Log.e("UsersByID", "GET GEO Response: " + response.toString());
+				try {
+					JSONObject jObj = new JSONObject(response);
+					boolean error = jObj.getBoolean("error");
+					if (!error) {
+						Log.e("JSON", "GEO COLLECTED");
+						nearby_users = jObj.getJSONArray("geo");
+						Log.e("LOG", "*****JARRAY*****" + nearby_users.length());
+						if (nearby_users.length() == 0) {
+							isSuccess = 1;
+						} else {
+							for (int i = 0; i < nearby_users.length(); i++) {
+								JSONObject c = nearby_users.getJSONObject(i);
+								String uname = c.getString(TAG_GEO_USER);
+								String rawDis = c.getString(TAG_GEO_DIS);
+								float dis = Float.parseFloat(rawDis);
+								strUser = "";
+								if (dis <= dst) {
+									//try{
+									msg = new Message(uname + "@vps.gigapros.com/Smack", Message.Type.normal);
+									msg.setBody(StringFormattingUtils.setBroadcastChatEquivalent(locationName, edBroad.getText().toString()));
+									try{
+									connection.sendPacket(msg);
+									exactBroadCount++;
+									}catch(Exception xmp){
+										Log.e("ERR", "ds"+ xmp.getLocalizedMessage());
+									}
+								}
+								Log.e("XMPPChatDemoActivity", "Sending broadcast to: " + uname);
+								if (i + 1 == nearby_users.length()) {
+									db.insertBroadcast(1, db.getLoggedInID() + "" + 0, edBroad.getText().toString(), longitude, latitude, locationName, exactBroadCount);
+									dialogBroadcast.dismiss();
+									makeNotify("Message Successfully Broadcasted", AppMsg.STYLE_INFO);
+									mNotifier.sendEmptyMessage(2);
+								}
+								if (i == nearby_users.length() - 1) {
+									isSuccess = 2;
+								}
+							}
+						}
+					} else {
+						isSuccess = 3;
+						failedToBroadcast(isSuccess);
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+					isSuccess = 4;
+					failedToBroadcast(isSuccess);
+				}
+			}
+		}, new Response.ErrorListener() {@Override
+			public void onErrorResponse(VolleyError error) {
+				Log.e("UsersByID", "Error: " + error.getMessage());
+				isSuccess = 4;
+				failedToBroadcast(isSuccess);
+			}
+		}) {@Override
+			protected Map < String, String > getParams() {
+				Map < String, String > params = new HashMap < String, String > ();
+				String ins_latitude = db.getLocationLatitude();
+				String ins_longitude = db.getLocationLongitude();
+				String ins_user = db.getLoggedInID();
+				params.put("tag", tag_string_req);
+				params.put("pid", ins_user);
+				params.put("longitude", ins_longitude + "");
+				params.put("latitude", ins_latitude + "");
+				return params;
+			}
+		};
+		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+	}
+	private void failedToBroadcast(int type){
+		if (type == 3){
+			makeNotify("Failed To Contact Server", AppMsg.STYLE_ALERT);
+		}
+		else if (type == 4){
+			makeNotify("Connection Error", AppMsg.STYLE_ALERT);
+		}
+		else if (type == 5){
+			makeNotify("GPS Unavailavle", AppMsg.STYLE_ALERT);
+		}
+		else if (type == 6){
+			makeNotify("No Connection Available", AppMsg.STYLE_ALERT);
+		}
+		dialogBroadcast.dismiss();
+		
+	}
 }

@@ -15,9 +15,22 @@ android:orientation="vertical">
 		android:textAllCaps="true" android:textColor="@color/white"
 		/>
 
+		
+        
 		<View android:layout_width="0dp" android:layout_height="0dp"
 		android:layout_weight="1" />
 
+		<ProgressBar
+		    android:id="@+id/pbBroadcast"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:minHeight="30dp"
+		    android:minWidth="30dp"
+		     android:maxHeight="30dp"
+		    android:maxWidth="30dp" >
+
+        </ProgressBar>
+        
 		<Button android:id="@+id/dialogButtonOK"
 		android:layout_width="30dp" android:layout_height="30dp"
 		android:background="@drawable/btn_ok" />

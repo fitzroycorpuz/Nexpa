@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
@@ -44,21 +44,34 @@
                 android:scaleType="fitXY" />
         </RelativeLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_smoke" >
+        </TextView>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
             android:gravity="right"
             android:orientation="horizontal"
-            android:padding="16dp" >
+            android:paddingRight="16dp" >
 
             <ImageView
                 android:id="@+id/img_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
                 android:src="@drawable/ic_settings" />
+
+            <Button
+                android:id="@+id/btn_edit_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_profile" >
+            </Button>
         </LinearLayout>
-    </FrameLayout>
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"

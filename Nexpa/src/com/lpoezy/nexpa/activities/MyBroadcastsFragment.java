@@ -1,3 +1,4 @@
+
 package com.lpoezy.nexpa.activities;
 
 import java.io.ByteArrayOutputStream;
@@ -378,5 +379,4 @@ public class MyBroadcastsFragment extends Fragment {
 		}
 		
 	}
-
 }

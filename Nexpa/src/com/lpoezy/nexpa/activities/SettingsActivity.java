@@ -376,7 +376,14 @@ public class SettingsActivity extends Activity {
 
 				rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
 				rbDistance.setRangeBarEnabled(false);
-				rbDistance.setSeekPinByValue(Float.parseFloat(db.getBroadcastDist()));
+				 int dst = 100;
+	        		try{
+	        			dst = Integer.parseInt(db.getBroadcastDist());
+	        		}
+	        		catch (Exception e){
+	        			dst = 100;
+	        		}
+	                rbDistance.setSeekPinByValue(dst);
 
 				rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
 				rbDistance.setConnectingLineColor(getResources().getColor(R.color.EDWARD));
