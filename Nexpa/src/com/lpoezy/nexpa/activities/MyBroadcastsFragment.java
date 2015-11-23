@@ -82,9 +82,6 @@ public class MyBroadcastsFragment extends Fragment {
 		
 		//mAdapter = new MyBroascastsAdapter(getActivity());
 		
-		
-		 
-	       
 		mAdapter = new ParallaxRecyclerAdapter<Announcement>(mAnouncements) {
 			
 			
@@ -377,6 +374,5 @@ public class MyBroadcastsFragment extends Fragment {
 			
 		
 		}
-		
 	}
 }

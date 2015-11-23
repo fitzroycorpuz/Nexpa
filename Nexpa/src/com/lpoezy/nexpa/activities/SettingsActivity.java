@@ -591,8 +591,9 @@ public class SettingsActivity extends Activity {
 				        R.drawable.pic_sample_girl);
 			 
 			
-			if (imgDecodableString!=null && !imgDecodableString.isEmpty()) {
-				
+			if ((pic.getImgDir()!=null && !pic.getImgDir().isEmpty()) 
+					&& (pic.getImgFile()!=null && !pic.getImgFile().isEmpty())) {
+				L.debug("SettingsActivity, imgDecodableString "+imgDecodableString);
 				// Get the dimensions of the View
 	            int targetW = profilePic.getWidth();
 	            int targetH = profilePic.getHeight();
