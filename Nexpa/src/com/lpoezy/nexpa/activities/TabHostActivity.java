@@ -3,6 +3,7 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.ChatMessagesService;
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
+import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.L;
 
@@ -79,7 +80,10 @@ public class TabHostActivity extends TabActivity {
 		Intent intent;
 		
 		session = new SessionManager(getApplicationContext());
-		
+		SQLiteHandler db = new SQLiteHandler(this);
+		db.openToWrite();
+		db.updateBroadcasting(0);
+		db.updateBroadcastTicker(0);
 	
 		if (!session.isLoggedIn()) {
 			UserProfileActivity.logoutUser(TabHostActivity.this, true, null);
