@@ -381,34 +381,34 @@ public class MainSignInActivity extends Activity {
 												
 												newExec.shutdown();
 												
-												try {
-													String imgUri = newF.get();
-													
+//												try {
+//													String imgUri = newF.get();
+//													
 //													hideDialog();
 //													Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
 //													startActivity(intent);
 //													finish();
-													btnLogin.post(new Runnable() {
-														
-														@Override
-														public void run() {
-															
-															Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
-															startActivity(intent);
-															
-															finish();
-															
-															hideDialog();
-														}
-													});
-													
-													
-												} catch (InterruptedException e) {
-													L.error(""+e);
-												} catch (ExecutionException e) {
-													L.error(""+e);
-												}
+//													
+//												} catch (InterruptedException e) {
+//													L.error(""+e);
+//												} catch (ExecutionException e) {
+//													L.error(""+e);
+//												}
 											}
+											
+											btnLogin.post(new Runnable() {
+												
+												@Override
+												public void run() {
+													
+													Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
+													startActivity(intent);
+													
+													finish();
+													
+													hideDialog();
+												}
+											});
 											
 											
 										}

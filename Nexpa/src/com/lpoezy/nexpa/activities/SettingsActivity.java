@@ -235,15 +235,10 @@ public class SettingsActivity extends Activity {
 					}
 				});
 				
-				
-				
 				((Button)dialog.findViewById(R.id.dialogButtonOK)).setOnClickListener(new View.OnClickListener() {
 					
-					
-
 					@Override
 					public void onClick(View v) {
-						
 						
 						//check internet connection before performing http request
 						if(!SystemUtilz.isNetworkAvailable(SettingsActivity.this)){

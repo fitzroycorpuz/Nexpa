@@ -35,6 +35,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -147,15 +148,21 @@ public class MyBroadcastsFragment extends Fragment {
        
         mImgProfile = (ImageView) header.findViewById(R.id.img_profile);
         
-        
-        
-        
         ((ImageView)header.findViewById(R.id.img_settings)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				
 				getActivity().startActivity(new Intent(getActivity(), SettingsActivity.class));
+			}
+		});
+        
+        ((Button)header.findViewById(R.id.btn_edit_profile)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				
 			}
 		});
 		
