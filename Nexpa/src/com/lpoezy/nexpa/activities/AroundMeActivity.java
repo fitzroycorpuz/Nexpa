@@ -182,10 +182,10 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 			}
 		});
 
-		web.add(0, "You");
-		distance.add(0, 0);
-		imageId.add(0, R.drawable.pic_sample_girl);
-		availabilty.add(0, "Online");
+		//web.add(0, "You");
+		//distance.add(0, 0);
+		//imageId.add(0, R.drawable.pic_sample_girl);
+		//availabilty.add(0, "Online");
 		adapter = new CustomGrid(AroundMeActivity.this, web, arr_user_id/*imageId*/, availabilty, distance);
 		 mHandler = new Handler()
 			{
@@ -309,6 +309,11 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		grid.invalidateViews();
 		list = db.getNearByUserDetails();
 		
+		imageId.clear();
+		availabilty.clear();
+		web.clear();
+		distance.clear();
+		
 		Comparator < Users > comparator = new Comparator < Users > () {@Override
 			public int compare(Users lhs, Users rhs) {
 				return lhs.getDistance() - rhs.getDistance();
@@ -324,7 +329,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		int userSize = us.size();
 		int disSize = distance.size();
 		
-		try {
+		/*try {
 			if (userSize < disSize) {
 				for (int i = disSize; i > userSize; i--) {
 					adapter.removeItem(i - 1);
@@ -341,12 +346,11 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 				}
 			}
 		} catch (Exception e) {}
-		
+		*/
 		
 		for (int j = 0; j < us.size(); j++) {
 			if (sentType.equals("1")) {//user is already added
-				
-				if (us.get(j).getShown().equals("0")) {//
+				//if (us.get(j).getShown().equals("0")) {
 					imageId.add(j, R.drawable.pic_sample_girl);
 					availabilty.add(j, "INSERTED");
 					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
@@ -362,8 +366,12 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					arr_about.add(j, us.get(j).getAboutMe());
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
+					//}
 					
-				} else if (us.get(j).getShown().equals("1")) {
+				//} 
+				//else
+				/*else if (us.get(j).getShown().equals("1")) 
+				{
 					us.get(j).setShown("1");
 					availabilty.set(j, "UPDATED");
 					web.set(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
@@ -377,7 +385,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					arr_about.add(j, us.get(j).getAboutMe());
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
-				}
+				}*/
 			} else if (sentType.equals("0")) {//
 				imageId.add(j, R.drawable.pic_sample_girl);
 				availabilty.add(j, "ADDED");
