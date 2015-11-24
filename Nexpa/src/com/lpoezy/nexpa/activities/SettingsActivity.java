@@ -213,6 +213,9 @@ public class SettingsActivity extends Activity {
 		ln_personal = (LinearLayout) findViewById(R.id.ln_personal);
 		ln_personal.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
+				
+				
+				/*/
 				final DateUtils du = new DateUtils();
 				// Intent intent = new Intent(UserProfileActivity.this,
 				// UserPersonalActivity.class);
@@ -253,7 +256,7 @@ public class SettingsActivity extends Activity {
 						pDialog.setCancelable(false);
 						pDialog.setMessage("Saving ...");
 						pDialog.show();
-						final String imgDecodableString = Utilz.getDataFrmSharedPref(SettingsActivity.this, UserProfile.PROFILE_PIC_LOC, "");
+						final String imgDecodableString = Utilz.getDataFrmSharedPref(SettingsActivity.this, ProfilePicture.LOC, "");
 						
 						if (imgDecodableString!=null && !imgDecodableString.isEmpty()) {
 							
@@ -365,6 +368,8 @@ public class SettingsActivity extends Activity {
 				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 				dialog.show();
 				dialog.getWindow().setAttributes(lp);
+				
+				//*/
 			}
 		});
 		ln_distance = (LinearLayout) findViewById(R.id.ln_distance);

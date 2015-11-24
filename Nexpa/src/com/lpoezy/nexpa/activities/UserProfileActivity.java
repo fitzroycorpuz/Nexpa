@@ -51,7 +51,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-public class UserProfileActivity extends Activity
+public class UserProfileActivity extends Activity implements EditProfileFragment.OnShowProfilePicScreenListener
 {
 	RangeBar rbDistance;
 	
@@ -127,6 +127,17 @@ public class UserProfileActivity extends Activity
     SQLiteHandler db;
 
     Profile jsonProfile;
+    
+    
+    
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		
+	      super.onActivityResult(requestCode, resultCode, intent);
+	      
+	      L.debug("UserProfileActivity, onActivityResult");
+	      if(profPicDialog!=null)profPicDialog.onActivityResult(requestCode, resultCode, intent);
+	      
+	 }
     
 
     
@@ -338,5 +349,13 @@ public class UserProfileActivity extends Activity
     	public void onUserIsLoggedOut();
     }
     
-    
+    ProfilePicFragment profPicDialog;
+	@Override
+	public void onShowProfilePicScreen() {
+		 profPicDialog = ProfilePicFragment.newInstance();
+
+		profPicDialog.show(getFragmentManager().beginTransaction(), ProfilePicFragment.TAG);
+		
+	}
+
 }

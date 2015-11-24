@@ -36,7 +36,7 @@ public class SQLiteHandler{
 	private static final String KEY_UTYPE = "utype"; //online  id
 	private static final String KEY_CREATED_AT = "created_at";
 	private static final String KEY_FNAME = "fname";
-	private static final String KEY_AGE = "age";
+	private static final String KEY_AGE = "age";//birthday
 	private static final String KEY_GENDER = "gender";
 	private static final String KEY_ABOUTME = "about_me";
 	private static final String KEY_LOOKING_FOR_STATUS = "looking_status";
@@ -322,6 +322,22 @@ public class SQLiteHandler{
 		onCreate(db);
 	}*/
 	
+	public void updateUserProfile(long userid, String firstname, String gender, String birthday) {
+		
+		ContentValues values = new ContentValues();
+		values.put(KEY_FNAME, firstname);
+		values.put(KEY_GENDER, gender);
+		values.put(KEY_AGE, birthday);
+		
+		int row = sqLiteDatabase.update(TABLE_LOGIN, values, KEY_UTYPE+" =? ", new String[]{Long.toString(userid)});
+		if(row>0){
+			L.debug(TAG+" profile with user id of " + userid+" updated successfully!");
+		}else{
+			L.debug(TAG+" profile with user id of " + userid+" failed to update");
+		}
+		
+		
+	}
 	
 	//will always return the latest profile pic info 
 	public HashMap<String, String> downloadProfilePicture(long userId){
@@ -727,6 +743,11 @@ public class SQLiteHandler{
 		contentValues.put(PROFILE_VALID, val);
 		sqLiteDatabase.update(DATABASE_TABLE_2, contentValues, PROFILE_USER_ID + "=" + userid, null);
 	}
+	
+	
+	
+	
+	
 	public void updateUserPersonal(String fname, String age, String gender) {
 		//SQLiteDatabase db = this.getReadableDatabase();
 		ContentValues contentValues = new ContentValues();
@@ -1114,7 +1135,7 @@ public class SQLiteHandler{
 				us.setEmail(cursor.getString(cursor.getColumnIndex(PROFILE_EMAIL)));
 				userlist.add(us);
 				
-				L.debug("SqliteHelper, us.getFName() "+us.getFName());
+				//L.debug("SqliteHelper, us.getFName() "+us.getFName());
 			} while (cursor.moveToNext());
 			cursor.close();
 		} else {
@@ -1181,6 +1202,9 @@ public class SQLiteHandler{
 		sqLiteDatabase.delete(TABLE_CORRESPONDENTS, null, null);
 		
 	}
+
+	
+	
 
 	
 }

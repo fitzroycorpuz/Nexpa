@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -16,7 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.jivesoftware.smack.XMPPConnection;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,6 +28,7 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
 import com.lpoezy.nexpa.objects.ProfilePicture;
+import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
@@ -45,8 +44,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -294,8 +291,6 @@ public class MainSignInActivity extends Activity {
 						
 						if (is_activated.equals("1")) {
 							
-							
-							
 							db.addUser(server_name, server_email, server_uid, server_created_at, password);
 							session.setLogin(true);
 							Account ac = new Account();
@@ -306,7 +301,7 @@ public class MainSignInActivity extends Activity {
 									
 									new Thread(new Runnable() {
 										
-										private ProfilePicture profilePicture;
+										
 
 										@Override
 										public void run() {
@@ -319,28 +314,39 @@ public class MainSignInActivity extends Activity {
 													
 													
 													 HashMap<String, String> postDataParams = new HashMap<String, String>();
-											         postDataParams.put("tag", "download");
+											         postDataParams.put("tag", "download_profile_and_pic_info");//download_profile_and_pic_info
 											         postDataParams.put("user_id", server_uid);
 											        
 											         final String spec = AppConfig.URL_PROFILE_PIC;
 											         String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-//													 {"tag":"download",
-//											         "error":false,
-//											         "profile_picture":
-//											        	 [{"user_id":"2",
-//											        		 "img_dir":"profile_pictures",
-//											        		 "img_file":"ef75a17963e785522PeterKaiserSimpson-13.jpg",
-//											        		 "date_uploaded":"2015-11-12 08:19:22"}],
-//											        	 "msg":"Profile picture found!"}
+											         JSONObject jResult = new JSONObject(webPage);
 											         
-											         if((webPage!=null && !webPage.isEmpty())){
-											        	 JSONObject jResult = new JSONObject(webPage);
-												         JSONObject profilePicture = jResult.getJSONArray("profile_picture").getJSONObject(0);
-												         long userId = profilePicture.getLong("user_id");
-												         String imgDir = profilePicture.getString("img_dir");
-												         String imgFile = profilePicture.getString("img_file");
-												         String dateUploaded = profilePicture.getString("date_uploaded");
-												         return new ProfilePicture(userId, imgDir, imgFile, dateUploaded);
+											         L.debug("MainSignInActivity, webPage: "+webPage);
+											         
+											         if(!jResult.getBoolean("error")){
+											        	 
+											        	 
+												         JSONObject profilePictureJson = jResult.getJSONArray("profile_and_pic_info").getJSONObject(0);
+												         long userId = profilePictureJson.getLong("user_id");
+												         String firstname = profilePictureJson.getString("firstname");
+												         String gender = profilePictureJson.getString("gender");
+												         String date_update = profilePictureJson.getString("date_update");
+												         
+												         String birthday = profilePictureJson.getString("birthday");
+														 String lastname = "";
+														 
+														 UserProfile profile = new UserProfile(userId, firstname, lastname, birthday, gender, date_update);
+														 profile.updateOffline(MainSignInActivity.this);
+														 
+												         String imgDir = profilePictureJson.getString("img_dir");
+												         String imgFile = profilePictureJson.getString("img_file");
+												         String dateUploaded = profilePictureJson.getString("date_uploaded");
+												         
+												         ProfilePicture profilePicture = new ProfilePicture(userId, imgDir, imgFile, dateUploaded);
+												         profilePicture.downloadImageOnline();
+														 profilePicture.saveOffline(MainSignInActivity.this);
+												         
+												         return profilePicture;
 											         }
 											         
 													return null;
@@ -348,6 +354,7 @@ public class MainSignInActivity extends Activity {
 											});
 											exec.shutdown();
 											
+											ProfilePicture profilePicture;
 											try {
 												
 												//AppConfig.URL+"/"+imgDir+"/"+imgFile
@@ -362,39 +369,6 @@ public class MainSignInActivity extends Activity {
 												L.error(""+e);
 											}
 											
-											//download the profile pic img
-											if(profilePicture!=null){
-												ExecutorService newExec = Executors.newCachedThreadPool();
-												Future<String> newF = newExec.submit(new Callable<String>() {
-
-													@Override
-													public String call() throws Exception {
-														
-														String uri = profilePicture.downloadImageOnline();
-														profilePicture.saveOffline(MainSignInActivity.this);
-														
-														
-														
-														return uri;
-													}
-												});	
-												
-												newExec.shutdown();
-												
-//												try {
-//													String imgUri = newF.get();
-//													
-//													hideDialog();
-//													Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
-//													startActivity(intent);
-//													finish();
-//													
-//												} catch (InterruptedException e) {
-//													L.error(""+e);
-//												} catch (ExecutionException e) {
-//													L.error(""+e);
-//												}
-											}
 											
 											btnLogin.post(new Runnable() {
 												
@@ -409,8 +383,6 @@ public class MainSignInActivity extends Activity {
 													hideDialog();
 												}
 											});
-											
-											
 										}
 									}).start();
 									

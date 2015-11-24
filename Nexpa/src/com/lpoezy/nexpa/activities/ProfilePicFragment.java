@@ -90,7 +90,7 @@ public class ProfilePicFragment extends DialogFragment {
 					if (photoFile != null) {
 						mCurrentPhotoPath  = photoFile.getAbsolutePath();
 						takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-						startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+						getActivity().startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
 					}
 				}
 
@@ -109,7 +109,7 @@ public class ProfilePicFragment extends DialogFragment {
 				Intent galleryIntent = new Intent(Intent.ACTION_PICK,
 						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 				// Start the Intent
-				startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+				getActivity().startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
 
 			}
 		});
@@ -119,9 +119,9 @@ public class ProfilePicFragment extends DialogFragment {
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-		super.onActivityResult(requestCode, resultCode, data);
 		
+		super.onActivityResult(requestCode, resultCode, data);
+		L.debug("ProfilePicFragment onActivityResult");
 		try {
 			// When an Image is picked
 			if (requestCode == RESULT_LOAD_IMG && resultCode == Activity.RESULT_OK && null != data) {
@@ -177,5 +177,7 @@ public class ProfilePicFragment extends DialogFragment {
 		} catch (Exception e) {
 		}
 	}
+	
+	
 
 }

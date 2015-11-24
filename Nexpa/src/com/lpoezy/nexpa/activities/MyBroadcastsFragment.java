@@ -22,6 +22,7 @@ import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
 import com.lpoezy.nexpa.utility.Utilz;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.ActionBar.LayoutParams;
 import android.content.Context;
@@ -48,7 +49,8 @@ public class MyBroadcastsFragment extends Fragment {
 	List<Announcement> mAnouncements;
 	//private MyBroascastsAdapter mAdapter;
 	private RecyclerView mRvBroadcasts;
-	protected String mUsername; 
+	protected String mUsername;
+	
 	
 	public static MyBroadcastsFragment newInstance() {
 		MyBroadcastsFragment fragment = new MyBroadcastsFragment();
@@ -59,6 +61,8 @@ public class MyBroadcastsFragment extends Fragment {
 	public MyBroadcastsFragment() {
 		// Required empty public constructor
 	}
+	
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -161,6 +165,11 @@ public class MyBroadcastsFragment extends Fragment {
 			public void onClick(View v) {
 				
 				
+				//mCallback.onShowEditProfileScreen();
+				EditProfileFragment editProfileFrag = EditProfileFragment.newInstance();
+				
+				editProfileFrag.show(getFragmentManager().beginTransaction(), EditProfileFragment.TAG);
+				
 			}
 		});
 		
@@ -235,7 +244,7 @@ public class MyBroadcastsFragment extends Fragment {
 		
         Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
         R.drawable.pic_sample_girl);
-       
+       L.debug("MyBroadcastFragment, imgDecodableString "+imgDecodableString);
         if(imgDecodableString!=null && !imgDecodableString.isEmpty()){
         	
         	// Get the dimensions of the View
@@ -375,4 +384,6 @@ public class MyBroadcastsFragment extends Fragment {
 		
 		}
 	}
+	
+	
 }

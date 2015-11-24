@@ -39,9 +39,8 @@ public class TabHostActivity extends TabActivity {
 	private ProgressDialog pDialog;
 
 	private FrameLayout mViewMsgCount;
-
 	
-	
+    
 
 	@Override
 	protected void onResume() {

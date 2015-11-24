@@ -1,23 +1,36 @@
 package com.lpoezy.nexpa.objects;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.jivesoftware.smack.util.Base64;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.devspark.appmsg.AppMsg;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent.OnCorrespondentUpdateListener;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.BmpFactory;
+import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
+import com.lpoezy.nexpa.utility.SystemUtilz;
+import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Environment;
 
 public class ProfilePicture {
-
+	
+	public static final String LOC = "PROFILE_PIC_LOC";
 	private long userId;
 	private String imgDir;
 	private String imgFile;
@@ -82,9 +95,70 @@ public class ProfilePicture {
 		this.img = img;
 		notifyListeners();
 	}
+	
+	public void saveImgOnline(Context context){
+		
+		String imgDecodableString = getUserImgDecodableString(context);
+		
+		if(imgDecodableString==null)return;
+		
+		L.debug("started sending profile pic to server directory...");
+		
+		BmpFactory bmpFactory = new BmpFactory();
+		final int MAX_SIZE = 150;
+		Bitmap bmp = bmpFactory.getBmpWithTargetWTargetHFrm(MAX_SIZE, MAX_SIZE, imgDecodableString);
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+		bmp.compress(Bitmap.CompressFormat.PNG, 90, stream); // compress
+																// to
+																// which
+																// format
+																// you
+																// want.
+
+		byte[] byte_arr = stream.toByteArray();
+
+		final String imageStr = Base64.encodeBytes(byte_arr);
+		//L.debug("imageStr "+imageStr);
+		long now = System.currentTimeMillis();
+		final String dateCreated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+		
+		Uri uri = Uri.parse(imgDecodableString);
+		imgFile = SystemUtilz.getDeviceUniqueId(context.getApplicationContext()) + userId
+				+ uri.getLastPathSegment().replace(" ", "");
+		L.debug("imgFile " + imgFile);
+		
+		HashMap<String, String> postDataParams = new HashMap<String, String>();
+		postDataParams.put("tag", "upload");
+		postDataParams.put("image", imageStr);
+		postDataParams.put("img_file", imgFile);
+		postDataParams.put("user_id", Long.toString(userId));
+		postDataParams.put("date_created", dateCreated);
+
+		final String spec = AppConfig.URL_PROFILE_PIC;
+		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+
+		L.debug("ProfilePicture, webPage: " + webPage);
+		// {"tag":"upload","error":false,"msg":"9a89cdbd7bb2909289a89cdbd7bb290928female2.jpg Image upload complete!!"}
+		try {
+			JSONObject result = new JSONObject(webPage);
+			boolean error = result.getBoolean("error");
+			
+			if(error)L.makeText((Activity)context, "Failed to save picture", AppMsg.STYLE_ALERT);
+			
+		} catch (JSONException e) {
+			L.error(""+e);
+		}
+		
+		
+	}
 
 	public void saveOffline(Context context) {
-		
+		if(imgDir==null||imgFile==null|| imgDir.isEmpty() || imgFile.isEmpty() || imgDir.equalsIgnoreCase("null") || imgFile.equalsIgnoreCase("null")){
+			return;
+		}
+		L.debug("ProfilePicture, saveOffline");
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		//save picture info offline 
@@ -115,7 +189,9 @@ public class ProfilePicture {
 	}
 	
 	public  String downloadImageOnline(){
-		
+		if(imgDir==null||imgFile==null|| imgDir.isEmpty() || imgFile.isEmpty() || imgDir.equalsIgnoreCase("null") || imgFile.equalsIgnoreCase("null")){
+			return null;
+		}
 		String spec = AppConfig.URL+"/"+imgDir+"/"+imgFile;
 		
 		File file = new File(Environment.getExternalStorageDirectory(), "nexpa/profile_pictures");
