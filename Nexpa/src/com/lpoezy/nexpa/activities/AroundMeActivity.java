@@ -45,7 +45,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -54,7 +58,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 
-public class AroundMeActivity extends Activity implements OnRefreshListener {
+public class AroundMeActivity  extends AppCompatActivity implements OnRefreshListener {
 	private static final String TAG = AroundMeActivity.class.getSimpleName();
 	//Button btnUpdate;
 	LocationManager locationManager;
@@ -151,10 +155,23 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	}
 
 	@Override
+	  public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.toolbar, menu);
+	    return true;
+	  } 
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_around_me);
 
+		Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+	    setSupportActionBar(myToolbar);
+	 //   myToolbar.titl(false);
+	    myToolbar.setLogo(R.drawable.icon_nexpa);
+	    myToolbar.setTitle("");
+	  //  myToolbar.settex(getResources().getColor(R.color.white));
 		oldDst = 0;
 		
 		du = new DateUtils();
@@ -241,6 +258,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		
 		
 	}
+
 	
 	private void getNewLoc(){
 		String dtUpdate = db.getLocationDateUpdate();

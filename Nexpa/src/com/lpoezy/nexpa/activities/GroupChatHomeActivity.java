@@ -50,6 +50,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -71,7 +74,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GroupChatHomeActivity extends Activity implements OnItemClickListener{
+public class GroupChatHomeActivity extends AppCompatActivity implements OnItemClickListener{
 	Button btnStartChat;
 	Button btnCancel;
 	Button dialogButtonOK;
@@ -295,6 +298,9 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		setContentView(R.layout.activity_group_chat_home);
 		Log.e("WINDOW", "CREATE ");
 		
+		///Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+	   // setSupportActionBar(myToolbar);
+	    
 		in = AnimationUtils.loadAnimation(this, R.anim.anim_fade_in_r);
 		
 		out = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_r);

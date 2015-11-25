@@ -33,6 +33,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -51,7 +53,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-public class UserProfileActivity extends Activity implements EditProfileFragment.OnShowProfilePicScreenListener
+public class UserProfileActivity extends AppCompatActivity implements EditProfileFragment.OnShowProfilePicScreenListener
 {
 	RangeBar rbDistance;
 	
@@ -164,6 +166,14 @@ public class UserProfileActivity extends Activity implements EditProfileFragment
        
         setContentView(R.layout.activity_userprofile);
         
+    	Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+	    setSupportActionBar(myToolbar);
+	  //  myToolbar.setTitle("Settings");
+	    TextView mTitle = (TextView) myToolbar.findViewById(R.id.toolbar_title);
+	    mTitle.setText("SETTINGS");
+	    myToolbar.setTitleTextColor(getResources().getColor(R.color.white));
+	    myToolbar.setTitle("");
+	    
     	if(savedInstanceState==null){
 			Fragment myBroadcasts = MyBroadcastsFragment.newInstance();
 			getFragmentManager().beginTransaction()
@@ -178,13 +188,7 @@ public class UserProfileActivity extends Activity implements EditProfileFragment
 		AppMsg.makeText(this, con, style).show();
 	}
     
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
+  
     
     public static void logoutUser(Context context, boolean isExitingApp, Object callback) {
     	

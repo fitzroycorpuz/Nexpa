@@ -9,12 +9,15 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.widget.TextView;
 
 
-public class ChatHistoryActivity extends Activity implements OnShowChatHistoryListener{
+public class ChatHistoryActivity extends AppCompatActivity implements OnShowChatHistoryListener{
 
 	public static boolean isRunning;
 	
@@ -37,6 +40,8 @@ public class ChatHistoryActivity extends Activity implements OnShowChatHistoryLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat_history);
+	
+		
 		if(savedInstanceState==null){
 			Fragment chatHistoryList = ChatHistoryListFragment.newInstance();
 			getFragmentManager().beginTransaction()
@@ -44,6 +49,8 @@ public class ChatHistoryActivity extends Activity implements OnShowChatHistoryLi
 			.commit();
 		}
 		
+		
+	    
 //		if (android.os.Build.VERSION.SDK_INT>=android.os.Build.VERSION_CODES.HONEYCOMB) {
 //			 ActionBar actionBar = getActionBar();
 //			 actionBar.setHomeButtonEnabled(true);
@@ -55,6 +62,12 @@ public class ChatHistoryActivity extends Activity implements OnShowChatHistoryLi
 		
 		
 		//RecyclerView
+		Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+	    setSupportActionBar(myToolbar);
+	    TextView mTitle = (TextView) myToolbar.findViewById(R.id.toolbar_title);
+	    mTitle.setText("MESSAGES");
+	    myToolbar.setTitleTextColor(getResources().getColor(R.color.white));
+	    myToolbar.setTitle("");
 	}
 	
 	@Override
