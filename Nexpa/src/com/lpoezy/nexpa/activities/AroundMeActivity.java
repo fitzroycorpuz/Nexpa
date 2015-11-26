@@ -16,6 +16,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.appyvet.rangebar.RangeBar;
 import com.lpoezy.nexpa.activities.CustomGrid;
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
@@ -34,6 +35,7 @@ import com.lpoezy.nexpa.utility.MyLocation.LocationResult;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -50,10 +52,15 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -161,6 +168,68 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	    return true;
 	  } 
 	
+	Dialog dialogPref;
+	RangeBar rbDistance;
+	String distTick = "";
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        
+	        case R.id.action_distance:
+	        	dialogPref = new Dialog(AroundMeActivity.this);
+				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				dialogPref.setContentView(R.layout.activity_profile_distance_settings);
+
+				rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
+				rbDistance.setRangeBarEnabled(false);
+					dst = 100;
+	        		try{
+	        			dst = Integer.parseInt(db.getBroadcastDist());
+	        		}
+	        		catch (Exception e){
+	        			dst = 100;
+	        		}
+	                rbDistance.setSeekPinByValue(dst);
+
+				rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
+				rbDistance.setConnectingLineColor(getResources().getColor(R.color.EDWARD));
+				rbDistance.setSelectorColor(getResources().getColor(R.color.EDWARD));
+				rbDistance.setPinRadius(30f);
+				rbDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+					@Override
+					public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
+							String leftPinValue, String rightPinValue) {
+						distTick = rightPinValue;
+					}
+				});
+
+				Button dialogButton = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
+				dialogButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
+						db.updateBroadcastDist(distTick);
+						dst = Integer.parseInt(distTick);
+						tryGridToUpdate();
+						dialogPref.dismiss();
+					}
+				});
+				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+				lp.copyFrom(dialogPref.getWindow().getAttributes());
+				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+				dialogPref.show();
+				dialogPref.getWindow().setAttributes(lp);
+	            return true;
+
+	        default:
+	            // If we got here, the user's action was not recognized.
+	            // Invoke the superclass to handle it.
+	            return super.onOptionsItemSelected(item);
+
+	    }
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -168,11 +237,9 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
 	    setSupportActionBar(myToolbar);
-	 //   myToolbar.titl(false);
 	    myToolbar.setLogo(R.drawable.icon_nexpa);
 	    myToolbar.setTitle("");
-	  //  myToolbar.settex(getResources().getColor(R.color.white));
-		oldDst = 0;
+	 	oldDst = 0;
 		
 		du = new DateUtils();
 		db = new SQLiteHandler(this);
