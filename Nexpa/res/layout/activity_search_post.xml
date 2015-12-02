@@ -21,4 +21,21 @@ android:orientation="vertical">
 			android:textSize="18dp" />
 		</LinearLayout>
 	</LinearLayout>
+
+	<TextView
+	    android:id="@+id/txtNo"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:gravity="center"
+	    android:padding="5dp"
+	    android:text="No Results Found"
+	    android:textColor="@color/asbestos"
+	    android:textSize="18dp" />
+
+	<ListView android:layout_width="match_parent"
+		android:layout_height="match_parent" 
+		android:id="@+id/listview" 
+		tools:context=".SearchPostActivity"
+		android:dividerHeight="10.0sp"  android:animateLayoutChanges="true"
+		/>
 </LinearLayout>	

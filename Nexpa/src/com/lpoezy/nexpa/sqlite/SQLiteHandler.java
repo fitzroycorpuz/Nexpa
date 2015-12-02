@@ -191,7 +191,7 @@ public class SQLiteHandler{
 		  }
 		 }
 	
-	/** Returns all the customers in the table */
+	/** Returns broadcasts in the table */
 	public Cursor getAllBroadCast(int limiter){   
 		 String[] columns = new String[]{BROAD_ID, BROADCAST_FROM, BROADCAST_DATE,BROADCAST_LOCATION_LOCAL, BROADCAST_MESSAGE,  BROADCAST_REACH, BROADCAST_TYPE
 			};
@@ -201,6 +201,29 @@ public class SQLiteHandler{
 	  	  	//Log.e("CURSOR REQ","TOUCHED REQUERY");
 			return cursor;
 	}
+	
+	/** Returns filtered broadcasts in the table */
+	public Cursor getFilteredBroadCast(int limiter, String filter){   
+		 String[] columns = new String[]{BROAD_ID, BROADCAST_FROM, BROADCAST_DATE,BROADCAST_LOCATION_LOCAL, BROADCAST_MESSAGE,  BROADCAST_REACH, BROADCAST_TYPE
+			};
+	  	  	//SQLiteDatabase db = sqLiteDatabase.getWritableDatabase();
+	  	  	Cursor cursor = sqLiteDatabase.query(DATABASE_TABLE_3, columns,
+	  	  		BROADCAST_STATUS + "=?" + " AND " + BROADCAST_MESSAGE + " LIKE '%" + filter + "%'", new String[] { "1" }, null, null, BROADCAST_DATE + " desc ",limiter +"");
+	  	  	//Log.e("CURSOR REQ","TOUCHED REQUERY");
+			return cursor;
+	}
+	
+	public int getFilteredBroadCastCount(String filter) {
+		String countQuery = "SELECT * FROM " + DATABASE_TABLE_3  +" WHERE "+  BROADCAST_MESSAGE + " LIKE '%" + filter + "%'";
+	//	SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = sqLiteDatabase.rawQuery(countQuery, null);
+		int rowCount = cursor.getCount();
+		Log.e("BROADCAST COUNT", rowCount +"");
+		//db.close();
+		cursor.close();
+		return rowCount;
+	}
+	
 	
 	 public SQLiteHandler openToRead() throws android.database.SQLException {
 		  sqLiteHelper = new SQLiteHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
