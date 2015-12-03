@@ -27,6 +27,8 @@ import com.lpoezy.nexpa.utility.DividerItemDecoration;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
 import com.lpoezy.nexpa.utility.SystemUtilz;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 
 import android.app.ActionBar;
@@ -85,7 +87,8 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 
 	private long mCorrespondentId;
 
-	private SwipeRefreshLayout mSwipeRefreshLayout;
+	//private SwipeRefreshLayout mSwipeRefreshLayout;
+	private SwipyRefreshLayout mSwipeRefreshLayout;
 
 	private LinearLayout textMessageContainer;
 
@@ -183,20 +186,33 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 		} else {
 			textMessage.setText("");
 		}
+		
+		
 
-		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+		//mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+		mSwipeRefreshLayout = (SwipyRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+		mSwipeRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
 		mSwipeRefreshLayout.setColorSchemeResources(R.color.niagara, R.color.buttercup, R.color.niagara);
 
 		mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.carrara));
+		
+		mSwipeRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh(SwipyRefreshLayoutDirection direction) {
 
-		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-				updateList();
-			}
-			
-			
+            	updateList();
+            }
 		});
+		
+
+//		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//			@Override
+//			public void onRefresh() {
+//				updateList();
+//			}
+//			
+//			
+//		});
 
 		mSwipeRefreshLayout.post(new Runnable() {
 			@Override

@@ -18,6 +18,8 @@ import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
 import com.lpoezy.nexpa.utility.SystemUtilz;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -46,7 +48,8 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 	private OnShowChatHistoryListener mCallback;
 	private List<Correspondent> mBuddys;
 	private ChatHistoryAdapter mAdapter;
-	private SwipeRefreshLayout mSwipeRefreshLayout;
+	//private SwipeRefreshLayout mSwipeRefreshLayout;
+	private SwipyRefreshLayout mSwipeRefreshLayout;
 
 	public static ChatHistoryListFragment newInstance() {
 		ChatHistoryListFragment fragment = new ChatHistoryListFragment();
@@ -91,17 +94,27 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		mAdapter = new ChatHistoryAdapter(getActivity(), mCallback);
 		rvChatHistory.setAdapter(mAdapter);
 
-		mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+		//mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+		mSwipeRefreshLayout = (SwipyRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+		mSwipeRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
 		mSwipeRefreshLayout.setColorSchemeResources(R.color.niagara, R.color.buttercup, R.color.niagara);
 
 		mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.carrara));
+		
+		mSwipeRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh(SwipyRefreshLayoutDirection direction) {
 
-		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-				updateList();
-			}
+            	updateList();
+            }
 		});
+
+//		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//			@Override
+//			public void onRefresh() {
+//				updateList();
+//			}
+//		});
 
 		return v;
 	}

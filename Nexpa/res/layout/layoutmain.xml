@@ -23,8 +23,26 @@
             android:scrollHorizontally="true"
             android:singleLine="true" />
     </RelativeLayout>
+    
+    
+    <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+         android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+        
+         <android.support.v7.widget.RecyclerView
+            android:id="@+id/listMessages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColor="@color/txt_color" >
+        </android.support.v7.widget.RecyclerView>
+    
+    </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <!-- <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -38,7 +56,7 @@
             android:layout_weight="1"
             android:textColor="@color/txt_color" >
         </android.support.v7.widget.RecyclerView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </android.support.v4.widget.SwipeRefreshLayout> -->
 
     <!--
         <ListView
