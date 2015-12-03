@@ -624,10 +624,13 @@ public class SQLiteHandler {
 	
 
 	private Map<String, String> compareWithLatestSentMsg(Map<String, String> receive, long senderId, long receiverId) {
+		
+		
+		
 		Map<String, String> sent = downloadLatestMsgSentOffline(senderId, receiverId);
 		try {
 			long receivedDate = DateUtils.simpleDateToMillis(receive.get(MSG_DATE_RECEIVED));
-			long sentDate = DateUtils.simpleDateToMillis(receive.get(MSG_DATE));
+			long sentDate = DateUtils.simpleDateToMillis(sent.get(MSG_DATE));
 			
 			if(receivedDate>sentDate)return receive;
 			

@@ -217,8 +217,6 @@ public class OneComment {
 			this.date = map.get(SQLiteHandler.MSG_DATE);
 			this.isUnread = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_UNREAD));
 			
-			
-			
 		}
 
 		db.close();
