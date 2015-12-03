@@ -428,17 +428,30 @@ public class SQLiteHandler {
 
 		return count;
 	}
-
-	public void markMessageAsReadOffline(long senderId, String date) {
-
+	
+	public void markMessageAsReceived(long senderId, String date, String dateReceived) {
 		ContentValues values = new ContentValues();
 
-		values.put(MSG_IS_UNREAD, "0");
+		values.put(MSG_DATE_RECEIVED, dateReceived);
 
 		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND "+MSG_DATE+" = ?",
 				new String[] { Long.toString(senderId), date });
 		if(rowCount>0){
 			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as read");
+		}
+		
+	}
+
+	public void markMessageAsRead(long senderId, String date) {
+
+		ContentValues values = new ContentValues();
+		values.put(MSG_IS_UNREAD, "0");
+		
+
+		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND "+MSG_DATE+" = ?",
+				new String[] { Long.toString(senderId), date });
+		if(rowCount>0){
+			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as received");
 		}
 
 	}
@@ -1540,6 +1553,8 @@ public class SQLiteHandler {
 		sqLiteDatabase.delete(TABLE_CORRESPONDENTS, null, null);
 
 	}
+
+	
 
 
 }

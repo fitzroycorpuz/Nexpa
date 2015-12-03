@@ -180,12 +180,22 @@ public class OneComment {
 		return false;
 
 	}
+	
+	public void markAsReceivedOffline(Context context) {
+		
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToWrite();
+		db.markMessageAsReceived(senderId, date, dateReceived);
+		db.close();
+		
+	}
+	
 
 	public void markAsReadOffline(Context context, long senderId) {
 
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
-		db.markMessageAsReadOffline(senderId, date);
+		db.markMessageAsRead(senderId, date);
 		db.close();
 
 	}
@@ -349,5 +359,7 @@ public class OneComment {
 		L.debug("message don't exists ");
 		return false;
 	}
+
+	
 
 }

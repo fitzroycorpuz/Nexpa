@@ -288,11 +288,21 @@ public class Correspondent {
 
 		for (OneComment comment : conversation) {
 			
+			
+			
+			if(comment.dateReceived==null ||comment.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")){
+				
+				long now = System.currentTimeMillis();
+				String dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+				comment.dateReceived = dateReceived;
+				
+				comment.markAsReceivedOffline(context);
+			}
 			if(comment.isUnread){
 				//marking messages read online is moved,
 				//to the sync button in the settings screen
 				//if (comment.markAsReadOnline(context, id)) {
-	
+				
 					comment.markAsReadOffline(context, id);
 	
 				//}

@@ -403,8 +403,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 				}
 			}).start();
 
-			// else notify user that they need,
-			// to enable their internet connection
+			
 		} else {
 			//mCorrespondent.downloadOfflineMessages(ChatActivity.this);
 			
