@@ -165,7 +165,7 @@ public class TabHostActivity extends TabActivity {
 				if(ChatHistoryActivity.isRunning || ChatActivity.isRunning)return;
 				
 				int count = OneComment.getUnReadMsgCountOffline(TabHostActivity.this);
-				L.debug("TabhostActivity, mUpdateMsgCount ");
+				L.debug("TabhostActivity, mUpdateMsgCount "+count);
 				if(count>0){
 					if(mViewMsgCount.getVisibility() == View.GONE)mViewMsgCount.setVisibility(View.VISIBLE);
 					((TextView)mViewMsgCount.findViewById(R.id.tv_msg_count)).setText(Integer.toString(count));

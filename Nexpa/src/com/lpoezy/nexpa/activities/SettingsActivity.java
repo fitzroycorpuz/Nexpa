@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -26,6 +27,7 @@ import com.appyvet.rangebar.RangeBar;
 import com.devspark.appmsg.AppMsg;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.Profile;
+import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
@@ -191,6 +193,8 @@ public class SettingsActivity extends Activity {
 	
 	
 	private ProgressDialog pDialog;
+
+	private LinearLayout ln_sync;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -417,6 +421,44 @@ public class SettingsActivity extends Activity {
 				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 				dialogPref.show();
 				dialogPref.getWindow().setAttributes(lp);
+			}
+		});
+		
+		ln_sync = (LinearLayout) findViewById(R.id.ln_sync);
+		ln_sync.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				pDialog = new ProgressDialog(SettingsActivity.this);
+				pDialog.setCancelable(false);
+				pDialog.setMessage("Syncing ...");
+				pDialog.show();
+				
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						
+						List<OneComment> msgs = OneComment.downloadReceivedMsgsOffline(getApplicationContext());
+						
+						for(OneComment msg: msgs){
+							msg.markAsReceivedOnline();
+						}
+						
+						ln_sync.post(new Runnable() {
+							
+							@Override
+							public void run() {
+								pDialog.dismiss();
+								
+							}
+						});
+						
+					}
+				}).start();
+				
+				
 			}
 		});
 

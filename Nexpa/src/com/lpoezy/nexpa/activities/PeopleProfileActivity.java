@@ -138,7 +138,7 @@ public class PeopleProfileActivity extends Activity {
 			public void onClick(View view) {
 				Intent intentMes = new Intent(PeopleProfileActivity.this, ChatActivity.class);
 				
-				L.debug("sending msg to user_id: "+userId);
+				
 				intentMes.putExtra("userid", userId);
 				intentMes.putExtra("email", email);
 				intentMes.putExtra("username", username);

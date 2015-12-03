@@ -295,8 +295,6 @@ public class EditProfileFragment extends DialogFragment {
 		} catch (ParseException e) {  
 		   L.error(""+e);  
 		}
-		
-		
 	}
 
 	private void resetProfilePic() {

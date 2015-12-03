@@ -30,6 +30,7 @@
     <string name="radio_female">Female</string>
     <string name="preferences">about me</string>
     <string name="sign_out">Sign out</string>
+    <string name="sync">Sync</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="take_photo">Take photo</string>
      <string name="choose_existing_photo">Choose existing photo</string>

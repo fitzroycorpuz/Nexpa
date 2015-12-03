@@ -181,6 +181,38 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/white" />
+     
+     
+     <LinearLayout
+        android:id="@+id/ln_sync"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/flat_white"
+        android:orientation="horizontal"
+        android:padding="20dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_vertical|center"
+            android:text="@string/sync"
+            android:textAllCaps="true"
+            android:textColor="@color/old_black"
+            android:textSize="18dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+    
+     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/white" />
+     
     
     <LinearLayout
         android:id="@+id/ln_sign_out"

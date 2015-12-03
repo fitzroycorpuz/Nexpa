@@ -5,42 +5,43 @@
     android:background="@color/white"
     android:orientation="vertical" >
 
-     <RelativeLayout
-       
+    <RelativeLayout
         android:layout_width="1dp"
         android:layout_height="1dp"
-        android:visibility ="invisible">
+        android:visibility="invisible" >
 
-         <TextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chat With"
-            android:textColor="@color/txt_color"
-            />
+            android:textColor="@color/txt_color" />
 
         <EditText
             android:id="@+id/toET"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scrollHorizontally="true"
-            android:singleLine="true"
-            />
-        
+            android:singleLine="true" />
     </RelativeLayout>
-    
-      <android.support.v7.widget.RecyclerView
-        android:id="@+id/listMessages"
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-       
-        android:textColor="@color/txt_color"
-        >
-        
-    </android.support.v7.widget.RecyclerView>  
-    
+         >
 
-     <!-- <ListView
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listMessages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColor="@color/txt_color" >
+        </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <!--
+        <ListView
         android:id="@+id/listMessages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -52,15 +53,16 @@
         android:stackFromBottom="true"
         android:listSelector="@android:color/transparent"
         android:transcriptMode="alwaysScroll"
-        android:divider="@null" /> -->
+        android:divider="@null" />
+    -->
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/chatETContainer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom"
-        android:textColor="@color/txt_color"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:textColor="@color/txt_color" >
 
         <EditText
             android:id="@+id/chatET"
@@ -68,9 +70,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="top"
-            android:textColor="@color/txt_color"
             android:hint="Type to compose"
-            android:scrollHorizontally="true" >
+            android:scrollHorizontally="true"
+            android:textColor="@color/txt_color" >
         </EditText>
 
         <Button
@@ -82,7 +84,6 @@
             android:layout_marginTop="5dp"
             android:text="Send"
             android:textColor="@color/white"
-          
             android:textStyle="normal" />
     </LinearLayout>
 

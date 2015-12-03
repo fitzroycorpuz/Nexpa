@@ -7,9 +7,9 @@ import android.util.Log;
 
 public class StringFormattingUtils {
 	
-	public static int getBoolean(boolean value){
+	public static String getBoolean(boolean value){
 		
-		return (!value)?0:1;
+		return (!value)?"0":"1";
 		
 	}
 	

@@ -324,8 +324,7 @@ public class MainSignInActivity extends Activity {
 											         L.debug("MainSignInActivity, webPage: "+webPage);
 											         
 											         if(!jResult.getBoolean("error")){
-											        	 
-											        	 
+											        	
 												         JSONObject profilePictureJson = jResult.getJSONArray("profile_and_pic_info").getJSONObject(0);
 												         long userId = profilePictureJson.getLong("user_id");
 												         String firstname = profilePictureJson.getString("firstname");

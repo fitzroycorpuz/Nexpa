@@ -8,13 +8,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.BmpFactory;
 import com.lpoezy.nexpa.utility.DividerItemDecoration;
 import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
+import com.lpoezy.nexpa.utility.SystemUtilz;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -26,6 +29,7 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -37,11 +41,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ChatHistoryListFragment extends Fragment implements Correspondent.OnCorrespondentUpdateListener{
+public class ChatHistoryListFragment extends Fragment implements Correspondent.OnCorrespondentUpdateListener {
 
 	private OnShowChatHistoryListener mCallback;
 	private List<Correspondent> mBuddys;
 	private ChatHistoryAdapter mAdapter;
+	private SwipeRefreshLayout mSwipeRefreshLayout;
 
 	public static ChatHistoryListFragment newInstance() {
 		ChatHistoryListFragment fragment = new ChatHistoryListFragment();
@@ -85,6 +90,19 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 		mAdapter = new ChatHistoryAdapter(getActivity(), mCallback);
 		rvChatHistory.setAdapter(mAdapter);
+
+		mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+		mSwipeRefreshLayout.setColorSchemeResources(R.color.niagara, R.color.buttercup, R.color.niagara);
+
+		mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.carrara));
+
+		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				updateList();
+			}
+		});
+
 		return v;
 	}
 
@@ -94,7 +112,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
-			L.debug("ChatHistoryList, message received");
+			L.debug("=============ChatHistoryList, message received================");
 			updateList();
 
 		}
@@ -102,26 +120,29 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 	};
 
 	// receiving update from correspondent model
-//	private BroadcastReceiver mReceivedCorrespondentUpdate = new BroadcastReceiver() {
-//
-//		@Override
-//		public void onReceive(final Context context, final Intent intent) {
-//			L.debug("ChatHistoryList, correspondent update "+mBuddys.get(0).getProfilePic());
-//			
-//			mAdapter.notifyDataSetChanged();
-//
-//		}
-//	};
-	List<Correspondent> mCorrespondents;
+	// private BroadcastReceiver mReceivedCorrespondentUpdate = new
+	// BroadcastReceiver() {
+	//
+	// @Override
+	// public void onReceive(final Context context, final Intent intent) {
+	// L.debug("ChatHistoryList, correspondent update
+	// "+mBuddys.get(0).getProfilePic());
+	//
+	// mAdapter.notifyDataSetChanged();
+	//
+	// }
+	// };
+	// List<Correspondent> correspondents;
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
 
 		getActivity().unregisterReceiver(mReceivedMessage);
-		//getActivity().unregisterReceiver(mReceivedCorrespondentUpdate);
-		
-		for (final Correspondent correspondent : mCorrespondents) {
+		// getActivity().unregisterReceiver(mReceivedCorrespondentUpdate);
+
+		for (int i = 0; i < mBuddys.size(); i++) {
+			Correspondent correspondent = mBuddys.get(i);
 			correspondent.removeListener(this);
 		}
 	}
@@ -132,81 +153,101 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		super.onResume();
 
 		getActivity().registerReceiver(mReceivedMessage, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
-		//getActivity().registerReceiver(mReceivedCorrespondentUpdate, new IntentFilter(Correspondent.ACTION_UPDATE));
+		// getActivity().registerReceiver(mReceivedCorrespondentUpdate, new
+		// IntentFilter(Correspondent.ACTION_UPDATE));
+		int count = OneComment.getUnReadMsgCountOffline(getActivity());
+		L.debug("count: "+count+", mBuddys.isEmpty: "+mBuddys.isEmpty());
+		if ((mBuddys != null && mBuddys.isEmpty())) {
+			updateList();
 
-		updateList();
+			mSwipeRefreshLayout.post(new Runnable() {
+				@Override
+				public void run() {
+					mSwipeRefreshLayout.setRefreshing(true);
+				}
+			});
+		} else {
+			downloadAllMsgsOffline();
+		}
+
 	}
-	
-	private void updateList() {
-		
-		mCorrespondents = Correspondent.downloadAllOffline(getActivity());
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				final int MAX_THREAD = 5;
-				int n = mCorrespondents.size()<MAX_THREAD && mCorrespondents.size()!=0 ? mCorrespondents.size():MAX_THREAD;
-				ExecutorService exec = Executors.newFixedThreadPool(n);
-				for (int i=0;i<mCorrespondents.size();i++) {
-					final Correspondent correspondent = mCorrespondents.get(i);
-					correspondent.addListener(ChatHistoryListFragment.this);
-					exec.execute(new Runnable() {
-						
-						@Override
-						public void run() {
-							correspondent.downloadProfilePicOnline(getActivity());
-							L.debug("ChatHistory, updateList "+correspondent.getId());
-							correspondent.downloadLatestMsgOffline(getActivity());
-							
-						}
-					});
-					
-				}
-				
-				exec.shutdown();
-				try {
-					exec.awaitTermination(1, TimeUnit.HOURS);
-				} catch (InterruptedException e) {
-					
-				}
-				
-			}
-		}).start();
-		
-//		new Thread(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				for (int i=0;i<mCorrespondents.size();i++) {
-//					final Correspondent correspondent = mCorrespondents.get(i);
-//					correspondent.addListener(ChatHistoryListFragment.this);
-//					
-//					correspondent.downloadProfilePicOnline(getActivity());
-//					L.debug("ChatHistory, updateList "+correspondent.getId());
-//					correspondent.downloadLatestMsgOffline(getActivity());
-//							
-//				}
-//				
-//			}
-//		}).start();
-		
-		
-		
-		mBuddys.clear();
-		mBuddys.addAll(mCorrespondents);
-		mAdapter.notifyDataSetChanged();
 
+	private void downloadAllMsgsOffline() {
+
+		List<Correspondent> correspondents = Correspondent.downloadAllOffline(getActivity());
+
+		mBuddys.clear();
+		mBuddys.addAll(correspondents);
+		onCorrespondentUpdate();
+
+	}
+
+	private void updateList() {
+
+		if (SystemUtilz.isNetworkAvailable(getActivity())) {
+
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+
+					// mCorrespondents =
+					// Correspondent.downloadAllReceivedOnline(getActivity());
+					List<Correspondent> correspondents = Correspondent.downloadAllMsgsOnline(getActivity());
+
+					final int MAX_THREAD = 5;
+					int n = correspondents.size() < MAX_THREAD && correspondents.size() != 0 ? correspondents.size()
+							: MAX_THREAD;
+					ExecutorService exec = Executors.newFixedThreadPool(n);
+					L.debug("correspondents.size() "+correspondents.size());
+					for (int i = 0; i < correspondents.size(); i++) {
+						final Correspondent correspondent = correspondents.get(i);
+						//L.debug("xxxxxxxxxx correspondent username"+correspondent.getUsername()+", fname: "+correspondent.getFname()+"xxxxxxx");
+						correspondent.addListener(ChatHistoryListFragment.this);
+
+						mBuddys.clear();
+						mBuddys.addAll(correspondents);
+						onCorrespondentUpdate();
+
+						exec.execute(new Runnable() {
+
+							@Override
+							public void run() {
+
+								correspondent.downloadProfilePicOnline(getActivity());
+								// L.debug("ChatHistory, updateList
+								// "+correspondent.getId());
+
+							}
+						});
+
+					}
+					exec.shutdown();
+					try {
+						exec.awaitTermination(1, TimeUnit.HOURS);
+					} catch (InterruptedException e) {
+
+					}
+
+				}
+			}).start();
+
+		} else {
+
+			downloadAllMsgsOffline();
+		}
+		// onCorrespondentUpdate();
 	}
 
 	private class ChatHistoryAdapter extends RecyclerView.Adapter<ChatHistoryAdapter.ViewHolder> {
 
 		private LayoutInflater inflater;
-		//private List<Correspondent> buddys;
+		// private List<Correspondent> buddys;
 		private OnShowChatHistoryListener listener;
 
 		public ChatHistoryAdapter(Context context, OnShowChatHistoryListener listener) {
 			this.inflater = LayoutInflater.from(context);
-			//this.buddys = buddys;
+			// this.buddys = buddys;
 			this.listener = listener;
 		}
 
@@ -219,25 +260,41 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		@Override
 		public void onBindViewHolder(ViewHolder vh, int position) {
 			vh.position = position;
-			vh.tvBuddys.setText(mBuddys.get(position).getUsername());
 
-			boolean isMsgUnread = mBuddys.get(position).getConversation().get(0).isUnread;
+			// only use username if fname has no value
+			String name = (mBuddys.get(position).getFname().isEmpty()) ? mBuddys.get(position).getUsername()
+					: mBuddys.get(position).getFname();
+			vh.tvBuddys.setText(name);
 
-			if (isMsgUnread)
-				vh.tvMsg.setTypeface(null, Typeface.BOLD); // only text
+			OneComment msg = mBuddys.get(position).getConversation().get(0);
+
+			// only make the text bold if the msg is from a correpondent
+			boolean isMsgUnread = msg.isUnread;
+
+			SQLiteHandler db = new SQLiteHandler(getActivity());
+			db.openToRead();
+			long userId = Long.parseLong(db.getLoggedInID());
+			db.close();
+
+			if (isMsgUnread && (userId != msg.senderId))
+				vh.tvMsg.setTypeface(null, Typeface.BOLD); // only text //
 															// style(only bold)
 			else
 				vh.tvMsg.setTypeface(null, Typeface.NORMAL);
-			//L.debug("update view holder "+mBuddys.get(position).getProfilePic());
-            if(mBuddys.get(position).getProfilePic()!=null){
-            	
-            	RoundedImageView riv = new RoundedImageView(getActivity());
-                Bitmap circImage = riv.getCroppedBitmap(mBuddys.get(position).getProfilePic(), 68);
-               
-            	vh.imgProfilePic.setImageBitmap(circImage);
-            	
-            }
-			vh.tvMsg.setText(mBuddys.get(position).getConversation().get(0).comment);
+
+			// L.debug("update view holder
+			// "+mBuddys.get(position).getProfilePic());
+
+			if (mBuddys.get(position).getProfilePic() != null) {
+
+				RoundedImageView riv = new RoundedImageView(getActivity());
+				Bitmap circImage = riv.getCroppedBitmap(mBuddys.get(position).getProfilePic(), 68);
+
+				vh.imgProfilePic.setImageBitmap(circImage);
+
+			}
+
+			vh.tvMsg.setText(msg.comment);
 
 		}
 
@@ -258,7 +315,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 				super(view);
 				tvBuddys = (TextView) view.findViewById(R.id.tv_buddys_name);
 				tvMsg = (TextView) view.findViewById(R.id.tv_buddys_msg);
-				imgProfilePic=(ImageView)view.findViewById(R.id.img_profile_pic);
+				imgProfilePic = (ImageView) view.findViewById(R.id.img_profile_pic);
 				view.setOnClickListener(this);
 			}
 
@@ -266,6 +323,17 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 			public void onClick(View v) {
 
 				Correspondent buddy = mBuddys.get(position);
+				// will set all the unread flags,
+				// of the messages to read
+				for (OneComment comment : buddy.getConversation()) {
+					if (comment.isUnread) {
+						comment.isUnread = false;
+					}
+				}
+
+				// update adapter
+				notifyDataSetChanged();
+
 				listener.onShowChatHistory(buddy);
 			}
 
@@ -279,15 +347,24 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 	@Override
 	public void onCorrespondentUpdate() {
-		
-		L.debug("ChatHistoryList, correspondent update "+mBuddys.get(0).getProfilePic());
-		getActivity().runOnUiThread( new Runnable() {
+
+		mSwipeRefreshLayout.post(new Runnable() {
+			@Override
 			public void run() {
 				mAdapter.notifyDataSetChanged();
+
+				if (mSwipeRefreshLayout.isRefreshing()) {
+					mSwipeRefreshLayout.setRefreshing(false);
+				}
 			}
 		});
-		
-		
+
+		// getActivity().runOnUiThread( new Runnable() {
+		// public void run() {
+		//
+		// }
+		// });
+
 	}
 
 }

@@ -351,8 +351,8 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					availabilty.add(j, "INSERTED");
 					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
 					
-					
-					arr_user_id.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
+					L.debug("userID: "+us.get(j).getUserId()+", username: "+us.get(j).getUserName());
+					arr_user_id.add(j,Long.parseLong(Integer.toString(us.get(j).getUserId())));
 					distance.add(j, us.get(j).getDistance());
 					arr_uname.add(j, us.get(j).getUserName());
 					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
@@ -367,7 +367,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					us.get(j).setShown("1");
 					availabilty.set(j, "UPDATED");
 					web.set(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
-					arr_user_id.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
+					arr_user_id.add(j,Long.parseLong(Integer.toString(us.get(j).getUserId())));
 					distance.set(j, us.get(j).getDistance());
 					arr_uname.add(j, us.get(j).getUserName());
 					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
@@ -546,15 +546,15 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 								String sex = c.getString(TAG_GEO_GENDER);
 								
 								//profile pic info
-								long userId 		= Long.parseLong(id);
+								String userId 		= c.getString("user_id");
 								String imgDir 		= c.getString("img_dir");
 								String imgFile 		= c.getString("img_file");
 								String dateCreated 	= c.getString("date_uploaded");
-								
+								id = userId;
 								//L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir.equalsIgnoreCase("null")+", imgFile "+imgFile);
 								if((imgDir!=null && !imgDir.isEmpty() && !imgDir.equalsIgnoreCase("null")) && (imgFile!=null && !imgFile.isEmpty() && !imgFile.equalsIgnoreCase("null"))){
 									L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir+", imgFile "+imgFile);
-									ProfilePicture profilePic = new ProfilePicture(userId, imgDir, imgFile, dateCreated);
+									ProfilePicture profilePic = new ProfilePicture(Long.parseLong(userId), imgDir, imgFile, dateCreated);
 									profilePic.saveOffline(AroundMeActivity.this);
 								}
 								
