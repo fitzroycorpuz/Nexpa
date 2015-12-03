@@ -16,6 +16,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.appyvet.rangebar.RangeBar;
 import com.lpoezy.nexpa.activities.CustomGrid;
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
@@ -34,6 +35,7 @@ import com.lpoezy.nexpa.utility.MyLocation.LocationResult;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -45,16 +47,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
 
-public class AroundMeActivity extends Activity implements OnRefreshListener {
+public class AroundMeActivity  extends AppCompatActivity implements OnRefreshListener {
 	private static final String TAG = AroundMeActivity.class.getSimpleName();
 	//Button btnUpdate;
 	LocationManager locationManager;
@@ -151,11 +162,84 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 	}
 
 	@Override
+	  public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.toolbar, menu);
+	    return true;
+	  } 
+	
+	Dialog dialogPref;
+	RangeBar rbDistance;
+	String distTick = "";
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        
+	        case R.id.action_distance:
+	        	dialogPref = new Dialog(AroundMeActivity.this);
+				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				dialogPref.setContentView(R.layout.activity_profile_distance_settings);
+
+				rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
+				rbDistance.setRangeBarEnabled(false);
+					dst = 100;
+	        		try{
+	        			dst = Integer.parseInt(db.getBroadcastDist());
+	        		}
+	        		catch (Exception e){
+	        			dst = 100;
+	        		}
+	                rbDistance.setSeekPinByValue(dst);
+
+				rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
+				rbDistance.setConnectingLineColor(getResources().getColor(R.color.EDWARD));
+				rbDistance.setSelectorColor(getResources().getColor(R.color.EDWARD));
+				rbDistance.setPinRadius(30f);
+				rbDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+					@Override
+					public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
+							String leftPinValue, String rightPinValue) {
+						distTick = rightPinValue;
+					}
+				});
+
+				Button dialogButton = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
+				dialogButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
+						db.updateBroadcastDist(distTick);
+						dst = Integer.parseInt(distTick);
+						tryGridToUpdate();
+						dialogPref.dismiss();
+					}
+				});
+				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+				lp.copyFrom(dialogPref.getWindow().getAttributes());
+				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+				dialogPref.show();
+				dialogPref.getWindow().setAttributes(lp);
+	            return true;
+
+	        default:
+	            // If we got here, the user's action was not recognized.
+	            // Invoke the superclass to handle it.
+	            return super.onOptionsItemSelected(item);
+
+	    }
+	}
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_around_me);
 
-		oldDst = 0;
+		Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+	    setSupportActionBar(myToolbar);
+	    myToolbar.setLogo(R.drawable.icon_nexpa);
+	    myToolbar.setTitle("");
+	 	oldDst = 0;
 		
 		du = new DateUtils();
 		db = new SQLiteHandler(this);
@@ -182,10 +266,10 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 			}
 		});
 
-		web.add(0, "You");
-		distance.add(0, 0);
-		imageId.add(0, R.drawable.pic_sample_girl);
-		availabilty.add(0, "Online");
+		//web.add(0, "You");
+		//distance.add(0, 0);
+		//imageId.add(0, R.drawable.pic_sample_girl);
+		//availabilty.add(0, "Online");
 		adapter = new CustomGrid(AroundMeActivity.this, web, arr_user_id/*imageId*/, availabilty, distance);
 		 mHandler = new Handler()
 			{
@@ -241,6 +325,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		
 		
 	}
+
 	
 	private void getNewLoc(){
 		String dtUpdate = db.getLocationDateUpdate();
@@ -309,6 +394,11 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		grid.invalidateViews();
 		list = db.getNearByUserDetails();
 		
+		imageId.clear();
+		availabilty.clear();
+		web.clear();
+		distance.clear();
+		
 		Comparator < Users > comparator = new Comparator < Users > () {@Override
 			public int compare(Users lhs, Users rhs) {
 				return lhs.getDistance() - rhs.getDistance();
@@ -324,7 +414,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 		int userSize = us.size();
 		int disSize = distance.size();
 		
-		try {
+		/*try {
 			if (userSize < disSize) {
 				for (int i = disSize; i > userSize; i--) {
 					adapter.removeItem(i - 1);
@@ -341,12 +431,11 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 				}
 			}
 		} catch (Exception e) {}
-		
+		*/
 		
 		for (int j = 0; j < us.size(); j++) {
 			if (sentType.equals("1")) {//user is already added
-				
-				if (us.get(j).getShown().equals("0")) {//
+				//if (us.get(j).getShown().equals("0")) {
 					imageId.add(j, R.drawable.pic_sample_girl);
 					availabilty.add(j, "INSERTED");
 					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
@@ -362,8 +451,12 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					arr_about.add(j, us.get(j).getAboutMe());
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
+					//}
 					
-				} else if (us.get(j).getShown().equals("1")) {
+				//} 
+				//else
+				/*else if (us.get(j).getShown().equals("1")) 
+				{
 					us.get(j).setShown("1");
 					availabilty.set(j, "UPDATED");
 					web.set(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
@@ -377,7 +470,7 @@ public class AroundMeActivity extends Activity implements OnRefreshListener {
 					arr_about.add(j, us.get(j).getAboutMe());
 					arr_email.add(j, us.get(j).getEmail());
 					arr_status.add(j, us.get(j).getStatus());
-				}
+				}*/
 			} else if (sentType.equals("0")) {//
 				imageId.add(j, R.drawable.pic_sample_girl);
 				availabilty.add(j, "ADDED");

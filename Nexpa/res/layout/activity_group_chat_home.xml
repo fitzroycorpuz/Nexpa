@@ -2,6 +2,7 @@
      xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent" android:layout_height="match_parent"
 android:orientation="vertical">
+     
 	<LinearLayout android:id="@+id/lnBroadcast"
 	android:layout_width="fill_parent" android:layout_height="wrap_content"
 	android:background="@color/toucan_green"
@@ -28,7 +29,7 @@ android:orientation="vertical">
 	android:orientation="vertical">
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:gravity="center"
-		android:weightSum="7" android:orientation="horizontal"  android:padding="5dp">
+		android:weightSum="7" android:orientation="horizontal"  android:padding="8dp">
 		
 		    <EditText
 			    android:id="@+id/btnOptions"
@@ -39,7 +40,7 @@ android:orientation="vertical">
  				android:paddingRight="1dp"
 			    android:scaleType="center"
 			    android:background="@drawable/radiused_button"
-			    android:hint="Search"
+			    android:hint="SEARCH"
 			    android:textColor="@color/white_smoke"
 			    android:layout_height="30dp"
 				android:layout_centerHorizontal="true" 
@@ -50,29 +51,45 @@ android:orientation="vertical">
 			    android:layout_height="wrap_content"
  				android:layout_weight="0.5"
 			     />
-		    <ImageView
+		   
+			     <ImageView
 			    android:id="@+id/img_search"
 			    android:layout_width="40dp"
 			    android:layout_height="40dp"
 			    android:layout_centerInParent="true"
 			 
-			     android:layout_weight="0"
+			    android:layout_weight="0"
 			    android:padding="5dp"
 			    
 			    android:scaleType="center"
 			    android:background="@drawable/btn_search" />
-		       <TextView		   
+		       	<TextView		   
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
  				android:layout_weight="0.2"
 			     />	
-			<ImageView
+			    <ImageView
+			    android:id="@+id/img_here"
+			    android:layout_width="40dp"
+			    android:layout_height="40dp"
+			    android:layout_centerInParent="true"
+			 	android:layout_weight="0"
+			    android:padding="5dp"
+			    android:scaleType="center"
+			    android:background="@drawable/btn_here" />
+		       
+		        <TextView		   
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+ 				android:layout_weight="0.1"
+			     />	
+				
+				<ImageView
 			    android:id="@+id/img_megaphone"
 			    android:layout_width="40dp"
 			    android:layout_height="40dp"
 			    android:layout_centerInParent="true"
-			 
-			     android:layout_weight="0"
+			 	android:layout_weight="0"
 			    android:padding="5dp"
 			    android:scaleType="center"
 			    android:background="@drawable/btn_megaphone" />

@@ -19,7 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
 import com.android.volley.toolbox.StringRequest;
-
+import com.appyvet.rangebar.RangeBar;
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
@@ -50,6 +50,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -71,7 +74,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GroupChatHomeActivity extends Activity implements OnItemClickListener{
+public class GroupChatHomeActivity extends AppCompatActivity implements OnItemClickListener{
 	Button btnStartChat;
 	Button btnCancel;
 	Button dialogButtonOK;
@@ -121,8 +124,13 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 	
 	ImageView btnSearch;
 	ImageView btnPost;
+	ImageView btnDistance;
 	
 	int dst;
+	
+	Dialog dialogPref;
+	RangeBar rbDistance;
+	String distTick = "";
 	
 	private PacketListener packetListener;
 	
@@ -295,6 +303,9 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		setContentView(R.layout.activity_group_chat_home);
 		Log.e("WINDOW", "CREATE ");
 		
+		///Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+	   // setSupportActionBar(myToolbar);
+	    
 		in = AnimationUtils.loadAnimation(this, R.anim.anim_fade_in_r);
 		
 		out = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_r);
@@ -331,7 +342,8 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		 mListView.setOnItemClickListener(onItemClickListener);
 		 btnSearch = (ImageView) findViewById(R.id.img_search);
 		 btnPost = (ImageView) findViewById(R.id.img_megaphone);
-
+		 btnDistance = (ImageView) findViewById(R.id.img_here);
+		 
 		/*btnReply = (LinearLayout) findViewById(R.id.btnReply);
 		btnReply.setOnClickListener(new View.OnClickListener() {@Override
 		public void onClick(View v) {
@@ -351,6 +363,55 @@ public class GroupChatHomeActivity extends Activity implements OnItemClickListen
 		lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 		lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 		dialogBroadcast.getWindow().setAttributes(lp);
+		
+		
+		btnDistance.setOnClickListener(new View.OnClickListener() {@Override
+			public void onClick(View arg0) {
+			dialogPref = new Dialog(GroupChatHomeActivity.this);
+			dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			dialogPref.setContentView(R.layout.activity_profile_distance_settings);
+
+			rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
+			rbDistance.setRangeBarEnabled(false);
+				dst = 100;
+        		try{
+        			dst = Integer.parseInt(db.getBroadcastDist());
+        		}
+        		catch (Exception e){
+        			dst = 100;
+        		}
+                rbDistance.setSeekPinByValue(dst);
+
+			rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
+			rbDistance.setConnectingLineColor(getResources().getColor(R.color.EDWARD));
+			rbDistance.setSelectorColor(getResources().getColor(R.color.EDWARD));
+			rbDistance.setPinRadius(30f);
+			rbDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+				@Override
+				public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
+						String leftPinValue, String rightPinValue) {
+					distTick = rightPinValue;
+				}
+			});
+
+			Button dialogButton = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
+			dialogButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+
+					db.updateBroadcastDist(distTick);
+					dst = Integer.parseInt(distTick);
+					dialogPref.dismiss();
+				}
+			});
+			WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+			lp.copyFrom(dialogPref.getWindow().getAttributes());
+			lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+			lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+			dialogPref.show();
+			dialogPref.getWindow().setAttributes(lp);
+			}
+		});
 		
 		btnPost.setOnClickListener(new View.OnClickListener() {@Override
 			public void onClick(View arg0) {
