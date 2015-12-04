@@ -216,13 +216,13 @@ public class SettingsActivity extends Activity {
 		db.openToWrite();
 		
 		
-
+		/*/
 		ln_personal = (LinearLayout) findViewById(R.id.ln_personal);
 		ln_personal.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
 				
 				
-				/*/
+				
 				final DateUtils du = new DateUtils();
 				// Intent intent = new Intent(UserProfileActivity.this,
 				// UserPersonalActivity.class);
@@ -376,9 +376,11 @@ public class SettingsActivity extends Activity {
 				dialog.show();
 				dialog.getWindow().setAttributes(lp);
 				
-				//*/
+				
 			}
 		});
+		//*/
+		
 		ln_distance = (LinearLayout) findViewById(R.id.ln_distance);
 		ln_distance.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View arg0) {
