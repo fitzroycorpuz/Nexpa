@@ -214,6 +214,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 					ExecutorService exec = Executors.newFixedThreadPool(n);
 					L.debug("correspondents.size() "+correspondents.size());
 					for (int i = 0; i < correspondents.size(); i++) {
+						
 						final Correspondent correspondent = correspondents.get(i);
 						//L.debug("xxxxxxxxxx correspondent username"+correspondent.getUsername()+", fname: "+correspondent.getFname()+"xxxxxxx");
 						correspondent.addListener(ChatHistoryListFragment.this);

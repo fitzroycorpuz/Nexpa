@@ -35,7 +35,7 @@ public class Correspondent {
 	private String username = "";
 	private String email = "";
 	private String fname = "";
-	
+
 	private Bitmap profilePic;
 
 	private List<OnCorrespondentUpdateListener> listeners = new ArrayList<Correspondent.OnCorrespondentUpdateListener>();
@@ -95,7 +95,7 @@ public class Correspondent {
 
 		notifyListeners();
 	}
-	
+
 	public Bitmap getProfilePic() {
 		return profilePic;
 	}
@@ -127,33 +127,34 @@ public class Correspondent {
 		// don't save this session if there is no conversation happen
 		if (conversation.size() == 0 || conversation.isEmpty())
 			return;
-		
+
 		boolean success = false;
 		for (OneComment comment : conversation) {
 
 			long now = System.currentTimeMillis();
-			//comment will automatically marked as read,
-			//if ChatActivity is running
-//			if (ChatActivity.isRunning) {
-//				comment.isUnread = false;
-//			}
-			
+			// comment will automatically marked as read,
+			// if ChatActivity is running
+			// if (ChatActivity.isRunning) {
+			// comment.isUnread = false;
+			// }
+
 			comment.isUnread = comment.success;
-		
+
 			long senderId = comment.senderId;
 			long receiverId = comment.receiverId;
 			success = comment.saveOnline(context, senderId, receiverId);
 
 			if (success) {
-				
+
 				comment.saveOffline(context, senderId, receiverId);
 			}
 		}
 
 		// clear all the conversation ,
 		// if all the messages were save in db
-		if (clearConversationStacks)conversation.clear();
-			
+		if (clearConversationStacks)
+			conversation.clear();
+
 	}
 
 	// will save the correspondent offline,
@@ -167,8 +168,7 @@ public class Correspondent {
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		long senderId = Long.parseLong(db.getLoggedInID());
-		long receiverId = id
-				;
+		long receiverId = id;
 		// correspondent does not exist in db
 		if (!isExisting(context)) {
 			// save correspondent
@@ -183,30 +183,29 @@ public class Correspondent {
 		for (OneComment comment : conversation) {
 
 			long now = System.currentTimeMillis();
-			//comment will automatically marked as read,
-			//if ChatActivity is running
-//			if (ChatActivity.isRunning) {
-//				comment.isUnread = false;
-//			}
-			
+			// comment will automatically marked as read,
+			// if ChatActivity is running
+			// if (ChatActivity.isRunning) {
+			// comment.isUnread = false;
+			// }
+
 			comment.isUnread = comment.success;
 			String date = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
 			comment.date = date;
 
-			
-			
 			success = comment.saveOnline(context, senderId, receiverId);
 
 			if (success) {
-				
+
 				comment.saveOffline(context, senderId, receiverId);
 			}
 		}
 
 		// clear all the conversation ,
 		// if all the messages were save in db
-		if (clearConversationStacks)conversation.clear();
-			
+		if (clearConversationStacks)
+			conversation.clear();
+
 		return success;
 	}
 
@@ -224,7 +223,7 @@ public class Correspondent {
 		// correspondent does not exist in db
 		if (!isExisting(context)) {
 			// save correspondent
-			
+
 			db.saveCorrespondent(Long.toString(id), username, email, fname);
 		}
 
@@ -235,18 +234,20 @@ public class Correspondent {
 		boolean success = false;
 		for (OneComment comment : conversation) {
 			boolean isExisting = OneComment.isExisting(context, comment);
-			//L.debug("comment "+comment.comment+", senderId: "+comment.senderId+", receiverId: "+comment.receiverId);
-			if(!isExisting){
-				comment.isUnread =ChatActivity.isRunning?false:true;
-				
+			// L.debug("comment "+comment.comment+", senderId:
+			// "+comment.senderId+", receiverId: "+comment.receiverId);
+			if (!isExisting) {
+				comment.isUnread = ChatActivity.isRunning ? false : true;
+
 				comment.saveOffline(context, senderId, receiverId);
 			}
-			
+
 		}
 
 		// clear all the conversation ,
 		// if all the messages were save in db
-		if (success && clearConversationStacks)conversation.clear();
+		if (success && clearConversationStacks)
+			conversation.clear();
 		return success;
 
 	}
@@ -273,54 +274,51 @@ public class Correspondent {
 	}
 
 	public void downloadLatestMsgOffline(Context context) {
-		
+
 		OneComment comment = new OneComment();
 		comment.downloadLatestOffline(context, id);
 
 		conversation.add(comment);
-		
+
 	}
 
 	public void downloadAllMessagesByUserIdAndCorrespondentIdOnline(Context context) {
-		
-		
+
 		conversation.addAll(OneComment.downloadAllMessagesByUserIdAndCorrespondentIdOnline(context, id));
 
 		for (OneComment comment : conversation) {
-			
-			
-			
-			if(comment.dateReceived==null ||comment.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")){
-				
+
+			if (comment.dateReceived == null || comment.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")) {
+
 				long now = System.currentTimeMillis();
 				String dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
 				comment.dateReceived = dateReceived;
-				
+
 				comment.markAsReceivedOffline(context);
 			}
-			if(comment.isUnread){
-				//marking messages read online is moved,
-				//to the sync button in the settings screen
-				//if (comment.markAsReadOnline(context, id)) {
-				
-					comment.markAsReadOffline(context, id);
-	
-				//}
+			if (comment.isUnread) {
+				// marking messages read online is moved,
+				// to the sync button in the settings screen
+				// if (comment.markAsReadOnline(context, id)) {
+
+				comment.markAsReadOffline(context, id);
+
+				// }
 			}
 		}
 
 	}
-	
+
 	public void downloadOfflineMessagesByIds(Context context, long senderId, long receiverId) {
 
-		conversation.addAll(OneComment.downloadMessagesOfflineByIds(context, Long.toString(senderId), Long.toString(receiverId)));
+		conversation.addAll(
+				OneComment.downloadMessagesOfflineByIds(context, Long.toString(senderId), Long.toString(receiverId)));
 		for (OneComment comment : conversation) {
-			
-			if(comment.isUnread){
-				
+
+			if (comment.isUnread) {
+
 				comment.markAsReadOffline(context, id);
-	
-				
+
 			}
 		}
 
@@ -331,12 +329,11 @@ public class Correspondent {
 		conversation.addAll(OneComment.downloadAllMessagesOffline(context, id));
 
 		for (OneComment comment : conversation) {
-			
-			if(comment.isUnread){
-				
+
+			if (comment.isUnread) {
+
 				comment.markAsReadOffline(context, id);
-	
-				
+
 			}
 		}
 
@@ -367,8 +364,9 @@ public class Correspondent {
 	public void removeListener(OnCorrespondentUpdateListener listener) {
 
 		int index = listeners.indexOf(listener);
-		if(index!=-1)listeners.remove(index);
-		
+		if (index != -1)
+			listeners.remove(index);
+
 	}
 
 	public void addListener(OnCorrespondentUpdateListener listener) {
@@ -382,14 +380,14 @@ public class Correspondent {
 		}
 
 	}
-	
-	public static List<Correspondent> downloadAllMsgsOnline(final Context context) {
 
+	public static List<Correspondent> downloadAllMsgsOnline(final Context context) {
+		L.debug("=============Correspondent, downloadAllMsgsOnline================");
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		final String userId = db.getLoggedInID();
-		
-		//will download all the messages info
+
+		// will download all the messages info
 		HashMap<String, String> postDataParams = new HashMap<String, String>();
 		postDataParams.put("tag", "download_all");
 		postDataParams.put("user_id", userId);
@@ -398,110 +396,94 @@ public class Correspondent {
 
 		final String spec = AppConfig.URL_MSG;
 		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-		//L.debug("webPage: " + webPage);
+		// L.debug("webPage: " + webPage);
 		db.close();
-		
+
 		try {
 			JSONObject result = new JSONObject(webPage);
 			if (!result.getBoolean("error")) {
 				final JSONArray jArr = result.getJSONArray("messages");
-				L.debug("jArr.length() "+jArr.length());
+				// L.debug("jArr.length() "+jArr.length());
 				if (jArr.length() != 0) {
-					
-					
-					int n = jArr.length()<5 && jArr.length()!=0 ? jArr.length():5;
-					
-					ExecutorService exec = Executors.newFixedThreadPool(n);
+
+					int n = jArr.length() < 5 && jArr.length() != 0 ? jArr.length() : 5;
+
 					for (int i = 0; i < jArr.length(); i++) {
-						
+
 						JSONObject jObj = jArr.getJSONObject(i);
-						final long senderId = Long.parseLong(jObj.getString("user_id"));//from
-						final long receiverId = Long.parseLong(jObj.getString("correspondent_id"));//to
-						final long correspondentId = (Long.parseLong(userId)==senderId)?receiverId:senderId;
-						
+						final long senderId = Long.parseLong(jObj.getString("user_id"));// from
+						final long receiverId = Long.parseLong(jObj.getString("correspondent_id"));// to
+						final long correspondentId = (Long.parseLong(userId) == senderId) ? receiverId : senderId;
+
 						final boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
 						final String comment = jObj.getString("message");
 						final boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
 						final String date = jObj.getString("date_created");
 						final String dateReceived = jObj.getString("date_received");
-						
-						final boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
-						
-						exec.execute(new Runnable() {
-							
-							@Override
-							public void run() {
-								
 
-								
-								Correspondent correspondent = new Correspondent();
-								correspondent.setId(correspondentId);
-								
-								
-								correspondent.downloadOnline(context);
-								
-								
-								//OneComment message = new OneComment(left, comment, success, date, isUnread);
-								OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, dateReceived, isUnread);
-								
-								message.dateReceived = dateReceived;
-								correspondent.addMessage(message);
-								
-								correspondent.saveOffline(context, senderId, receiverId, true);
-							}
-						});
-					
+						final boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
+
+						Correspondent correspondent = new Correspondent();
+						correspondent.setId(correspondentId);
+
+						correspondent.downloadOnline(context);
+
+						// OneComment message = new OneComment(left, comment,
+						// success, date, isUnread);
+						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
+								dateReceived, isUnread);
+
+						message.dateReceived = dateReceived;
+						correspondent.addMessage(message);
+
+						correspondent.saveOffline(context, senderId, receiverId, true);
+
 					}
+
 					
-					exec.shutdown();
-					try {
-						exec.awaitTermination(1, TimeUnit.HOURS);
-					} catch (InterruptedException e) {
-						L.error(""+e);
-					}
-					
+
 				}
 			}
 		} catch (JSONException e) {
-			L.error(""+e);
+			L.error("" + e);
 		}
 
 		List<Correspondent> list = downloadAllOffline(context);
-		
+		L.debug("================================================");
 		return list;
 
 	}
 
 	public boolean downloadOnline(Context context) {
-		
-		if(!isExisting(context)){
-			L.debug("============Correspondent, downloadOnline=============");
+
+		if (!isExisting(context)) {
+			L.debug("Correspondent, downloadOnline");
 			HashMap<String, String> postDataParams = new HashMap<String, String>();
 			postDataParams.put("tag", "profile_download");
-			postDataParams.put("user", ""+this.id);
-	
+			postDataParams.put("user", "" + this.id);
+
 			L.debug("Correspondent, getting profile details of user id: " + this.id + " online");
-	
+
 			final String spec = AppConfig.URL_PROFILE;
 			String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-			
-			//L.debug("webPage "+webPage);
+
+			// L.debug("webPage "+webPage);
 			try {
 				JSONObject result = new JSONObject(webPage);
-				if(!result.getBoolean("error")){
+				if (!result.getBoolean("error")) {
 					JSONObject profile = result.getJSONObject("profile");
 					this.id = Long.parseLong(profile.getString("user"));
 					this.fname = profile.getString("firstname");
 					this.username = profile.getString("username");
 					this.email = profile.getString("email_address");
-					
+
 					return true;
 				}
 			} catch (JSONException e) {
-				L.error(""+e);
+				L.error("" + e);
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -519,7 +501,7 @@ public class Correspondent {
 
 		final String spec = AppConfig.URL_MSG;
 		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-		//L.debug("webPage: " + webPage);
+		// L.debug("webPage: " + webPage);
 		db.close();
 
 		JSONObject result;
@@ -527,14 +509,14 @@ public class Correspondent {
 			result = new JSONObject(webPage);
 			if (!result.getBoolean("error")) {
 				JSONArray jArr = result.getJSONArray("messages");
-				L.debug("jArr.length() "+jArr.length());
+				L.debug("jArr.length() " + jArr.length());
 				if (jArr.length() != 0) {
-					
+
 					for (int i = 0; i < jArr.length(); i++) {
-						
+
 						JSONObject jObj = jArr.getJSONObject(i);
-						long senderId = jObj.getLong("user_id");//from
-						long receiverId = jObj.getLong("correspondent_id");//to
+						long senderId = jObj.getLong("user_id");// from
+						long receiverId = jObj.getLong("correspondent_id");// to
 						String username = jObj.getString("firstname");
 						String email = "";
 						String fname = username;
@@ -545,23 +527,23 @@ public class Correspondent {
 						boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
 						String date = jObj.getString("date_created");
 						String dateReceived = jObj.getString("date_received");
-						
+
 						boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
 						OneComment message = new OneComment(left, comment, success, date, isUnread);
 						message.dateReceived = dateReceived;
 						correspondent.addMessage(message);
-						
+
 						correspondent.saveOffline(context, senderId, receiverId, true);
-						
+
 					}
 				}
 			}
 		} catch (JSONException e) {
 			L.error("" + e);
 		}
-		
+
 		List<Correspondent> list = downloadAllOffline(context);
-		
+
 		return list;
 
 	}
@@ -574,7 +556,7 @@ public class Correspondent {
 		db.close();
 
 		for (Correspondent correspondent : correspondents) {
-			//correspondent.downloadOfflineMessages(context);
+			// correspondent.downloadOfflineMessages(context);
 			correspondent.downloadLatestMsgOffline(context);
 		}
 
