@@ -1,6 +1,7 @@
 package com.lpoezy.nexpa.chatservice;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class OneComment {
 	public String date;
 	public boolean isUnread;
 	public String dateReceived;
+	public boolean isSyncedOnline;
 
 	public OneComment(boolean left, String comment, boolean success) {
 		
@@ -50,7 +52,7 @@ public class OneComment {
 		this.isUnread = isUnread;
 	}
 	
-	public OneComment(long senderId, long receiverId, boolean left, String comment, boolean success, String date, String dateReceived, boolean isUnread) {
+	public OneComment(long senderId, long receiverId, boolean left, String comment, boolean success, String date, String dateReceived, boolean isUnread, boolean isSyncedOnline) {
 		this.senderId = senderId;
 		this.receiverId = receiverId;
 		this.left = left;
@@ -59,6 +61,7 @@ public class OneComment {
 		this.date = date;
 		this.isUnread = isUnread;
 		this.dateReceived = dateReceived;
+		this.isSyncedOnline = isSyncedOnline;
 	}
 
 	public OneComment() {
@@ -113,7 +116,7 @@ public class OneComment {
 
 		//long userId = Long.valueOf(db.getUserDetails().get("uid"));
 
-		db.saveMessage(senderId, receiverId, left, comment, success, date, isUnread, dateReceived);
+		db.saveMessage(senderId, receiverId, left, comment, success, date, isUnread, dateReceived, true);
 		db.close();
 
 	}
@@ -282,7 +285,7 @@ public class OneComment {
 						boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
 						String dateReceived = jObj.getString("date_received");
 						
-						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, dateReceived, isUnread);
+						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, dateReceived, isUnread, true);
 						
 						messages.add(message);
 						correspondent.addMessage(message);
@@ -356,6 +359,33 @@ public class OneComment {
 		
 		L.debug("message don't exists ");
 		return false;
+	}
+
+	public static OneComment getMsg(Cursor cursor) {
+		
+		String senderId 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_USER_ID));
+		String receiverId 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_CORRESPONDENT_ID));
+		int left 				= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_LEFT));
+		String msg 				= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_BODY));
+		int success 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_SUCCESS));
+		String date 			= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE));
+		int isUnread 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_UNREAD));
+		String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
+		int isSyncedOnline 		= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
+		
+
+		OneComment comment = new OneComment(Long.parseLong(senderId), 
+				Long.parseLong(receiverId), 
+				StringFormattingUtils.getBoolean(left), 
+				msg, 
+				StringFormattingUtils.getBoolean(success), 
+				date, 
+				dateReceived, 
+				StringFormattingUtils.getBoolean(isUnread),
+				StringFormattingUtils.getBoolean(isSyncedOnline)
+				);
+		
+		return comment;
 	}
 
 	

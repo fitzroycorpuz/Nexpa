@@ -29,6 +29,7 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.Profile;
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
+import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
@@ -450,6 +451,14 @@ public class SettingsActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
+				//check if there is network connection
+				if(!SystemUtilz.isNetworkAvailable(SettingsActivity.this)){
+					String msg = getResources().getString(R.string.msg_no_internet);
+					L.makeText(SettingsActivity.this, msg, AppMsg.STYLE_ALERT);
+					
+					return;
+				}
+				
 				pDialog = new ProgressDialog(SettingsActivity.this);
 				pDialog.setCancelable(false);
 				pDialog.setMessage("Syncing ...");
@@ -460,10 +469,18 @@ public class SettingsActivity extends Activity {
 					@Override
 					public void run() {
 						
+						//check if there is any new msgs online
+						Correspondent.downloadAllMsgsOnline(SettingsActivity.this);
+						
+						
+						//get all received msgs offline
 						List<OneComment> msgs = OneComment.downloadReceivedMsgsOffline(getApplicationContext());
 						
 						for(OneComment msg: msgs){
-							msg.markAsReceivedOnline();
+							L.debug("msg.isSyncedOnline "+msg.isSyncedOnline);
+							if(!msg.isSyncedOnline){
+								msg.markAsReceivedOnline();
+							}
 						}
 						
 						ln_sync.post(new Runnable() {

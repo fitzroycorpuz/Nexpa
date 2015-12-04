@@ -293,7 +293,7 @@ public class Correspondent {
 				long now = System.currentTimeMillis();
 				String dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
 				comment.dateReceived = dateReceived;
-
+				
 				comment.markAsReceivedOffline(context);
 			}
 			if (comment.isUnread) {
@@ -431,7 +431,7 @@ public class Correspondent {
 						// OneComment message = new OneComment(left, comment,
 						// success, date, isUnread);
 						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
-								dateReceived, isUnread);
+								dateReceived, isUnread, true);
 
 						message.dateReceived = dateReceived;
 						correspondent.addMessage(message);
