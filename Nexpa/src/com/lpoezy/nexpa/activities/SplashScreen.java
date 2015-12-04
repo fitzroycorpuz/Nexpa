@@ -25,6 +25,18 @@ public class SplashScreen extends Activity {
        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
        setContentView(R.layout.activity_splash);
       
+       SessionManager session = new SessionManager(getApplicationContext());
+       if(session.isLoggedIn()){
+    	  
+           
+           Intent i = new Intent(SplashScreen.this, TabHostActivity.class);
+           startActivity(i);
+
+           // close this activity
+           finish();
+           return;
+       }
+       
        new Handler().postDelayed(new Runnable() {
 
            /*
@@ -35,38 +47,37 @@ public class SplashScreen extends Activity {
            @Override
            public void run() {
         	   
-        	SessionManager session = new SessionManager(getApplicationContext());
+        	
         	//this will always ask the user to login,
         	//whenever the app crashed,
         	//or the user forced to terminate the app
-       		if (session.isLoggedIn()) {
-       		
-       			//erase all existing records in db,
-       			//except the recorded conversation for future use
-       			SQLiteHandler db = new SQLiteHandler(SplashScreen.this);
-       			db.openToWrite();
-       			db.deleteUsers();
-       			db.deleteAllPeople();
-       			db.updateAccountValidate(0);
-       			db.close();
-       			session.setLogin(false);
-       			
-       			//disconnect established connection from xmpp server
-       			XMPPConnection connection = XMPPLogic.getInstance().getConnection();
-       	       
-       	        if(connection != null && connection.isConnected()) 
-       	        {
-       	        	connection.disconnect();
-       	        }
-       	        
-       	        //stop any running service
-       	        if(ChatMessagesService.isRunning){
-       	        	stopService(new Intent(SplashScreen.this, ChatMessagesService.class));
-       	        }
-       			
-       		}
+//       		if (session.isLoggedIn()) {
+//       		
+//       			//erase all existing records in db,
+//       			//except the recorded conversation for future use
+//       			SQLiteHandler db = new SQLiteHandler(SplashScreen.this);
+//       			db.openToWrite();
+//       			db.deleteUsers();
+//       			db.deleteAllPeople();
+//       			db.updateAccountValidate(0);
+//       			db.close();
+//       			session.setLogin(false);
+//       			
+//       			//disconnect established connection from xmpp server
+//       			XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+//       	       
+//       	        if(connection != null && connection.isConnected()) 
+//       	        {
+//       	        	connection.disconnect();
+//       	        }
+//       	        
+//       	        //stop any running service
+//       	        if(ChatMessagesService.isRunning){
+//       	        	stopService(new Intent(SplashScreen.this, ChatMessagesService.class));
+//       	        }
+//       			
+//       		}
         	   
-        	  
                // This method will be executed once the timer is over
                // Start your app main activity
                Intent i = new Intent(SplashScreen.this, TabHostActivity.class);
@@ -76,6 +87,7 @@ public class SplashScreen extends Activity {
                finish();
            }
        }, SPLASH_TIME_OUT);
+      
    }
 
 }

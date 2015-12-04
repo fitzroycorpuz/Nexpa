@@ -195,6 +195,8 @@ public class SettingsActivity extends Activity {
 	private ProgressDialog pDialog;
 
 	private LinearLayout ln_sync;
+
+	private LinearLayout ln_signout;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -421,6 +423,24 @@ public class SettingsActivity extends Activity {
 				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 				dialogPref.show();
 				dialogPref.getWindow().setAttributes(lp);
+			}
+		});
+		
+		ln_signout = (LinearLayout) findViewById(R.id.ln_sign_out);
+		ln_signout.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				SessionManager session = new SessionManager(getApplicationContext());
+				if(session.isLoggedIn()){
+					UserProfileActivity.promptYesNoDialog("Quit Nexpa?",
+							"Are you sure you want to log off?",
+		   					SettingsActivity.this,
+		   					"DEAC",
+		   					true);
+				}
+				
 			}
 		});
 		

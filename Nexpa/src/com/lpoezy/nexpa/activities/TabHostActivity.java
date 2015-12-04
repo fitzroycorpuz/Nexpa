@@ -70,6 +70,7 @@ public class TabHostActivity extends TabActivity {
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tab_host);
 		
@@ -85,96 +86,102 @@ public class TabHostActivity extends TabActivity {
 		db.updateBroadcastTicker(0);
 	
 		if (!session.isLoggedIn()) {
-			UserProfileActivity.logoutUser(TabHostActivity.this, true, null);
 			
 			intent = new Intent(TabHostActivity.this, MainSignInActivity.class);
 			startActivity(intent);
 			finish();
 		} else {
-			
-			
-			//XMPPLogic.getInstance().getConnection();
+
+			// XMPPLogic.getInstance().getConnection();
 			intent = new Intent().setClass(TabHostActivity.this, AroundMeActivity.class);
-			
+
 			TabHost.TabSpec spec = null;
-			//"", res.getDrawable(R.drawable.ic_tab_people)
-			spec = tabHost.newTabSpec("home").setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_people))).setContent(intent);
+			// "", res.getDrawable(R.drawable.ic_tab_people)
+			spec = tabHost.newTabSpec("home")
+					.setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_people))).setContent(intent);
 			tabHost.addTab(spec);
-			//"", res.getDrawable(R.drawable.ic_tab_chat)
+			// "", res.getDrawable(R.drawable.ic_tab_chat)
 			intent = new Intent().setClass(TabHostActivity.this, ChatHistoryActivity.class);
-			spec = tabHost.newTabSpec("home3").setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_chat))).setContent(intent);
+			spec = tabHost.newTabSpec("home3")
+					.setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_chat))).setContent(intent);
 			tabHost.addTab(spec);
-			
-			//"", res.getDrawable(R.drawable.ic_tab_group)
+
+			// "", res.getDrawable(R.drawable.ic_tab_group)
 			intent = new Intent().setClass(TabHostActivity.this, GroupChatHomeActivity.class);
-			spec = tabHost.newTabSpec("home1").setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_group))).setContent(intent);
+			spec = tabHost.newTabSpec("home1")
+					.setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_group))).setContent(intent);
 			tabHost.addTab(spec);
-			
-			//"", res.getDrawable(R.drawable.ic_tab_profile)
+
+			// "", res.getDrawable(R.drawable.ic_tab_profile)
 			intent = new Intent().setClass(TabHostActivity.this, UserProfileActivity.class);
-			spec = tabHost.newTabSpec("home2").setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_profile))).setContent(intent);
+			spec = tabHost.newTabSpec("home2")
+					.setIndicator(getTabIndicator(this, res.getDrawable(R.drawable.ic_tab_profile))).setContent(intent);
 			tabHost.addTab(spec);
-			
+
 			tabHost.setCurrentTab(0);
 			tabHost.setup();
 			int heightValue = 45;
-			
+
 			for (int i = 0; i < tabHost.getTabWidget().getTabCount(); i++) {
-				//tabHost.getTabWidget().getChildAt(i).getLayoutParams().height = (int)(heightValue * res.getDisplayMetrics().density);
+				// tabHost.getTabWidget().getChildAt(i).getLayoutParams().height
+				// = (int)(heightValue * res.getDisplayMetrics().density);
 				tabHost.getTabWidget().getChildAt(i).setBackgroundColor(Color.parseColor("#D2D7D3"));
 				tabHost.getTabWidget().setDividerDrawable(null);
-				
+
 			}
-			
-			
-			
-			FrameLayout tabIcContainer = (FrameLayout)tabHost.getTabWidget().getChildAt(1).findViewById(R.id.tab_ic_container);
-			
-			mViewMsgCount = (FrameLayout)LayoutInflater.from(TabHostActivity.this).inflate(R.layout.message_count, null);
-			
-			FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+			FrameLayout tabIcContainer = (FrameLayout) tabHost.getTabWidget().getChildAt(1)
+					.findViewById(R.id.tab_ic_container);
+
+			mViewMsgCount = (FrameLayout) LayoutInflater.from(TabHostActivity.this).inflate(R.layout.message_count,
+					null);
+
+			FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+					LayoutParams.WRAP_CONTENT);
 			params.gravity = Gravity.RIGHT;
-			
+
 			mViewMsgCount.setLayoutParams(params);
 			tabIcContainer.addView(mViewMsgCount);
 			mViewMsgCount.setVisibility(View.GONE);
-			
+
 			tabHost.setOnTabChangedListener(new OnTabChangeListener() {
-				
+
 				@Override
 				public void onTabChanged(String tabId) {
-					
-					L.debug("tabId: "+tabId);
-					if(tabId.equalsIgnoreCase("home3")){
-						if(mViewMsgCount.getVisibility() == View.VISIBLE)mViewMsgCount.setVisibility(View.GONE);
+
+					L.debug("tabId: " + tabId);
+					if (tabId.equalsIgnoreCase("home3")) {
+						if (mViewMsgCount.getVisibility() == View.VISIBLE)
+							mViewMsgCount.setVisibility(View.GONE);
 					}
 				}
 			});
-			
+
 		}
 	}
 	
-		// receiving messages will be handle by receivedMessage
-		// in ChatMessagesService
-		private BroadcastReceiver mUpdateMsgCount = new BroadcastReceiver() {
+	// receiving messages will be handle by receivedMessage
+	// in ChatMessagesService
+	private BroadcastReceiver mUpdateMsgCount = new BroadcastReceiver() {
 
-			@Override
-			public void onReceive(final Context context, final Intent intent) {
-				//don't show the msg count,
-				//if current screen is ChatHistoryActivity or ChatActivity
-				if(ChatHistoryActivity.isRunning || ChatActivity.isRunning)return;
-				
-				int count = OneComment.getUnReadMsgCountOffline(TabHostActivity.this);
-				L.debug("TabhostActivity, mUpdateMsgCount "+count);
-				if(count>0){
-					if(mViewMsgCount.getVisibility() == View.GONE)mViewMsgCount.setVisibility(View.VISIBLE);
-					((TextView)mViewMsgCount.findViewById(R.id.tv_msg_count)).setText(Integer.toString(count));
-				}
-				
+		@Override
+		public void onReceive(final Context context, final Intent intent) {
+			// don't show the msg count,
+			// if current screen is ChatHistoryActivity or ChatActivity
+			if (ChatHistoryActivity.isRunning || ChatActivity.isRunning)
+				return;
 
+			int count = OneComment.getUnReadMsgCountOffline(TabHostActivity.this);
+			L.debug("TabhostActivity, mUpdateMsgCount " + count);
+			if (count > 0) {
+				if (mViewMsgCount.getVisibility() == View.GONE)
+					mViewMsgCount.setVisibility(View.VISIBLE);
+				((TextView) mViewMsgCount.findViewById(R.id.tv_msg_count)).setText(Integer.toString(count));
 			}
 
-		};
+		}
+
+	};
 	
 	private View getTabIndicator(Context context, Drawable background) {
 		

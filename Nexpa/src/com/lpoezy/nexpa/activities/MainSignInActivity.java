@@ -1,4 +1,5 @@
 package com.lpoezy.nexpa.activities;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,9 +61,9 @@ public class MainSignInActivity extends Activity {
 	private EditText inputPassword;
 	private ProgressDialog pDialog;
 	private SessionManager session;
-	//private LoginButton loginBtn;
+	// private LoginButton loginBtn;
 	private TextView username;
-	//private UiLifecycleHelper uiHelper;
+	// private UiLifecycleHelper uiHelper;
 	private SQLiteHandler db;
 	Bitmap proPic;
 	private ImageView imgProfile;
@@ -75,7 +76,7 @@ public class MainSignInActivity extends Activity {
 	private Animation animScrollLeft;
 	private Animation animScrollLeftB;
 	Timer timer;
-	
+
 	String server_uid;
 	String server_name;
 	String server_email;
@@ -83,10 +84,12 @@ public class MainSignInActivity extends Activity {
 	String public_pass;
 	
 	
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		
 		setContentView(R.layout.activity_main_sign_in);
 		imgRotator = (ImageView) findViewById(R.id.rotator_disp);
 		imgRotatorB = (ImageView) findViewById(R.id.rotator_disp_b);
@@ -110,40 +113,34 @@ public class MainSignInActivity extends Activity {
 		db = new SQLiteHandler(this);
 		db.openToWrite();
 		final CreateAccountActivity cAct;
-		
-		
-		
-		
+
 		if (session.isLoggedIn()) {
-			Intent intent = new Intent(MainSignInActivity.this, ProfileActivity.class);
-			startActivity(intent);
-			finish();
+			// Intent intent = new Intent(MainSignInActivity.this,
+			// ProfileActivity.class);
+			// startActivity(intent);
+			// finish();
 		} else {
-			/*uiHelper = new UiLifecycleHelper(this, statusCallback);
-			uiHelper.onCreate(savedInstanceState);
-			username = (TextView) findViewById(R.id.username);
-			loginBtn = (LoginButton) findViewById(R.id.fb_login_button);
-			loginBtn.setReadPermissions(Arrays.asList("email", "public_profile", "user_birthday"));
-			loginBtn.setUserInfoChangedCallback(new UserInfoChangedCallback() {@Override
-				public void onUserInfoFetched(GraphUser user) {
-					if (user != null) {
-						loginBtn.setReadPermissions(Arrays.asList("email", "public_profile", "user_birthday"));
-						if (hasFacebookPermissions(Arrays.asList("email", "public_profile", "user_birthday"))) {
-							session.setLogin(true);
-							String gender = (String) user.getProperty("gender");
-							String email = (String) user.getProperty("email");
-							URL image_value;
-						} else {
-							Log.e("xxxxxxxxxxxxxxz", user.getFirstName());
-							Session sess = Session.getActiveSession();
-							sess.closeAndClearTokenInformation();
-						}
-					} else {
-						Log.e("DEVICE X", "1");
-					}
-				}
-			});*/
-			
+			/*
+			 * uiHelper = new UiLifecycleHelper(this, statusCallback);
+			 * uiHelper.onCreate(savedInstanceState); username = (TextView)
+			 * findViewById(R.id.username); loginBtn = (LoginButton)
+			 * findViewById(R.id.fb_login_button);
+			 * loginBtn.setReadPermissions(Arrays.asList("email",
+			 * "public_profile", "user_birthday"));
+			 * loginBtn.setUserInfoChangedCallback(new UserInfoChangedCallback()
+			 * {@Override public void onUserInfoFetched(GraphUser user) { if
+			 * (user != null) {
+			 * loginBtn.setReadPermissions(Arrays.asList("email",
+			 * "public_profile", "user_birthday")); if
+			 * (hasFacebookPermissions(Arrays.asList("email", "public_profile",
+			 * "user_birthday"))) { session.setLogin(true); String gender =
+			 * (String) user.getProperty("gender"); String email = (String)
+			 * user.getProperty("email"); URL image_value; } else {
+			 * Log.e("xxxxxxxxxxxxxxz", user.getFirstName()); Session sess =
+			 * Session.getActiveSession(); sess.closeAndClearTokenInformation();
+			 * } } else { Log.e("DEVICE X", "1"); } } });
+			 */
+
 			btnLogin.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					String email = inputEmail.getText().toString();
@@ -164,123 +161,99 @@ public class MainSignInActivity extends Activity {
 			});
 		}
 	}
-	
-	/*private void registerFacebookUser(final String name, final String email, final String password, final String fname, final String lname, final String bday, final String gender) {
-		String tag_string_req = "register";
-		pDialog.setMessage("Updating");
-		showDialog();
-		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_REGISTER, new Response.Listener < String > () {@Override
-			public void onResponse(String response) {
-				Log.e(TAG, "Register Response: " + response.toString());
-				try {
-					JSONObject jObj = new JSONObject(response);
-					boolean error = jObj.getBoolean("error");
-					if (!error) {
-						hideDialog();
-						String uid = jObj.getString("uid");
-						JSONObject user = jObj.getJSONObject("user");
-						String name = user.getString("name");
-						String email = user.getString("email");
-						String created_at = user.getString("created_at");
-						db.addUser(name, email, uid, created_at, password);
-						session.setLogin(true);
-						Account ac = new Account();
-						ac.LogInChatAccount(name, password, email);
-						Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
-						startActivity(intent);
-						finish();
-					} else {
-						String errorMsg = jObj.getString("error_msg");
-						Toast.makeText(getApplicationContext(), "ERROR " + errorMsg, Toast.LENGTH_LONG).show();
-					}
-				} catch (JSONException e) {
-					makeNotify("Server Failed To Respond", AppMsg.STYLE_ALERT);
-					hideDialog();
-				}
-			}
-		}, new Response.ErrorListener() {@Override
-			public void onErrorResponse(VolleyError error) {
-				Log.e(TAG, "Registration Error: " + error.getMessage());
-				Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-				hideDialog();
-			}
-		}) {@Override
-			protected Map < String, String > getParams() {
-				Map < String, String > params = new HashMap < String, String > ();
-				params.put("tag", "register");
-				params.put("name", name);
-				params.put("email", email);
-				params.put("password", password);
-				params.put("user_type", "2");
-				params.put("prof_fname", fname);
-				params.put("prof_lname", lname);
-				params.put("prof_bday", bday);
-				params.put("prof_gender", gender);
-				return params;
-			}
-		};
-		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
-	}
-	
-	public static boolean hasFacebookPermissions(List < String > permissions) {
-		Session activeSession = Session.getActiveSession();
-		return activeSession != null && activeSession.isOpened() && activeSession.getPermissions().containsAll(permissions);
-	}
-	
-	private Session.StatusCallback statusCallback = new Session.StatusCallback() {@Override
-		public void call(Session session, SessionState state, Exception exception) {
-			if (state.isOpened()) {
-				Log.e("MainActivity", "Facebook session opened.");
-			} else if (state.isClosed()) {
-				Log.e("MainActivity", "Facebook session closed.");
-			}
-		}
-	};
-	*/
+
+	/*
+	 * private void registerFacebookUser(final String name, final String email,
+	 * final String password, final String fname, final String lname, final
+	 * String bday, final String gender) { String tag_string_req = "register";
+	 * pDialog.setMessage("Updating"); showDialog(); StringRequest strReq = new
+	 * StringRequest(Method.POST, AppConfig.URL_REGISTER, new Response.Listener
+	 * < String > () {@Override public void onResponse(String response) {
+	 * Log.e(TAG, "Register Response: " + response.toString()); try { JSONObject
+	 * jObj = new JSONObject(response); boolean error =
+	 * jObj.getBoolean("error"); if (!error) { hideDialog(); String uid =
+	 * jObj.getString("uid"); JSONObject user = jObj.getJSONObject("user");
+	 * String name = user.getString("name"); String email =
+	 * user.getString("email"); String created_at =
+	 * user.getString("created_at"); db.addUser(name, email, uid, created_at,
+	 * password); session.setLogin(true); Account ac = new Account();
+	 * ac.LogInChatAccount(name, password, email); Intent intent = new
+	 * Intent(MainSignInActivity.this, TabHostActivity.class);
+	 * startActivity(intent); finish(); } else { String errorMsg =
+	 * jObj.getString("error_msg"); Toast.makeText(getApplicationContext(),
+	 * "ERROR " + errorMsg, Toast.LENGTH_LONG).show(); } } catch (JSONException
+	 * e) { makeNotify("Server Failed To Respond", AppMsg.STYLE_ALERT);
+	 * hideDialog(); } } }, new Response.ErrorListener() {@Override public void
+	 * onErrorResponse(VolleyError error) { Log.e(TAG, "Registration Error: " +
+	 * error.getMessage()); Toast.makeText(getApplicationContext(),
+	 * error.getMessage(), Toast.LENGTH_LONG).show(); hideDialog(); } })
+	 * {@Override protected Map < String, String > getParams() { Map < String,
+	 * String > params = new HashMap < String, String > (); params.put("tag",
+	 * "register"); params.put("name", name); params.put("email", email);
+	 * params.put("password", password); params.put("user_type", "2");
+	 * params.put("prof_fname", fname); params.put("prof_lname", lname);
+	 * params.put("prof_bday", bday); params.put("prof_gender", gender); return
+	 * params; } }; AppController.getInstance().addToRequestQueue(strReq,
+	 * tag_string_req); }
+	 * 
+	 * public static boolean hasFacebookPermissions(List < String > permissions)
+	 * { Session activeSession = Session.getActiveSession(); return
+	 * activeSession != null && activeSession.isOpened() &&
+	 * activeSession.getPermissions().containsAll(permissions); }
+	 * 
+	 * private Session.StatusCallback statusCallback = new
+	 * Session.StatusCallback() {@Override public void call(Session session,
+	 * SessionState state, Exception exception) { if (state.isOpened()) {
+	 * Log.e("MainActivity", "Facebook session opened."); } else if
+	 * (state.isClosed()) { Log.e("MainActivity", "Facebook session closed."); }
+	 * } };
+	 */
 	@Override
 	public void onResume() {
 		super.onResume();
 	}
-	
+
 	@Override
 	public void onPause() {
 		super.onPause();
+
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 	}
-	
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		//uiHelper.onActivityResult(requestCode, resultCode, data);
+		// uiHelper.onActivityResult(requestCode, resultCode, data);
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle savedState) {
 		super.onSaveInstanceState(savedState);
-		//uiHelper.onSaveInstanceState(savedState);
+		// uiHelper.onSaveInstanceState(savedState);
 	}
-	
+
 	private void makeNotify(CharSequence con, Style style) {
 		AppMsg.makeText(this, con, style).show();
 	}
-	
+
 	private void checkLogin(final String email, final String password) {
 		final String tag_string_req = "login";
 		pDialog.setMessage("Logging in ...");
-		
+
 		showDialog();
-		
-		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_LOGIN, new Response.Listener < String > () {@Override
+
+		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_LOGIN, new Response.Listener<String>() {
+			@Override
 			public void onResponse(String response) {
 				Log.e(TAG, "Login Response: " + response.toString());
 				try {
 					JSONObject jObj = new JSONObject(response);
 					boolean error = jObj.getBoolean("error");
-					
+
 					if (!error) {
 						server_uid = jObj.getString("uid");
 						JSONObject user = jObj.getJSONObject("user");
@@ -288,109 +261,109 @@ public class MainSignInActivity extends Activity {
 						server_email = user.getString("email");
 						server_created_at = user.getString("created_at");
 						String is_activated = user.getString("isActive");
-						
+
 						if (is_activated.equals("1")) {
-							
+
 							db.addUser(server_name, server_email, server_uid, server_created_at, password);
 							session.setLogin(true);
 							Account ac = new Account();
 							ac.LogInChatAccount(server_name, password, server_email, new OnXMPPConnectedListener() {
-								
+
 								@Override
 								public void onXMPPConnected(XMPPConnection connection) {
-									
+
 									new Thread(new Runnable() {
-										
-										
 
 										@Override
 										public void run() {
-											//download user profile pic info
+											// download user profile pic info
 											ExecutorService exec = Executors.newCachedThreadPool();
 											Future<ProfilePicture> f = exec.submit(new Callable<ProfilePicture>() {
 
 												@Override
 												public ProfilePicture call() throws Exception {
-													
-													
-													 HashMap<String, String> postDataParams = new HashMap<String, String>();
-											         postDataParams.put("tag", "download_profile_and_pic_info");//download_profile_and_pic_info
-											         postDataParams.put("user_id", server_uid);
-											        
-											         final String spec = AppConfig.URL_PROFILE_PIC;
-											         String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-											         JSONObject jResult = new JSONObject(webPage);
-											         
-											         L.debug("MainSignInActivity, webPage: "+webPage);
-											         
-											         if(!jResult.getBoolean("error")){
-											        	
-												         JSONObject profilePictureJson = jResult.getJSONArray("profile_and_pic_info").getJSONObject(0);
-												         long userId = profilePictureJson.getLong("user_id");
-												         String firstname = profilePictureJson.getString("firstname");
-												         String gender = profilePictureJson.getString("gender");
-												         String date_update = profilePictureJson.getString("date_update");
-												         
-												         String birthday = profilePictureJson.getString("birthday");
-														 String lastname = "";
-														 
-														 UserProfile profile = new UserProfile(userId, firstname, lastname, birthday, gender, date_update);
-														 profile.updateOffline(MainSignInActivity.this);
-														 
-												         String imgDir = profilePictureJson.getString("img_dir");
-												         String imgFile = profilePictureJson.getString("img_file");
-												         String dateUploaded = profilePictureJson.getString("date_uploaded");
-												         
-												         ProfilePicture profilePicture = new ProfilePicture(userId, imgDir, imgFile, dateUploaded);
-												         profilePicture.downloadImageOnline();
-														 profilePicture.saveOffline(MainSignInActivity.this);
-												         
-												         return profilePicture;
-											         }
-											         
+
+													HashMap<String, String> postDataParams = new HashMap<String, String>();
+													postDataParams.put("tag", "download_profile_and_pic_info");// download_profile_and_pic_info
+													postDataParams.put("user_id", server_uid);
+
+													final String spec = AppConfig.URL_PROFILE_PIC;
+													String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+													JSONObject jResult = new JSONObject(webPage);
+
+													L.debug("MainSignInActivity, webPage: " + webPage);
+
+													if (!jResult.getBoolean("error")) {
+
+														JSONObject profilePictureJson = jResult
+																.getJSONArray("profile_and_pic_info").getJSONObject(0);
+														long userId = profilePictureJson.getLong("user_id");
+														String firstname = profilePictureJson.getString("firstname");
+														String gender = profilePictureJson.getString("gender");
+														String date_update = profilePictureJson
+																.getString("date_update");
+
+														String birthday = profilePictureJson.getString("birthday");
+														String lastname = "";
+
+														UserProfile profile = new UserProfile(userId, firstname,
+																lastname, birthday, gender, date_update);
+														profile.updateOffline(MainSignInActivity.this);
+
+														String imgDir = profilePictureJson.getString("img_dir");
+														String imgFile = profilePictureJson.getString("img_file");
+														String dateUploaded = profilePictureJson
+																.getString("date_uploaded");
+
+														ProfilePicture profilePicture = new ProfilePicture(userId,
+																imgDir, imgFile, dateUploaded);
+														profilePicture.downloadImageOnline();
+														profilePicture.saveOffline(MainSignInActivity.this);
+
+														return profilePicture;
+													}
+
 													return null;
 												}
 											});
 											exec.shutdown();
-											
+
 											ProfilePicture profilePicture;
 											try {
-												
-												//AppConfig.URL+"/"+imgDir+"/"+imgFile
+
+												// AppConfig.URL+"/"+imgDir+"/"+imgFile
 												profilePicture = f.get();
-												
-												//L.debug("MainSigninACtivity, imgUrl: "+imgUrl);
-												
-											
+
+												// L.debug("MainSigninACtivity,
+												// imgUrl: "+imgUrl);
+
 											} catch (InterruptedException e) {
-												L.error(""+e);
+												L.error("" + e);
 											} catch (ExecutionException e) {
-												L.error(""+e);
+												L.error("" + e);
 											}
-											
-											
+
 											btnLogin.post(new Runnable() {
-												
+
 												@Override
 												public void run() {
-													
-													Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
+
+													Intent intent = new Intent(MainSignInActivity.this,
+															TabHostActivity.class);
 													startActivity(intent);
-													
+
 													finish();
-													
+
 													hideDialog();
 												}
 											});
 										}
 									}).start();
-									
-									
+
 								}
 
 							});
-							
-										
+
 						} else {
 							Account ac = new Account();
 							ac.ReTryCreateChatAccount(MainSignInActivity.this, server_name, password, server_email);
@@ -409,34 +382,33 @@ public class MainSignInActivity extends Activity {
 					makeNotify("Cannot reach data on server.", AppMsg.STYLE_ALERT);
 				}
 			}
-		}, new Response.ErrorListener() {@Override
+		}, new Response.ErrorListener() {
+			@Override
 			public void onErrorResponse(VolleyError error) {
-			
-				Log.e(TAG, ""+error);
+
+				Log.e(TAG, "" + error);
 				makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
 				hideDialog();
 			}
-		}) {@Override
-			protected Map < String, String > getParams() {
-				Map < String, String > params = new HashMap < String, String > ();
+		}) {
+			@Override
+			protected Map<String, String> getParams() {
+				Map<String, String> params = new HashMap<String, String>();
 				params.put("tag", "login");
 				params.put("email", email);
 				params.put("password", password);
 				return params;
 			}
 		};
-		
+
 		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
-		
-	
-		
-		
+
 	}
-	
+
 	TimerTask showMainPageIntent;
 	int loader = 10;
 	final Handler handler = new Handler();
-	
+
 	public void initializeTimerTask() {
 		showMainPageIntent = new TimerTask() {
 			public void run() {
@@ -453,21 +425,22 @@ public class MainSignInActivity extends Activity {
 							startActivity(intent);
 							finish();
 							timer.cancel();
-						}
-						else{
+						} else {
 							if (loader < 0) {
 								hideDialog();
-								NiceDialog.promptDialog("Failed to sync on server","Unable to sync on server. \nPlease try again.",MainSignInActivity.this,"error"); 						
+								NiceDialog.promptDialog("Failed to sync on server",
+										"Unable to sync on server. \nPlease try again.", MainSignInActivity.this,
+										"error");
 								session.setLogin(false);
-								timer.cancel();	
-							} 
+								timer.cancel();
+							}
 						}
 					}
 				});
 			}
 		};
 	}
-	
+
 	private void saveBitmap(Bitmap bitmap) {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
@@ -495,12 +468,14 @@ public class MainSignInActivity extends Activity {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void showDialog() {
-		if (!pDialog.isShowing()) pDialog.show();
+		if (!pDialog.isShowing())
+			pDialog.show();
 	}
-	
+
 	private void hideDialog() {
-		if (pDialog.isShowing()) pDialog.dismiss();
+		if (pDialog.isShowing())
+			pDialog.dismiss();
 	}
 }

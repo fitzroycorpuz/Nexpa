@@ -53,12 +53,12 @@ public class LogInActivity extends Activity {
         session = new SessionManager(getApplicationContext());
  
         // Check if user is already logged in or not
-        if (session.isLoggedIn()) {
-            // User is already logged in. Take him to main activity
-            Intent intent = new Intent(LogInActivity.this, ProfileActivity.class);
-            startActivity(intent);
-            finish();
-        }
+//        if (session.isLoggedIn()) {
+//            // User is already logged in. Take him to main activity
+//            Intent intent = new Intent(LogInActivity.this, ProfileActivity.class);
+//            startActivity(intent);
+//            finish();
+//        }
  
         // Login button Click Event
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +72,7 @@ public class LogInActivity extends Activity {
                 if (email.trim().length() > 0 && password.trim().length() > 0) {
                     // login user
                 	
-                    checkLogin(email, password);
+                    //checkLogin(email, password);
                 } else {
                     // Prompt user to enter credentials
                     Toast.makeText(getApplicationContext(),

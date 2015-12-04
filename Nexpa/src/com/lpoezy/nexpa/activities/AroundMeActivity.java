@@ -147,19 +147,19 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	private int dst;
 	private int oldDst;
 	
-	@Override
-	public void onBackPressed() {
-		
-		//super.onBackPressed();
-		SessionManager session = new SessionManager(getApplicationContext());
-		if(session.isLoggedIn()){
-			UserProfileActivity.promptYesNoDialog("Quit Toucan?",
-					"Are you sure you want to log off?",
-   					this,
-   					"DEAC",
-   					true);
-		}
-	}
+//	@Override
+//	public void onBackPressed() {
+//		
+//		//super.onBackPressed();
+//		SessionManager session = new SessionManager(getApplicationContext());
+//		if(session.isLoggedIn()){
+//			UserProfileActivity.promptYesNoDialog("Quit Toucan?",
+//					"Are you sure you want to log off?",
+//   					this,
+//   					"DEAC",
+//   					true);
+//		}
+//	}
 
 	@Override
 	  public boolean onCreateOptionsMenu(Menu menu) {

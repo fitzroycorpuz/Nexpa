@@ -69,11 +69,12 @@ public class CreateAccountActivity extends Activity {
 		db.openToWrite();
 		ac = new Account();
 		
-		if (session.isLoggedIn()) {
-			Intent intent = new Intent(CreateAccountActivity.this, ProfileActivity.class);
-			startActivity(intent);
-			finish();
-		}
+//		if (session.isLoggedIn()) {
+//			Intent intent = new Intent(CreateAccountActivity.this, ProfileActivity.class);
+//			startActivity(intent);
+//			finish();
+//		}
+		
 		btnRegister.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				String name = inputFullName.getText().toString();

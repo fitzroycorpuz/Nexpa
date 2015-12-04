@@ -143,19 +143,19 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
     
 
     
-    @Override
-	public void onBackPressed() {
-		
-		//super.onBackPressed();
-		SessionManager session = new SessionManager(getApplicationContext());
-		if(session.isLoggedIn()){
-			UserProfileActivity.promptYesNoDialog("Quit Toucan?",
-					"Are you sure you want to log off?",
-   					this,
-   					"DEAC",
-   					true);
-		}
-	}
+//    @Override
+//	public void onBackPressed() {
+//		
+//		//super.onBackPressed();
+//		SessionManager session = new SessionManager(getApplicationContext());
+//		if(session.isLoggedIn()){
+//			UserProfileActivity.promptYesNoDialog("Quit Toucan?",
+//					"Are you sure you want to log off?",
+//   					this,
+//   					"DEAC",
+//   					true);
+//		}
+//	}
     
     
     
@@ -225,9 +225,10 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
         // Launching the login activity
         //if(!isExitingApp){
 	        Intent intent = new Intent(context, MainSignInActivity.class);
+	        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 	        context.startActivity(intent);
 	       
-       // }
+        //}
         
 	   
 	     
@@ -309,6 +310,8 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
 										pDialog.dismiss();
 										pDialog = null;
 									}
+									
+									
 //									dialogButton.post(new Runnable() {
 //										
 //										@Override

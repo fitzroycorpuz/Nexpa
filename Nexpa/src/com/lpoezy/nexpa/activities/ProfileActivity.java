@@ -9,6 +9,7 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
+import com.lpoezy.nexpa.utility.L;
 
 import android.app.Activity;
 import android.content.Context;
@@ -50,7 +51,7 @@ public class ProfileActivity extends Activity {
  
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
- 
+        db.openToRead();
         // session manager
         session = new SessionManager(getApplicationContext());
  
@@ -58,7 +59,7 @@ public class ProfileActivity extends Activity {
             logoutUser();
         }
         else{
- 
+       
         // Fetching user details from sqlite
         HashMap<String, String> user = db.getUserDetails();
  
@@ -79,6 +80,8 @@ public class ProfileActivity extends Activity {
             }
         });
         }
+        
+        db.close();
     }
  
     /**

@@ -78,6 +78,7 @@ public class SQLiteHandler {
 	public static final String MSG_DATE = "msg_date";
 	public static final String MSG_DATE_RECEIVED = "msg_date_received";
 	public static final String MSG_IS_UNREAD = "msg_is_unread";
+	public static final String MSG_IS_SYNCED = "msg_is_synced";
 
 	private static final String DATABASE_TABLE_2 = "profile";
 	public static final String PROFILE_ID = "_id";
@@ -168,7 +169,7 @@ public class SQLiteHandler {
 			String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "
 					+ MSG_USER_ID + " INTEGER, " + MSG_CORRESPONDENT_ID + " INTEGER, " + MSG_LEFT + " TEXT, " + MSG_BODY
 					+ " TEXT," + MSG_SUCCESS + " TEXT," + MSG_DATE + " TEXT, " + MSG_IS_UNREAD + " TEXT, "
-					+ MSG_DATE_RECEIVED + " TEXT);";
+					+ MSG_DATE_RECEIVED + " TEXT, "+MSG_IS_SYNCED+" TEXT);";
 			db.execSQL(CREATE_TABLE_MESSAGES);
 
 			String DATABASE_CREATE_2 = "create table " + DATABASE_TABLE_2 + "(" + PROFILE_ID
