@@ -29,6 +29,7 @@ import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.DateUtils;
+import com.lpoezy.nexpa.utility.Hashtag;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.LocationName;
 import com.lpoezy.nexpa.utility.StringFormattingUtils;
@@ -51,6 +52,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -74,11 +78,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import android.text.method.LinkMovementMethod;
+
 public class GroupChatHomeActivity extends AppCompatActivity implements OnItemClickListener{
 	Button btnStartChat;
 	Button btnCancel;
 	Button dialogButtonOK;
 	EditText edBroad;
+	TextView txtCharLeft;
 	String mNickName;
 	SQLiteHandler db;
 	Message msg;
@@ -131,6 +140,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 	Dialog dialogPref;
 	RangeBar rbDistance;
 	String distTick = "";
+	
+	int charCount;
 	
 	private PacketListener packetListener;
 	
@@ -282,19 +293,19 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 		Log.e("XMPP interactor",interactor + "");
 	}
 	
-//	@Override
-//	public void onBackPressed() {
-//		
-//		//super.onBackPressed();
-//		SessionManager session = new SessionManager(getApplicationContext());
-//		if(session.isLoggedIn()){
-//			UserProfileActivity.promptYesNoDialog("Quit Toucan?",
-//					"Are you sure you want to log off?",
-//   					this,
-//   					"DEAC",
-//   					true);
-//		}
-//	}
+	@Override
+	public void onBackPressed() {
+		
+		//super.onBackPressed();
+		SessionManager session = new SessionManager(getApplicationContext());
+		if(session.isLoggedIn()){
+			UserProfileActivity.promptYesNoDialog("Quit Toucan?",
+					"Are you sure you want to log off?",
+   					this,
+   					"DEAC",
+   					true);
+		}
+	}
 	
 	
 	@Override
@@ -329,8 +340,52 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 		dialogBroadcast = new Dialog(GroupChatHomeActivity.this);
 		dialogBroadcast.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialogBroadcast.setContentView(R.layout.activity_group_chat_main);
-		
+		txtCharLeft = (TextView) dialogBroadcast.findViewById(R.id.txtCharLeft);
 		edBroad = (EditText) dialogBroadcast.findViewById(R.id.txtBroadcast);
+		btnStartChat = (Button) dialogBroadcast.findViewById(R.id.btnStartLocChat);
+		charCount = 0;
+		edBroad.addTextChangedListener(new TextWatcher() {
+	            @Override
+	            public void onTextChanged(CharSequence s, int start, int before, int count) {
+	            	charCount = 150 - s.length();
+	            	txtCharLeft.setText(String.valueOf(charCount));
+	            	if ((charCount < 151)&&(charCount > 124)){
+	            		if (charCount == 150){
+	            			txtCharLeft.setTextColor(getResources().getColor(R.color.old_black));
+	            		}
+	            		else{
+	            			txtCharLeft.setTextColor(getResources().getColor(R.color.toucan_deep_red));
+	            		}
+	            		btnStartChat.setEnabled(false);
+	            		btnStartChat.setBackgroundColor((getResources().getColor(R.color.white_smoke)));
+	            	}
+	            	else if ((charCount < 125)&&(charCount > 24)){
+	            		txtCharLeft.setTextColor(getResources().getColor(R.color.toucan_green));
+	            		btnStartChat.setEnabled(true);
+	            		btnStartChat.setBackgroundColor((getResources().getColor(R.color.toucan_green)));
+	            	}
+	            	else if (charCount == 0){
+	            		txtCharLeft.setTextColor(getResources().getColor(R.color.toucan_deep_red));
+	            		btnStartChat.setEnabled(true);
+	            		btnStartChat.setBackgroundColor((getResources().getColor(R.color.toucan_green)));
+	            	}
+	            	else{
+	            		txtCharLeft.setTextColor(getResources().getColor(R.color.toucan_yellow));
+	            		btnStartChat.setEnabled(true);
+	            		btnStartChat.setBackgroundColor((getResources().getColor(R.color.toucan_green)));
+	            	}
+	              
+	            }
+	            @Override
+	            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	            	// TODO Auto-generated method stub
+	            }
+	            @Override
+	            public void afterTextChanged(Editable s) {
+	            	// TODO Auto-generated method stub
+	            }
+	        });
+		
 		btnCancel = (Button) dialogBroadcast.findViewById(R.id.btnClose);
 		btnOptions = (EditText) findViewById(R.id.btnOptions);
 		txtConnection = (TextView) findViewById(R.id.txt_broad_stat);
@@ -415,6 +470,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 		
 		btnPost.setOnClickListener(new View.OnClickListener() {@Override
 			public void onClick(View arg0) {
+				btnCancel.setEnabled(true);
 				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputMethodManager.toggleSoftInputFromWindow(lnBroadcast.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
 				openBroadcastDialog();
@@ -428,7 +484,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
                     SearchPostActivity.class);
 
             if (iv != null) {
-            	iv.putExtra("TYPE", "hashtag"); 
+            	iv.putExtra("TYPE", "post"); 
             	
             	String txtSearch = btnOptions.getText().toString();
             	if (txtSearch.equals(null) || txtSearch.equals("")){
@@ -473,11 +529,20 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 			 btnDel.setOnClickListener(new View.OnClickListener() {
 				 @Override
 				 public void onClick(View arg0) {
-					txtBroadId= (TextView) arg1.findViewById(R.id.broad_id);
-					br_id = txtBroadId.getText().toString();
-					promptYesNoDialog("Are you sure you want to delete this post?", 
+					 TextView txtDel = (TextView) arg1.findViewById(R.id.txtDel);
+					 String strDel = txtDel.getText().toString();
+					 txtBroadId= (TextView) arg1.findViewById(R.id.broad_id);
+						br_id = txtBroadId.getText().toString();
+						
+						 if (strDel.equals("1")){
+							 promptYesNoDialog("Are you sure you want to delete this post?", 
 							"This post will be deleted on your local memory.",
 							GroupChatHomeActivity.this,"DEL_POST",br_id);
+						 }
+						 else{
+							 promptYesNoDialog("Are you sure you want to block this user?","",
+										GroupChatHomeActivity.this,"BLOCK_POST",br_id);
+						 }
 				}	
 			 });
 			 
@@ -541,9 +606,10 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 			lnBroadcastExist.setEnabled(true);
 			lnBroadcastExist.setVisibility(LinearLayout.VISIBLE);
 			mAdapter = new SimpleCursorAdapter(this, R.layout.list_broadcast, crBroadcast, new String[] {
-				SQLiteHandler.BROAD_ID, SQLiteHandler.BROADCAST_FROM, SQLiteHandler.BROADCAST_DATE, SQLiteHandler.BROADCAST_LOCATION_LOCAL, SQLiteHandler.BROADCAST_MESSAGE,  SQLiteHandler.BROADCAST_REACH,  SQLiteHandler.BROADCAST_TYPE,  SQLiteHandler.BROADCAST_TYPE,  SQLiteHandler.BROADCAST_TYPE, SQLiteHandler.BROADCAST_FROM
+				SQLiteHandler.BROAD_ID, SQLiteHandler.BROADCAST_FROM, SQLiteHandler.BROADCAST_DATE, SQLiteHandler.BROADCAST_LOCATION_LOCAL, SQLiteHandler.BROADCAST_MESSAGE,  SQLiteHandler.BROADCAST_REACH,  
+				SQLiteHandler.BROADCAST_TYPE,  SQLiteHandler.BROADCAST_TYPE,  SQLiteHandler.BROADCAST_TYPE, SQLiteHandler.BROADCAST_FROM, SQLiteHandler.BROADCAST_TYPE, SQLiteHandler.BROADCAST_TYPE
 			}, new int[] {
-					R.id.broad_id, R.id.broad_from, R.id.date_broad, R.id.location_local, R.id.broad_message, R.id.reach, R.id.txtReply, R.id.imgReply, R.id.btnReply, R.id.broad_from_raw
+					R.id.broad_id, R.id.broad_from, R.id.date_broad, R.id.location_local, R.id.broad_message, R.id.reach, R.id.txtReply, R.id.imgReply, R.id.btnReply, R.id.broad_from_raw, R.id.btnTrash, R.id.txtDel
 					}, 0);
 			mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
 				 @Override
@@ -576,6 +642,20 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 						}
 					}
 					
+					if (view.getId() == R.id.broad_message) {
+						TextView txv = (TextView) view;
+						String msg = cursor.getString(cursor.getColumnIndex("broad_message")) + "";
+						ArrayList<int[]> hashtagSpans1 = getSpans(msg, '#');
+						   SpannableString commentsContent1 =
+						            new SpannableString(msg);
+
+						   setSpanComment(commentsContent1,hashtagSpans1) ;
+						   txv.setMovementMethod(LinkMovementMethod.getInstance());
+						   txv.setText(commentsContent1);
+						 
+						return true;
+					}
+					
 					if (view.getId() == R.id.date_broad) {
 						TextView txv = (TextView) view;
 						String dateFormatted = du.getMinAgo(cursor.getString(cursor.getColumnIndex("date_broad")));
@@ -602,6 +682,19 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 						}
 						else{
 							txReply.setText("REPLY");
+							//  setType = true;
+						}
+						return true;
+					}
+					
+					if (view.getId() == R.id.txtDel){	
+						
+						TextView txtDel = (TextView) view;
+						if (broad_user_type == 1){
+							txtDel.setText("1");
+						}
+						else{
+							txtDel.setText("0");
 							//  setType = true;
 						}
 						return true;
@@ -649,6 +742,17 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 		                            0, LayoutParams.WRAP_CONTENT , 0.9f);
 							
 							 noteTypeIcon.setLayoutParams(param);
+						}
+						return true;      
+					}
+					
+					if(view.getId() == R.id.btnTrash){
+						ImageView noteTypeIcon = (ImageView) view;
+						if (broad_user_type == 1){
+							noteTypeIcon.setBackgroundResource(R.drawable.btn_trash);
+						}
+						else{
+							noteTypeIcon.setBackgroundResource(R.drawable.btn_block_user);
 						}
 						return true;      
 					}
@@ -786,7 +890,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 					ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), null);
 					failedToBroadcast(6);
 				} else {
-					
+					btnStartChat.setEnabled(false);
+					btnCancel.setEnabled(false);
 					getReceivers();
 					
 					if (broadCount == 0){
@@ -1043,4 +1148,33 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 		dialogBroadcast.dismiss();
 		
 	}
+	private void setSpanComment(SpannableString commentsContent, ArrayList<int[]> hashtagSpans) {
+		  for(int i = 0; i < hashtagSpans.size(); i++) {
+		         int[] span = hashtagSpans.get(i);
+		         int hashTagStart = span[0];
+		         int hashTagEnd = span[1];
+
+		          commentsContent.setSpan(new Hashtag(GroupChatHomeActivity.this),
+		                 hashTagStart,
+		                 hashTagEnd, 0);
+
+		      }
+	}
+	public ArrayList<int[]> getSpans(String body, char prefix) {
+	     ArrayList<int[]> spans = new ArrayList<int[]>();
+
+	      Pattern pattern = Pattern.compile(prefix + "\\w+");
+	     Matcher matcher = pattern.matcher(body);
+
+	      // Check all occurrences
+	     while (matcher.find()) {
+	         int[] currentSpan = new int[2];
+	         currentSpan[0] = matcher.start();
+	         currentSpan[1] = matcher.end();
+	         spans.add(currentSpan);
+	     }
+
+	      return  spans;
+	 }
+
 }
