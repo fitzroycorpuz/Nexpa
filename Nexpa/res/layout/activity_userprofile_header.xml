@@ -16,17 +16,15 @@
             android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-30dp"
             android:background="@color/white"
             android:gravity="center"
-            android:paddingBottom="30dp"
-            android:paddingTop="60dp"
+            android:paddingTop="16dp"
             tools:ignore="HardcodedText" >
 
             <View
                 android:id="@+id/innerPic"
-                android:layout_width="200dip"
-                android:layout_height="200dip"
+                android:layout_width="138dip"
+                android:layout_height="138dip"
                 android:layout_marginBottom="5dip"
                 android:layout_marginTop="5dip"
                 android:background="@drawable/circle"
@@ -43,6 +41,67 @@
                 android:padding="12dip"
                 android:scaleType="fitXY" />
         </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingRight="16dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="8dp"
+                 />
+
+            <TextView
+                android:id="@+id/tv_job_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="job title"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_uname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="username"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_url0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="url0"
+                android:autoLink="web"
+                android:linksClickable="true"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_url1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="url1"
+                 android:autoLink="web"
+                android:linksClickable="true"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_url2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="url2"
+                 android:autoLink="web"
+                android:linksClickable="true"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                 />
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"

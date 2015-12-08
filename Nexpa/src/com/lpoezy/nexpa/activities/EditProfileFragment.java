@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.jivesoftware.smack.util.Base64;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
@@ -58,6 +60,11 @@ public class EditProfileFragment extends DialogFragment {
 	private RadioButton radBoy;
 	private RadioButton radGirl;
 	private OnShowProfilePicScreenListener mCallback;
+	private EditText edtDescription;
+	private EditText edtProfession;
+	private EditText edtUrl0;
+	private EditText edtUrl1;
+	private EditText edtUrl2;
 	
 	 public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 	      super.onActivityResult(requestCode, resultCode, intent);
@@ -96,58 +103,21 @@ public class EditProfileFragment extends DialogFragment {
 		View v = inflater.inflate(R.layout.activity_profile_personal, container, false);
 
 		profilePic = (ImageView) v.findViewById(R.id.img_profile_pic);
-
 		
 
 		addClickListenerToBtnProfilePic(v);
 
 		addClickListenerToBtnOk(v);
 
-		// final RadioButton radUnspec;
-
-		dpBDay = (DatePicker) v.findViewById(R.id.dbBirthday);
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, c.get(Calendar.YEAR) - 18);
-		dpBDay.setMaxDate(c.getTime().getTime());
-
 		edtName = (EditText) v.findViewById(R.id.edtName);
-
-		radBoy = (RadioButton) v.findViewById(R.id.radioMale);
-		radGirl = (RadioButton) v.findViewById(R.id.radioFemale);
-		// radUnspec = (RadioButton)
-		// dialog.findViewById(R.id.radioUnspecified);
-
-		SQLiteHandler db = new SQLiteHandler(getActivity());
-		db.openToRead();
-		// Button dialogButton = (Button)
-		// dialog.findViewById(R.id.dialogButtonOK);
-		edtName.setText(db.getName());
-
-		if ((db.getBDate().equals("")) || (db.getBDate().equals("null"))) {
-
-			dpBDay.updateDate(1980, 0, 1);
-
-		} else {
-
-			Date dtParse = new Date();
-			DateUtils du = new DateUtils();
-			dtParse = du.convertStringToDateToLocal(db.getBDate());
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dtParse);
-			int year = cal.get(Calendar.YEAR);
-			int month = cal.get(Calendar.MONTH);
-			int day = cal.get(Calendar.DAY_OF_MONTH);
-			dpBDay.updateDate(year, month, day);
-		}
-
-		if (db.getGender().equals("M")) {
-			radBoy.setChecked(true);
-		} else if (db.getGender().equals("F")) {
-			radGirl.setChecked(true);
-		}
-
-		db.close();
-
+		edtName.setEnabled(false);
+		
+		edtDescription =(EditText)v.findViewById(R.id.edt_short_description);
+		edtProfession =(EditText)v.findViewById(R.id.edt_profession);
+		edtUrl0 =(EditText)v.findViewById(R.id.edt_url0);
+		edtUrl1 =(EditText)v.findViewById(R.id.edt_url1);
+		edtUrl2 =(EditText)v.findViewById(R.id.edt_url2);
+		
 		return v;
 	}
 
@@ -199,45 +169,35 @@ public class EditProfileFragment extends DialogFragment {
 	}
 
 	protected void saveUserInfoOnline() {
-		String fullname = edtName.getText().toString();
 		
-		String fname = fullname;
-		String lname = null;
-		String birthday = null;
-
-		int day = dpBDay.getDayOfMonth();
-		int month = dpBDay.getMonth();
-		int year = dpBDay.getYear();
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yy");
-		@SuppressWarnings("deprecation")
-		String formatedDate = sdf.format(new Date(year, month, day));
-
-		try {
-			Date date = sdf.parse(formatedDate);
-			DateUtils du = new DateUtils();
-			
-			birthday = du.convertDateToStringToLocalTime(date);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		String gender = null;
-
-		if (radGirl.isChecked()) {
-			gender = "F";
-		} else if (radBoy.isChecked()) {
-			gender = "M";
-		}
 		long now = System.currentTimeMillis();
 		
 		String dateUpdated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+		SQLiteHandler db = new SQLiteHandler(getActivity());
+		db.openToRead();
 		
-		UserProfile userProfile = new UserProfile(fname, lname, birthday, gender, dateUpdated);
+		long uId = Long.parseLong(db.getLoggedInID());
+		
+		String uname = edtName.getText().toString();
+		String description = edtDescription.getText().toString();
+		String profession = edtProfession.getText().toString();
+		String url0 = edtUrl0.getText().toString();
+		String url1 = edtUrl1.getText().toString();
+		String url2 = edtUrl2.getText().toString();
+		
+		UserProfile userProfile = new UserProfile(uId, uname, description, profession, url0, url1, url2, dateUpdated);
 
-		userProfile.saveOnline(getActivity());
-		userProfile.updateOffline(getActivity());
-
+		String result = userProfile.saveOnline(getActivity());
+		try {
+			JSONObject jResult = new JSONObject(result);
+			if(!jResult.getBoolean("error")){
+				userProfile.updateOffline(getActivity());
+			}
+		} catch (JSONException e) {
+			L.error(""+e);
+		}
+		
+		db.close();
 	}
 
 	protected void saveProfilePicOnline() {
@@ -257,9 +217,6 @@ public class EditProfileFragment extends DialogFragment {
 			@Override
 			public void onClick(View v) {
 				mCallback.onShowProfilePicScreen();
-//				DialogFragment profPicDialog = ProfilePicFragment.newInstance();
-//
-//				profPicDialog.show(getFragmentManager().beginTransaction(), ProfilePicFragment.TAG);
 
 			}
 		});
@@ -269,32 +226,43 @@ public class EditProfileFragment extends DialogFragment {
 	private void resetProfileInfo() {
 		
 		UserProfile userProfile = new UserProfile();
+		
+		SQLiteHandler db = new SQLiteHandler(getActivity());
+		db.openToRead();
+		long uId = Long.parseLong(db.getLoggedInID());
+		userProfile.setId(uId);
+		db.close();
+		
 		userProfile.downloadOffline(getActivity());
 		
-		edtName.setText(userProfile.getFname());
-		edtName.setSelection(edtName.getText().length());
+		edtName.setText(userProfile.getUsername());
 		
-		if(userProfile.getGender().equalsIgnoreCase("M")){
-			radGirl.setChecked(false);
-			radBoy.setChecked(true);
-		}else{
-			radGirl.setChecked(true);
-			radBoy.setChecked(false);
+		if(userProfile.getDescription()!=null && !userProfile.getDescription().equalsIgnoreCase("null")){
+			edtDescription.setText(userProfile.getDescription());
+			edtDescription.setSelection(userProfile.getDescription().length());
 		}
 		
-		String dtStart = userProfile.getBirthday();  
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
-		try {  
-		    Date date = format.parse(dtStart);  
-		    Calendar calendar = Calendar.getInstance();
-		    calendar.setTime(date);
-		    int year 	= calendar.get(Calendar.YEAR);
-			int month 	= calendar.get(Calendar.MONTH);
-			int day 	= calendar.get(Calendar.DAY_OF_MONTH);
-			dpBDay.updateDate(year, month, day); 
-		} catch (ParseException e) {  
-		   L.error(""+e);  
+		if(userProfile.getProfession()!=null && !userProfile.getProfession().equalsIgnoreCase("null")){
+			edtProfession.setText(userProfile.getProfession());
+			edtProfession.setSelection(userProfile.getProfession().length());
 		}
+		
+		if(userProfile.getUrl0()!=null && !userProfile.getUrl0().equalsIgnoreCase("null")){
+			edtUrl0.setText(userProfile.getUrl0());
+			edtUrl0.setSelection(userProfile.getUrl0().length());
+		}
+		
+		if(userProfile.getUrl1()!=null && !userProfile.getUrl1().equalsIgnoreCase("null")){
+			edtUrl1.setText(userProfile.getUrl1());
+			edtUrl1.setSelection(userProfile.getUrl1().length());
+		}
+		
+		if(userProfile.getUrl2()!=null && !userProfile.getUrl2().equalsIgnoreCase("null")){
+			edtUrl2.setText(userProfile.getUrl2());
+			edtUrl2.setSelection(userProfile.getUrl2().length());
+		}
+		
+		
 	}
 
 	private void resetProfilePic() {

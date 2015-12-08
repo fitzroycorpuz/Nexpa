@@ -294,20 +294,21 @@ public class MainSignInActivity extends Activity {
 													L.debug("MainSignInActivity, webPage: " + webPage);
 
 													if (!jResult.getBoolean("error")) {
-
+														
 														JSONObject profilePictureJson = jResult
 																.getJSONArray("profile_and_pic_info").getJSONObject(0);
-														long userId = profilePictureJson.getLong("user_id");
-														String firstname = profilePictureJson.getString("firstname");
-														String gender = profilePictureJson.getString("gender");
-														String date_update = profilePictureJson
-																.getString("date_update");
-
-														String birthday = profilePictureJson.getString("birthday");
-														String lastname = "";
-
-														UserProfile profile = new UserProfile(userId, firstname,
-																lastname, birthday, gender, date_update);
+														
+														//reusing userid and username
+														long uId 			= Long.parseLong(server_uid);
+														String uname 		= server_name;
+														String description 	= profilePictureJson.getString("description");
+														String profession 	= profilePictureJson.getString("title");
+														String url0			= profilePictureJson.getString("url0");
+														String url1			= profilePictureJson.getString("url1");
+														String url2			= profilePictureJson.getString("url2");
+														String dateUpdated	= profilePictureJson.getString("date_updated");
+														
+														UserProfile profile = new UserProfile(uId, uname, description, profession, url0, url1, url2, dateUpdated);
 														profile.updateOffline(MainSignInActivity.this);
 
 														String imgDir = profilePictureJson.getString("img_dir");
@@ -315,7 +316,7 @@ public class MainSignInActivity extends Activity {
 														String dateUploaded = profilePictureJson
 																.getString("date_uploaded");
 
-														ProfilePicture profilePicture = new ProfilePicture(userId,
+														ProfilePicture profilePicture = new ProfilePicture(uId,
 																imgDir, imgFile, dateUploaded);
 														profilePicture.downloadImageOnline();
 														profilePicture.saveOffline(MainSignInActivity.this);

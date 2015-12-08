@@ -33,7 +33,8 @@
     <string name="sync">Sync</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="take_photo">Take photo</string>
-     <string name="choose_existing_photo">Choose existing photo</string>
+    <string name="photo">Photo</string>
+    <string name="choose_existing_photo">Choose existing photo</string>
     <string name="rad_lookingfor_networking">networking</string>
     <string name="rad_lookingfor_serious_relationship">serious relationship</string>
     <string name="rad_lookingfor_date">date</string>
@@ -90,7 +91,13 @@
     <string name="title_activity_test">TestActivity</string>
     <string name="delete">delete</string>
     
-    
+    <!-- alerts -->
     <string name="msg_no_internet">Sorry your internet connection is not working, please enable it!</string>
+    
+    <!-- hints -->
+    <string name="short_description">Short description</string>
+    <string name="profession">Profession</string>
+    <string name="username">Username</string>
+    <string name="url">URL</string>
 
 </resources>

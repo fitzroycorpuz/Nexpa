@@ -75,6 +75,11 @@ public class MyBroadcastsFragment extends Fragment {
 	
 	ParallaxRecyclerAdapter<Announcement> mAdapter;
 	private ImageView mImgProfile;
+	private TextView mTvJobTitle;
+	private TextView mTvUname;
+	private TextView mTvUrl0;
+	private TextView mTvUrl1;
+	private TextView mTvUrl2;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_my_broadcasts, container, false);
@@ -147,8 +152,15 @@ public class MyBroadcastsFragment extends Fragment {
         mAdapter.setData(mAnouncements);
         mRvBroadcasts.setAdapter(mAdapter);
         
-       
         mImgProfile = (ImageView) header.findViewById(R.id.img_profile);
+        
+        
+        mTvJobTitle = (TextView)header.findViewById(R.id.tv_job_title);
+        mTvUname = (TextView)header.findViewById(R.id.tv_uname);
+        mTvUrl0 = (TextView)header.findViewById(R.id.tv_url0);
+        mTvUrl1 = (TextView)header.findViewById(R.id.tv_url1);
+        mTvUrl2 = (TextView)header.findViewById(R.id.tv_url2);
+        
         
         ((ImageView)header.findViewById(R.id.img_settings)).setOnClickListener(new View.OnClickListener() {
 			
@@ -182,6 +194,7 @@ public class MyBroadcastsFragment extends Fragment {
 		super.onResume();
 		
 		resetProfilePic();
+		resetUserInfo();
 		
 		new Thread(new Runnable() {
 			
@@ -220,25 +233,51 @@ public class MyBroadcastsFragment extends Fragment {
 	}
 	
 	
+	private void resetUserInfo() {
+		
+		SQLiteHandler db = new SQLiteHandler(getActivity());
+		db.openToRead();
+		
+		UserProfile profile = new UserProfile();
+		profile.setId(Long.parseLong(db.getLoggedInID()));
+		profile.downloadOffline(getActivity());
+		
+		mTvJobTitle.setVisibility(View.GONE);
+		mTvUname.setVisibility(View.GONE);
+		mTvUrl0.setVisibility(View.GONE);
+		mTvUrl1.setVisibility(View.GONE);
+		mTvUrl2.setVisibility(View.GONE);
+		
+		if(profile.getProfession()!=null &&(!profile.getProfession().equalsIgnoreCase("null") || !profile.getProfession().isEmpty())){
+			mTvJobTitle.setVisibility(View.VISIBLE);
+			mTvJobTitle.setText(profile.getProfession());
+		}
+		
+		if(profile.getUsername()!=null &&(!profile.getUsername().equalsIgnoreCase("null") || !profile.getUsername().isEmpty())){
+			mTvUname.setVisibility(View.VISIBLE);
+			mTvUname.setText(profile.getUsername());
+		}
+		
+		if(profile.getUrl0()!=null &&(!profile.getUrl0().equalsIgnoreCase("null") || !profile.getUrl0().isEmpty())){
+			mTvUrl0.setVisibility(View.VISIBLE);
+			mTvUrl0.setText(profile.getUrl0());
+		}
+		
+		if(profile.getUrl1()!=null &&(!profile.getUrl1().equalsIgnoreCase("null") || !profile.getUrl1().isEmpty())){
+			mTvUrl1.setVisibility(View.VISIBLE);
+			mTvUrl1.setText(profile.getUrl1());
+		}
+		
+		if(profile.getUrl2()!=null &&(!profile.getUrl2().equalsIgnoreCase("null") || !profile.getUrl2().isEmpty())){
+			mTvUrl2.setVisibility(View.VISIBLE);
+			mTvUrl2.setText(profile.getUrl2());
+		}
+		
+		db.close();
+		
+	}
+
 	private void resetProfilePic(){
-		
-		//String imgDecodableString = Utilz.getDataFrmSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, "");
-		
-//		long userId = -1;
-//		SQLiteHandler db = new SQLiteHandler(getActivity());
-//		db.openToRead();
-//		userId = Long.parseLong(db.getLoggedInID());
-//		db.close();
-//		
-//		ProfilePicture pic = new ProfilePicture();
-//		pic.setUserId(userId);
-//		pic.downloadOffline(getActivity());
-//		
-//		String imgDecodableString = null;
-//		if((pic.getImgDir()!=null && !pic.getImgDir().isEmpty()) && (pic.getImgFile()!=null && !pic.getImgFile().isEmpty())){
-//			imgDecodableString = 
-//					pic.getImgDir()+"/"+pic.getImgFile();
-//		}
 		
 		String imgDecodableString = ProfilePicture.getUserImgDecodableString(getActivity());
 		
@@ -258,7 +297,7 @@ public class MyBroadcastsFragment extends Fragment {
         
         L.debug("imgDecodableString "+imgDecodableString+", rawImage "+rawImage);
         RoundedImageView riv = new RoundedImageView(getActivity());
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 380);
         mImgProfile.setImageBitmap(circImage);
 	}
 	

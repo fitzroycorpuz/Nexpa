@@ -6,157 +6,206 @@
     android:isScrollContainer="false"
     android:orientation="vertical" >
 
-    <LinearLayout android:id="@+id/linearLayout1"
-	android:layout_width="fill_parent" android:layout_height="wrap_content"
-	android:background="@color/toucan_green"
-	
-	android:padding="15dp">
-
-		<TextView
-		    android:layout_width="200dp"
-		    android:layout_height="match_parent"
-		    android:text="@string/edit_profile"
-		    android:textAllCaps="true"
-		    android:textColor="@color/white"
-		    android:textSize="18dp" />
-
-		<View android:layout_width="0dp" android:layout_height="0dp"
-		android:layout_weight="1" />
-
-		<Button
-		    android:id="@+id/dialogButtonOK"
-		    android:layout_width="30dp"
-		    android:layout_height="30dp"
-		    android:background="@drawable/btn_ok" />
-
-	</LinearLayout>
-
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/linearLayout1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp" >
-
-        <LinearLayout
-            android:id="@+id/btn_profile_pic"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@color/white_smoke"
-            android:orientation="horizontal"
-            android:padding="10dp" >
-
-            <ImageView
-                android:id="@+id/img_profile_pic"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/pic_sample_girl" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
-
-                <TextView
-                    android:layout_marginLeft="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Photo"
-                     android:layout_gravity="center_vertical"
-                    android:textAllCaps="true"
-                    android:textColor="@color/old_black"
-                    android:textSize="18dp" />
-            </FrameLayout>
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/edtName"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@color/white_smoke"
-            android:hint="Your Name Here"
-            android:inputType="textPersonName|textCapWords"
-            android:maxLength="20"
-            android:padding="10dp"
-            android:singleLine="true"
-            android:textColor="@color/old_black" />
-
-        <RadioGroup
-            android:id="@+id/radioSex"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-             android:orientation="horizontal"
-            android:background="@color/white_smoke"
-            android:padding="10dp" >
-
-          
-            <RadioButton
-                android:id="@+id/radioMale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/flat_btn_radio"
-                android:checked="true"
-                android:text="@string/radio_male"
-                android:layout_marginRight="16dp"
-                android:textAllCaps="true"
-                android:textColor="@color/old_black" />
-
-            <RadioButton
-                android:id="@+id/radioFemale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/flat_btn_radio"
-                android:text="@string/radio_female"
-                android:textAllCaps="true"
-                android:textColor="@color/old_black" />
-        </RadioGroup>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="vertical"
-        android:padding="10dp" >
+        android:background="@color/toucan_green"
+        android:padding="15dp" >
 
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="1dp"
-            android:background="@color/white_smoke"
-            android:gravity="center"
-            android:padding="1dp"
-            android:text="birthday"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:text="@string/edit_profile"
             android:textAllCaps="true"
-            android:textColor="@color/EDWARD"
+            android:textColor="@color/white"
             android:textSize="18dp" />
 
-        <DatePicker
-            android:id="@+id/dbBirthday"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@color/white_smoke"
-            android:calendarViewShown="false"
-            android:padding="1dp" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-       
-
-        <!--
-        <Button android:id="@+id/dialogButtonCancel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Cancel" android:background="@color/pubescent_white"
-        android:textAllCaps="true" android:textColor="@color/flat_white"
-        />
-        -->
-
+        <Button
+            android:id="@+id/dialogButtonOK"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/btn_ok" />
     </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" >
+
+                <LinearLayout
+                    android:id="@+id/btn_profile_pic"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_smoke"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/img_profile_pic"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/pic_sample_girl" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:text="@string/photo"
+                            android:textAllCaps="true"
+                            android:textColor="@color/old_black"
+                            android:textSize="18dp" />
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" >
+
+                <EditText
+                    android:id="@+id/edtName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_smoke"
+                    android:hint="@string/username"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textColor="@color/old_black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" >
+
+                <EditText
+                    android:id="@+id/edt_short_description"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_smoke"
+                    android:hint="@string/short_description"
+                    android:maxLength="150"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textColor="@color/old_black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" >
+
+                <EditText
+                    android:id="@+id/edt_profession"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_smoke"
+                    android:hint="@string/profession"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:textColor="@color/old_black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" >
+
+                <EditText
+                    android:id="@+id/edt_url0"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_smoke"
+                    android:hint="@string/url"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/old_black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" >
+
+                <EditText
+                    android:id="@+id/edt_url1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_smoke"
+                    android:hint="@string/url"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/old_black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" >
+
+                <EditText
+                    android:id="@+id/edt_url2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_smoke"
+                    android:hint="@string/url"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/old_black" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

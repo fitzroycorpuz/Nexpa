@@ -430,6 +430,7 @@ public class Correspondent {
 
 						// OneComment message = new OneComment(left, comment,
 						// success, date, isUnread);
+						
 						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
 								dateReceived, isUnread, true);
 

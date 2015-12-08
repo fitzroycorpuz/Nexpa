@@ -247,15 +247,15 @@ public class UserProfileActivityOld extends Activity
                 final RadioButton radGirl;
                 //final RadioButton radUnspec;
                 
-                dpBDay = (DatePicker) dialog.findViewById(R.id.dbBirthday);
-                Calendar c = Calendar.getInstance();
-                c.set(Calendar.YEAR, c.get(Calendar.YEAR) - 18 );
-                dpBDay.setMaxDate(c.getTime().getTime());
-                
-                edtName = (EditText) dialog.findViewById(R.id.edtName);
-                
-                radBoy = (RadioButton) dialog.findViewById(R.id.radioMale);
-                radGirl = (RadioButton) dialog.findViewById(R.id.radioFemale);
+//                dpBDay = (DatePicker) dialog.findViewById(R.id.dbBirthday);
+//                Calendar c = Calendar.getInstance();
+//                c.set(Calendar.YEAR, c.get(Calendar.YEAR) - 18 );
+//                dpBDay.setMaxDate(c.getTime().getTime());
+//                
+//                edtName = (EditText) dialog.findViewById(R.id.edtName);
+//                
+//                radBoy = (RadioButton) dialog.findViewById(R.id.radioMale);
+//                radGirl = (RadioButton) dialog.findViewById(R.id.radioFemale);
                 //radUnspec = (RadioButton) dialog.findViewById(R.id.radioUnspecified);
                 
                 Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
@@ -274,12 +274,12 @@ public class UserProfileActivityOld extends Activity
                     int day = cal.get(Calendar.DAY_OF_MONTH);
                     dpBDay.updateDate(year, month , day);
                 }
-                if (db.getGender().equals("M")){
-                    radBoy.setChecked(true);
-                }
-                else if (db.getGender().equals("F")){
-                    radGirl.setChecked(true);
-                }
+//                if (db.getGender().equals("M")){
+//                    radBoy.setChecked(true);
+//                }
+//                else if (db.getGender().equals("F")){
+//                    radGirl.setChecked(true);
+//                }
 //                else{
 //                    radUnspec.setChecked(true);
 //                }
@@ -291,15 +291,15 @@ public class UserProfileActivityOld extends Activity
                         String name = edtName.getText().toString();
                         String gender = "";
                         String dateBday = "";
-                        if (radGirl.isChecked()){
-                            gender = "F";
-                        }
-                        else if (radBoy.isChecked()){
-                            gender = "M";
-                        }
-                        else {
-                            gender = "U";
-                        }
+//                        if (radGirl.isChecked()){
+//                            gender = "F";
+//                        }
+//                        else if (radBoy.isChecked()){
+//                            gender = "M";
+//                        }
+//                        else {
+//                            gender = "U";
+//                        }
                         int day = dpBDay.getDayOfMonth();
                         int month= dpBDay.getMonth();
                         int year = dpBDay.getYear();
