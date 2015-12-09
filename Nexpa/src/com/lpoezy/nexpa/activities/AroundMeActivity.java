@@ -24,6 +24,7 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.JSONParser;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
+import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
@@ -39,6 +40,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -65,7 +67,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 
-public class AroundMeActivity  extends AppCompatActivity implements OnRefreshListener {
+public class AroundMeActivity  extends AppCompatActivity implements OnRefreshListener, Correspondent.OnCorrespondentUpdateListener {
 	private static final String TAG = AroundMeActivity.class.getSimpleName();
 	//Button btnUpdate;
 	LocationManager locationManager;
@@ -82,7 +84,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	ArrayList < Integer > distance = new ArrayList < Integer > ();
 	ArrayList < Integer > imageId = new ArrayList < Integer > ();
 	ArrayList < Bitmap > images = new ArrayList < Bitmap > ();
-	ArrayList < Long > 	arr_user_id = new ArrayList < Long > ();
+	ArrayList < Correspondent > 	arr_correspondents = new ArrayList < Correspondent > ();
 	ArrayList < String > arr_fname = new ArrayList < String > ();
 	ArrayList < String > arr_age = new ArrayList < String > ();
 	ArrayList < String > arr_uname = new ArrayList < String > ();
@@ -270,7 +272,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 		//distance.add(0, 0);
 		//imageId.add(0, R.drawable.pic_sample_girl);
 		//availabilty.add(0, "Online");
-		adapter = new CustomGrid(AroundMeActivity.this, web, arr_user_id/*imageId*/, availabilty, distance);
+		adapter = new CustomGrid(AroundMeActivity.this, web, arr_correspondents/*imageId*/, availabilty, distance);
 		 mHandler = new Handler()
 			{
 			    public void handleMessage(android.os.Message msg)
@@ -304,7 +306,8 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 					Intent intent = new Intent(AroundMeActivity.this, PeopleProfileActivity.class);
 					Log.e("ccc", arr_about.get(position));
 					//intent.putExtra("TAG_GEO_PID", us.get(position).getId());
-					intent.putExtra("TAG_GEO_USER_ID", arr_user_id.get(position));
+					
+					intent.putExtra("TAG_GEO_USER_ID", arr_correspondents.get(position).getId());
 					intent.putExtra("TAG_GEO_USER", arr_uname.get(position));
 					intent.putExtra("TAG_GEO_EMAIL", arr_email.get(position));
 					intent.putExtra("TAG_GEO_FNAME", arr_fname.get(position));
@@ -434,14 +437,34 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 		*/
 		
 		for (int j = 0; j < us.size(); j++) {
+			//L.debug("userID: "+us.get(j).getUserId()+", username: "+us.get(j).getUserName());
+			
+			final Correspondent correspondent = new Correspondent();
+		
+	    	correspondent.addListener(this);
+	   		correspondent.setId(Long.parseLong(Integer.toString(us.get(j).getUserId())));
+			
+	   	
+			arr_correspondents.add(j,correspondent);
+			
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					correspondent.downloadProfilePicOnline(AroundMeActivity.this);
+					
+				}
+			}).start();
+			
 			if (sentType.equals("1")) {//user is already added
 				//if (us.get(j).getShown().equals("0")) {
 					imageId.add(j, R.drawable.pic_sample_girl);
 					availabilty.add(j, "INSERTED");
 					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
 					
-					L.debug("userID: "+us.get(j).getUserId()+", username: "+us.get(j).getUserName());
-					arr_user_id.add(j,Long.parseLong(Integer.toString(us.get(j).getUserId())));
+					
+					
+					
 					distance.add(j, us.get(j).getDistance());
 					arr_uname.add(j, us.get(j).getUserName());
 					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
@@ -476,7 +499,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 				availabilty.add(j, "ADDED");
 				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
 				distance.add(j, us.get(j).getDistance());
-				arr_user_id.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
+				//arr_correspondents.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
 				
 				arr_uname.add(j, us.get(j).getUserName());
 				arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
@@ -762,6 +785,17 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 		//locationManager.removeUpdates(locationListener);
 		isRunning = false;
 		Log.e("ON PAUSE", "APP PAUSE");
+		
+		
+	}
+	
+	@Override
+	public void onCorrespondentUpdate() {
+		this.runOnUiThread(new Runnable() {
+			public void run() {
+				adapter.notifyDataSetChanged();
+			}
+		});
 		
 		
 	}

@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
+import com.lpoezy.nexpa.objects.UserProfile;
+import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,7 +20,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class CustomGrid extends BaseAdapter implements Correspondent.OnCorrespondentUpdateListener{
+public class CustomGrid extends BaseAdapter {
 	 private Context mContext;
     // private final String[] web;
 	 private ArrayList<String> web = new ArrayList<String>();
@@ -28,15 +31,15 @@ public class CustomGrid extends BaseAdapter implements Correspondent.OnCorrespon
 	private ArrayList<Long> userIds;
     
      
-       public CustomGrid(Context c, ArrayList<String> web,ArrayList < Long > userIds/*ArrayList<Integer> Imageid*/,ArrayList<String> availabilty,ArrayList<Integer> distance ) {
+       public CustomGrid(Context c, ArrayList<String> web,ArrayList < Correspondent > correspondents/*ArrayList<Integer> Imageid*/,ArrayList<String> availabilty,ArrayList<Integer> distance ) {
            mContext = c;
            //this.Imageid = Imageid;
            this.userIds = userIds;
            this.distance = distance;
            this.web = web;
            this.availabilty = availabilty;
+           this.mCorrespondents = correspondents;
            
-           mCorrespondents = new ArrayList<Correspondent>();
        }
 
        @Override
@@ -92,24 +95,41 @@ public class CustomGrid extends BaseAdapter implements Correspondent.OnCorrespon
 
            textView.setText(web.get(position)+ " | " + distance.get(position) +"m");
            //imageView.setImageResource(Imageid.get(position));
-           imageView.setImageBitmap(getCorrespondentPic(position));
+          
+           
+           Bitmap rawImage = BitmapFactory.decodeResource(mContext.getResources(),
+			        R.drawable.pic_sample_girl);
+           
+	
+			if(mCorrespondents.get(position).getProfilePic()!=null){
+				rawImage = mCorrespondents.get(position).getProfilePic();
+			}
+           
+   			imageView.setImageBitmap(rawImage);
            
           // txtAvailView.setText(availabilty.get(position));
            
            return grid;
        }
        
-       private Bitmap getCorrespondentPic(int pos) {
-			
-			Bitmap rawImage = BitmapFactory.decodeResource(mContext.getResources(),
-			        R.drawable.pic_sample_girl);
-			
-			return rawImage;
-		}
+//       private Bitmap getCorrespondentPic(final Correspondent correspondent) {
+//			
+//			Bitmap rawImage = BitmapFactory.decodeResource(mContext.getResources(),
+//			        R.drawable.pic_sample_girl);
+//			//L.debug("CustomGrid, getCorrespondentPic: "+this.userIds.get(pos)+", "+this.web.get(pos));
+//			
+//			new Thread(new Runnable() {
+//				
+//				@Override
+//				public void run() {
+//					
+//					correspondent.downloadProfilePicOnline(mContext);
+//					
+//				}
+//			}).start();
+//			
+//			return rawImage;
+//		}
 
-	@Override
-	public void onCorrespondentUpdate() {
-		notifyDataSetChanged();
-		
-	}
+	
 }
