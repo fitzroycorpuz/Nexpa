@@ -170,7 +170,7 @@ public class UserProfile {
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToRead();
 		Map<String, String> map = db.downloadUserProfile(this.id);
-		L.debug("UserProfile, downloadOffline: "+map.size());
+		//L.debug("UserProfile, downloadOffline: "+map.size());
 		if(map!=null){
 			this.id 			= Long.parseLong(map.get(SQLiteHandler.USER_PROFILE_USER_ID));
 			this.username 		= map.get(SQLiteHandler.USER_PROFILE_USERNAME);
