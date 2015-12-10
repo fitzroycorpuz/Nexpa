@@ -6,7 +6,14 @@ xmlns:yourapp="http://schemas.android.com/apk/res-auto">
      <item
     android:id="@+id/action_distance"
     android:orderInCategory="100"
-    android:title="Share"
+    android:title="Distance Settings"
+    android:icon="@drawable/icon_target"
+    yourapp:showAsAction="ifRoom" />
+     
+       <item
+    android:id="@+id/action_distance_test"
+    android:orderInCategory="100"
+    android:title="Distance Settings (Tester)"
     android:icon="@drawable/icon_target"
     yourapp:showAsAction="ifRoom" />
 

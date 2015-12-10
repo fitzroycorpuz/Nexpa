@@ -64,6 +64,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -173,6 +174,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	
 	Dialog dialogPref;
 	RangeBar rbDistance;
+	EditText rbDistance1;
 	String distTick = "";
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -225,6 +227,48 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 				dialogPref.getWindow().setAttributes(lp);
 	            return true;
 
+	        case R.id.action_distance_test:
+	        	dialogPref = new Dialog(AroundMeActivity.this);
+				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				dialogPref.setContentView(R.layout.android_profile_distance_tester);
+
+				rbDistance1 = (EditText) dialogPref.findViewById(R.id.rbDistance);
+					dst = 100;
+	        		try{
+	        			dst = Integer.parseInt(db.getBroadcastDist());
+	        		}
+	        		catch (Exception e){
+	        			dst = 100;
+	        		}
+	               
+				Button dialogButton1 = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
+				dialogButton1.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
+					
+						
+						try{
+							dst = Integer.parseInt(rbDistance1.getText().toString());
+						}
+						catch(Exception e){
+							dst = 100;
+						}
+						Log.e("dst", dst+ " c");
+						db.updateBroadcastDist(distTick);
+						tryGridToUpdate();
+						dialogPref.dismiss();
+					}
+				});
+				
+				WindowManager.LayoutParams lp1 = new WindowManager.LayoutParams();
+				lp1.copyFrom(dialogPref.getWindow().getAttributes());
+				lp1.width = WindowManager.LayoutParams.MATCH_PARENT;
+				lp1.height = WindowManager.LayoutParams.WRAP_CONTENT;
+				dialogPref.show();
+				dialogPref.getWindow().setAttributes(lp1);
+	            return true;
+	            
 	        default:
 	            // If we got here, the user's action was not recognized.
 	            // Invoke the superclass to handle it.
@@ -462,9 +506,6 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 					imageId.add(j, R.drawable.pic_sample_girl);
 					availabilty.add(j, "INSERTED");
 					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
-					
-					
-					
 					
 					distance.add(j, us.get(j).getDistance());
 					arr_uname.add(j, us.get(j).getUserName());
