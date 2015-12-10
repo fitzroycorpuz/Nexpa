@@ -9,6 +9,7 @@ import java.util.List;
 import org.jivesoftware.smack.util.Base64;
 
 import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Announcement;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
@@ -25,8 +26,10 @@ import com.lpoezy.nexpa.utility.Utilz;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ActionBar.LayoutParams;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -80,6 +83,19 @@ public class MyBroadcastsFragment extends Fragment {
 	private TextView mTvUrl0;
 	private TextView mTvUrl1;
 	private TextView mTvUrl2;
+	
+	private BroadcastReceiver mActionUserProfileUpdatedReceived = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			
+			resetProfilePic();
+			resetUserInfo();
+		}
+	};
+	
+	
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_my_broadcasts, container, false);
@@ -189,17 +205,25 @@ public class MyBroadcastsFragment extends Fragment {
 	}
 	
 	@Override
-	public void onResume() {
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
 		
+		getActivity().unregisterReceiver(mActionUserProfileUpdatedReceived);
+	}
+	
+	@Override
+	public void onResume() {
+		L.debug("MyBroadcastFragment, onResume");
 		super.onResume();
+		
+		getActivity().registerReceiver(mActionUserProfileUpdatedReceived , new IntentFilter(AppConfig.ACTION_USER_PROFILE_UPDATED));
 		
 		resetProfilePic();
 		resetUserInfo();
 		
 		new Thread(new Runnable() {
 			
-			
-
 			@Override
 			public void run() {
 				
@@ -209,8 +233,6 @@ public class MyBroadcastsFragment extends Fragment {
 				final List<Announcement> announcements = db.downloadPersonalBroadcasts();
 				
 				mUsername = GroupChatHomeActivity.displayName(db.getFName() + "", db.getUsername());
-				
-				
 				
 				db.close();
 				

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.objects.Announcement;
 import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.openfire.Account;
@@ -784,23 +785,29 @@ public class SQLiteHandler {
 		L.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		L.error("SQLiteHandler,getting message senders");
 
-		Cursor cursor = sqLiteDatabase.query(TABLE_CORRESPONDENTS, new String[] { CORRESPONDENT_USER_ID,
-				CORRESPONDENT_USERNAME, CORRESPONDENT_EMAIL, CORRESPONDENT_FNAME }, null, null, null, null, null);
+		Cursor cursor = sqLiteDatabase.query(TABLE_CORRESPONDENTS, new String[] { CORRESPONDENT_USER_ID, CORRESPONDENT_USERNAME }, null, null, null, null, null);
+		
+//		String myId = getLoggedInID();
+//		Cursor cursor = sqLiteDatabase.query(TABLE_USER_PROFILE, new String[] { USER_PROFILE_USER_ID,
+//				USER_PROFILE_USERNAME, USER_PROFILE_DESCRIPTION, USER_PROFILE_PROFESSION, USER_PROFILE_URL0,
+//				USER_PROFILE_URL1,USER_PROFILE_URL2, USER_PROFILE_DATE_UPDATED }, 
+//				USER_PROFILE_USER_ID+" <> ?", 
+//				new String[]{myId}, null, null, null);
 
 		List<Correspondent> correspondents = new ArrayList<Correspondent>();
 		List<Long> ids = new ArrayList<Long>();
 		if (cursor.moveToFirst()) {
 			do {
-				long userId = cursor.getLong(cursor.getColumnIndex(CORRESPONDENT_USER_ID));
+				
 
-				String username = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
-				L.error("SQLiteHandler, username:" + username);
-				String email = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_EMAIL));
-				String fname = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_FNAME));
-
-				Correspondent correspondent = new Correspondent(userId, username, email, fname);
-				if (ids.indexOf(userId) == -1) {
-					ids.add(userId);
+				long id = Long.parseLong(cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USER_ID)));
+				String uname  = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
+				
+				Correspondent correspondent = new Correspondent(id, uname);
+				
+				//UserProfile correspondent = new UserProfile(id, uname, description, profession, url0, url1, url2, dateUpdated);
+				if (ids.indexOf(id) == -1) {
+					ids.add(id);
 					correspondents.add(correspondent);
 				}
 			} while (cursor.moveToNext());
@@ -917,7 +924,7 @@ public class SQLiteHandler {
 			String username = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
 			String fname = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_FNAME));
 
-			correspondent = new Correspondent(id, username, email, fname);
+			correspondent = new Correspondent(id, username);
 		}
 		cursor.close();
 		return correspondent;

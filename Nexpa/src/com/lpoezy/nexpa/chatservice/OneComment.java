@@ -276,7 +276,7 @@ public class OneComment {
 						String username = jObj.getString("firstname");
 						String email = "";
 						String fname = username;
-						Correspondent correspondent = new Correspondent(correspondentId, username, email, fname);
+						Correspondent correspondent = new Correspondent(correspondentId, username);
 
 						boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
 						String comment = jObj.getString("message");

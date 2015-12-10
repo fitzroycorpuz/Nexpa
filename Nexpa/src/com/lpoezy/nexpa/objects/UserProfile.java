@@ -3,6 +3,10 @@ package com.lpoezy.nexpa.objects;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.DateUtils;
@@ -165,6 +169,42 @@ public class UserProfile {
 		
 		return webPage;
 	}
+	
+	public boolean downloadOnline() {
+		
+		HashMap<String, String> postDataParams = new HashMap<String, String>();
+		postDataParams.put("tag", "profile_download");
+		postDataParams.put("user_id", Long.toString(this.id));
+		
+		final String spec = AppConfig.URL_USER_PROFILES;
+		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+		
+		L.debug("UserProfile, downloadOnline, webPage: "+webPage);
+		
+		try {
+			JSONObject jResult = new JSONObject(webPage);
+			//org.json.JSONException: Value {"id":"8","title":"mobile app developer","username":"h","url1":"www.lpoezy.com","url2":"www.lpoezy.com","description":"gghuyyrt","date_updated":"2015-12-08 14:06:41","url0":"www.lpoezy.com"} at user_profiles of type org.json.JSONObject cannot be converted to JSONArray
+			if(!jResult.getBoolean("error")){
+				
+				JSONObject jProfile = jResult.getJSONObject("user_profiles");
+				this.id 			= Long.parseLong(jProfile.getString("id"));
+				this.username 		= jProfile.getString("username");
+				this.description 	= jProfile.getString("description");
+				this.profession 	= jProfile.getString("title");
+				this.url0 			= jProfile.getString("url0");
+				this.url1 			= jProfile.getString("url1");
+				this.url2 			= jProfile.getString("url2");
+				this.dateUpdated 	= jProfile.getString("date_updated");
+				
+				return true;
+			}
+			
+		} catch (JSONException e) {
+			L.error(""+e);
+		}
+		
+		return false;
+	} 
 
 	public void downloadOffline(Context context) {
 		SQLiteHandler db = new SQLiteHandler(context);
@@ -187,5 +227,7 @@ public class UserProfile {
 		db.close();
 
 	}
+
+	
 
 }

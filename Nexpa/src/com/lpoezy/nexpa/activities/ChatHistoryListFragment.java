@@ -276,8 +276,8 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 			vh.position = position;
 
 			// only use username if fname has no value
-			String name = (mBuddys.get(position).getFname().isEmpty()) ? mBuddys.get(position).getUsername()
-					: mBuddys.get(position).getFname();
+			String name = mBuddys.get(position).getUsername();
+					
 			vh.tvBuddys.setText(name);
 
 			OneComment msg = mBuddys.get(position).getConversation().get(0);

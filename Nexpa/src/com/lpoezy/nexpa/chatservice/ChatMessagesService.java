@@ -192,7 +192,7 @@ public class ChatMessagesService extends Service {
 									final Correspondent correspondent = new Correspondent();
 									correspondent.setId(Long.parseLong(userId));
 									correspondent.setUsername(name);
-									correspondent.setEmail(email);
+									
 
 									OneComment comment = new OneComment(false, newMsg, true, dateCreated, true);
 									long now = System.currentTimeMillis();
@@ -228,9 +228,7 @@ public class ChatMessagesService extends Service {
 											// send broadcast
 											Intent broadcast = new Intent(AppConfig.ACTION_RECEIVED_MSG);
 											broadcast.putExtra("userid", correspondent.getId());
-											broadcast.putExtra("email", correspondent.getEmail());
 											broadcast.putExtra("username", correspondent.getUsername());
-											broadcast.putExtra("fname", correspondent.getFname());
 											broadcast.putExtra("msg", message.getBody());
 											L.debug("sending broadcast!");
 											sendBroadcast(broadcast);
@@ -399,10 +397,7 @@ public class ChatMessagesService extends Service {
 		// Creates an explicit intent for an Activity in your app
 		Intent resultIntent = new Intent(this, ChatActivity.class);
 		resultIntent.putExtra("userid", correspondent.getId());
-		resultIntent.putExtra("email", correspondent.getEmail());
 		resultIntent.putExtra("username", correspondent.getUsername());
-		resultIntent.putExtra("fname", correspondent.getFname());
-
 		// The stack builder object will contain an artificial back stack for
 		// the
 		// started Activity.

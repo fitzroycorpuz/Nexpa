@@ -95,7 +95,18 @@ public class EditProfileFragment extends DialogFragment {
 		resetProfileInfo();
 	}
 
-	
+	@Override
+	public void onDestroy() {
+		
+		super.onDestroy();
+		
+		//let all the screens the listaening screens,
+		//that there is a change in,
+		//user profile information,
+		//and give the listening screens to update
+		getActivity().sendBroadcast(new Intent(AppConfig.ACTION_USER_PROFILE_UPDATED));
+		
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

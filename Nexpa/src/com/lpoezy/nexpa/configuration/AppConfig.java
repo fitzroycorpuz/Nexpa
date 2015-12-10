@@ -18,6 +18,7 @@ public class AppConfig {
    
     public static int MSG_NOTIFICATION_ID = 1000;
     public static final String ACTION_RECEIVED_MSG = "com.lpoezy.nexpa.actions.ACTION_RECEIVED_MSG";
+    public static final String ACTION_USER_PROFILE_UPDATED = "com.lpoezy.nexpa.actions.ACTION_USER_PROFILE_UPDATED";
 
     
 }

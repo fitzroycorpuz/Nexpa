@@ -91,9 +91,7 @@ public class ChatHistoryActivity extends AppCompatActivity implements OnShowChat
 
 		Intent intentMes = new Intent(this, ChatActivity.class);
 		intentMes.putExtra("userid", buddy.getId());
-		intentMes.putExtra("email", buddy.getEmail());
 		intentMes.putExtra("username", buddy.getUsername());
-		intentMes.putExtra("fname", buddy.getFname());
 		
 		//L.debug("username "+buddy.getUsername()+", email: "+email);
 		startActivity(intentMes);

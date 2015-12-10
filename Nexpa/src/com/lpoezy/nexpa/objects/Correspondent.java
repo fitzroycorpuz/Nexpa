@@ -33,9 +33,7 @@ public class Correspondent {
 
 	private long id = -1;
 	private String username = "";
-	private String email = "";
-	private String fname = "";
-
+	
 	private Bitmap profilePic;
 
 	private List<OnCorrespondentUpdateListener> listeners = new ArrayList<Correspondent.OnCorrespondentUpdateListener>();
@@ -43,14 +41,16 @@ public class Correspondent {
 	public static final String ACTION_UPDATE = "com.lpoezy.nexpa.actions.CORRESPONDENT_UPDATE";
 
 	private List<OneComment> conversation = new ArrayList<OneComment>();
+	
+	private UserProfile mAdaptee = new UserProfile();
 
-	public Correspondent(long id, String username, String email, String fname) {
+	public Correspondent(long id, String username) {
 
 		this.id = id;
 		this.username = username;
-		this.email = email;
-		this.fname = fname;
-
+		
+		mAdaptee.setId(id);
+		mAdaptee.setUsername(username);
 	}
 
 	public Correspondent() {
@@ -62,7 +62,7 @@ public class Correspondent {
 
 	public void setId(long id) {
 		this.id = id;
-
+		mAdaptee.setId(id);
 		notifyListeners();
 	}
 
@@ -72,27 +72,7 @@ public class Correspondent {
 
 	public void setUsername(String username) {
 		this.username = username;
-
-		notifyListeners();
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-
-		notifyListeners();
-	}
-
-	public String getFname() {
-		return fname;
-	}
-
-	public void setFname(String fname) {
-		this.fname = fname;
-
+		mAdaptee.setUsername(username);
 		notifyListeners();
 	}
 
@@ -170,12 +150,12 @@ public class Correspondent {
 		long senderId = Long.parseLong(db.getLoggedInID());
 		long receiverId = id;
 		// correspondent does not exist in db
-		if (!isExisting(context)) {
-			// save correspondent
-			db.saveCorrespondent(Long.toString(id), username, email, fname);
-		}
-
-		db.close();
+//		if (!isExisting(context)) {
+//			// save correspondent
+//			db.saveCorrespondent(Long.toString(id), username, "", "");
+//		}
+		mAdaptee.updateOffline(context);
+		
 
 		// save messages to db
 		L.debug("Correspondent id: " + id);
@@ -205,18 +185,18 @@ public class Correspondent {
 		// if all the messages were save in db
 		if (clearConversationStacks)
 			conversation.clear();
-
+		
+		db.close();
 		return success;
 	}
 
 	// will save the correspondent queried online,
 	// plus all the messages pointing to the correspondent id
-	public boolean saveOffline(Context context, long senderId, long receiverId, boolean clearConversationStacks) {
+	public void saveOffline(Context context, long senderId, long receiverId, boolean clearConversationStacks) {
 		L.debug("Correspondent, saveOffline");
 		// don't save this session if there is no conversation happen
-		if (conversation.size() == 0 || conversation.isEmpty())
-			return false;
-
+		if (conversation.size() == 0 || conversation.isEmpty())return;
+			
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 
@@ -224,14 +204,14 @@ public class Correspondent {
 		if (!isExisting(context)) {
 			// save correspondent
 
-			db.saveCorrespondent(Long.toString(id), username, email, fname);
+			db.saveCorrespondent(Long.toString(id), username, "", "");
 		}
 
 		db.close();
 
 		// save messages to db
 		L.debug("sender id: " + id);
-		boolean success = false;
+
 		for (OneComment comment : conversation) {
 			boolean isExisting = OneComment.isExisting(context, comment);
 			// L.debug("comment "+comment.comment+", senderId:
@@ -246,9 +226,9 @@ public class Correspondent {
 
 		// clear all the conversation ,
 		// if all the messages were save in db
-		if (success && clearConversationStacks)
+		if (clearConversationStacks)
 			conversation.clear();
-		return success;
+		
 
 	}
 
@@ -257,15 +237,15 @@ public class Correspondent {
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToRead();
 		Correspondent result = db.downloadCorrespondentByUserId(id);
+		
+		
 		db.close();
 
 		if (result != null) {
 
 			id = result.id;
 			username = result.username;
-			email = result.email;
-			fname = result.fname;
-
+		
 			if (id != -1)
 				return true;
 		}
@@ -279,7 +259,6 @@ public class Correspondent {
 		comment.downloadLatestOffline(context, id);
 
 		conversation.add(comment);
-
 	}
 
 	public void downloadAllMessagesByUserIdAndCorrespondentIdOnline(Context context) {
@@ -456,34 +435,42 @@ public class Correspondent {
 	}
 
 	public boolean downloadOnline(Context context) {
-
-		if (!isExisting(context)) {
-			L.debug("Correspondent, downloadOnline");
-			HashMap<String, String> postDataParams = new HashMap<String, String>();
-			postDataParams.put("tag", "profile_download");
-			postDataParams.put("user", "" + this.id);
-
-			L.debug("Correspondent, getting profile details of user id: " + this.id + " online");
-
-			final String spec = AppConfig.URL_PROFILE;
-			String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-
-			// L.debug("webPage "+webPage);
-			try {
-				JSONObject result = new JSONObject(webPage);
-				if (!result.getBoolean("error")) {
-					JSONObject profile = result.getJSONObject("profile");
-					this.id = Long.parseLong(profile.getString("user"));
-					this.fname = profile.getString("firstname");
-					this.username = profile.getString("username");
-					this.email = profile.getString("email_address");
-
-					return true;
-				}
-			} catch (JSONException e) {
-				L.error("" + e);
-			}
+		
+		if(mAdaptee.downloadOnline()){
+			
+			this.id = mAdaptee.getId();
+			this.username = mAdaptee.getUsername();
+			
+			return true;
 		}
+
+//		if (!isExisting(context)) {
+//			L.debug("Correspondent, downloadOnline");
+//			HashMap<String, String> postDataParams = new HashMap<String, String>();
+//			postDataParams.put("tag", "profile_download");
+//			postDataParams.put("user", "" + this.id);
+//
+//			L.debug("Correspondent, getting profile details of user id: " + this.id + " online");
+//
+//			final String spec = AppConfig.URL_PROFILE;
+//			String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+//
+//			// L.debug("webPage "+webPage);
+//			try {
+//				JSONObject result = new JSONObject(webPage);
+//				if (!result.getBoolean("error")) {
+//					JSONObject profile = result.getJSONObject("profile");
+//					this.id = Long.parseLong(profile.getString("user"));
+//					this.fname = profile.getString("firstname");
+//					this.username = profile.getString("username");
+//					this.email = profile.getString("email_address");
+//
+//					return true;
+//				}
+//			} catch (JSONException e) {
+//				L.error("" + e);
+//			}
+//		}
 
 		return false;
 	}
@@ -519,9 +506,8 @@ public class Correspondent {
 						long senderId = jObj.getLong("user_id");// from
 						long receiverId = jObj.getLong("correspondent_id");// to
 						String username = jObj.getString("firstname");
-						String email = "";
-						String fname = username;
-						Correspondent correspondent = new Correspondent(senderId, username, email, fname);
+						
+						Correspondent correspondent = new Correspondent(senderId, username);
 
 						boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
 						String comment = jObj.getString("message");
@@ -553,6 +539,7 @@ public class Correspondent {
 
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToRead();
+		//List<Correspondent> correspondents = db.downloadAllCorrespondents();
 		List<Correspondent> correspondents = db.downloadAllCorrespondents();
 		db.close();
 

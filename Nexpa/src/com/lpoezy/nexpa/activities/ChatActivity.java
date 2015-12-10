@@ -360,7 +360,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 		final String email = getIntent().getStringExtra("email");
 		final String fname = getIntent().getStringExtra("fname");
 		L.error("userId: "+userId+", username: "+username);
-		mCorrespondent = new Correspondent(userId, username, email, fname);
+		mCorrespondent = new Correspondent(userId, username);
 		mCorrespondent.addListener(this);
 		
 		// only do this task if there is an availabel,
