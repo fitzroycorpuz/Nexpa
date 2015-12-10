@@ -159,9 +159,9 @@ public class EditProfileFragment extends DialogFragment {
 					@Override
 					public void run() {
 
-						saveProfilePicOnline();
+						//saveProfilePicOffline();
 
-						saveUserInfoOnline();
+						saveUserInfoOffline();
 
 						profilePic.post(new Runnable() {
 
@@ -179,7 +179,7 @@ public class EditProfileFragment extends DialogFragment {
 
 	}
 
-	protected void saveUserInfoOnline() {
+	protected void saveUserInfoOffline() {
 		
 		long now = System.currentTimeMillis();
 		
@@ -198,20 +198,25 @@ public class EditProfileFragment extends DialogFragment {
 		
 		UserProfile userProfile = new UserProfile(uId, uname, description, profession, url0, url1, url2, dateUpdated);
 
-		String result = userProfile.saveOnline(getActivity());
-		try {
-			JSONObject jResult = new JSONObject(result);
-			if(!jResult.getBoolean("error")){
-				userProfile.updateOffline(getActivity());
-			}
-		} catch (JSONException e) {
-			L.error(""+e);
-		}
+		//moved to sync in settings screen
+		//String result = userProfile.saveOnline(getActivity());
+		
+		userProfile.updateOffline(getActivity());
+		
+		
+//		try {
+//			JSONObject jResult = new JSONObject(result);
+//			if(!jResult.getBoolean("error")){
+//				userProfile.updateOffline(getActivity());
+//			}
+//		} catch (JSONException e) {
+//			L.error(""+e);
+//		}
 		
 		db.close();
 	}
 
-	protected void saveProfilePicOnline() {
+	protected void saveProfilePicOffline() {
 		
 		SQLiteHandler db = new SQLiteHandler(getActivity());
 		db.openToRead();

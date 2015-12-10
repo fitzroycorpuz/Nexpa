@@ -471,6 +471,24 @@ public class SettingsActivity extends Activity {
 					@Override
 					public void run() {
 						
+						SQLiteHandler db = new SQLiteHandler(SettingsActivity.this);
+						db.openToRead();
+						long userId = Long.parseLong(db.getLoggedInID());
+						
+						UserProfile userProfile = new UserProfile();
+						userProfile.setId(userId);
+						userProfile.downloadOffline(SettingsActivity.this);
+						
+						userProfile.saveOnline(SettingsActivity.this);
+						
+						
+						ProfilePicture pic = new ProfilePicture();
+						pic.setUserId(userId);
+						pic.downloadOffline(SettingsActivity.this);
+						pic.saveImgOnline(SettingsActivity.this);
+						
+						db.close();
+						
 						//check if there is any new msgs online
 						Correspondent.downloadAllMsgsOnline(SettingsActivity.this);
 						

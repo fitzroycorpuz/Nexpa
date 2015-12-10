@@ -121,8 +121,8 @@ public class ProfilePicture {
 
 		final String imageStr = Base64.encodeBytes(byte_arr);
 		//L.debug("imageStr "+imageStr);
-		long now = System.currentTimeMillis();
-		final String dateCreated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+		//long now = System.currentTimeMillis();
+		//final String dateCreated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
 		
 		Uri uri = Uri.parse(imgDecodableString);
 		imgFile = SystemUtilz.getDeviceUniqueId(context.getApplicationContext()) + userId
@@ -134,7 +134,7 @@ public class ProfilePicture {
 		postDataParams.put("image", imageStr);
 		postDataParams.put("img_file", imgFile);
 		postDataParams.put("user_id", Long.toString(userId));
-		postDataParams.put("date_created", dateCreated);
+		postDataParams.put("date_created", this.dateUploaded);
 
 		final String spec = AppConfig.URL_PROFILE_PIC;
 		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
