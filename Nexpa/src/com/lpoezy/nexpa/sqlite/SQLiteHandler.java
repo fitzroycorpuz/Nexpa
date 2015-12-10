@@ -1662,5 +1662,10 @@ public class SQLiteHandler {
 
 	}
 
+	public void deleteUserProfiles() {
+		sqLiteDatabase.delete(TABLE_USER_PROFILE, null, null);
+		
+	}
+
 
 }

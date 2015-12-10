@@ -197,9 +197,10 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
         //LogoutFB(this);
         SQLiteHandler db = new SQLiteHandler(context);
         db.openToWrite();
-        db.deleteCorrespondents();
         db.deleteMessages();
+        db.deleteCorrespondents();
         db.deleteProfilePictures();
+        db.deleteUserProfiles();
         db.deleteUsers();
         db.deleteAllPeople();
         db.updateAccountValidate(0);
