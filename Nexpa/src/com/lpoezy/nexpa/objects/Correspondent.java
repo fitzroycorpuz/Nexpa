@@ -436,13 +436,20 @@ public class Correspondent {
 
 	public boolean downloadOnline(Context context) {
 		
-		if(mAdaptee.downloadOnline()){
+		//only download user profile,
+		//if correspondent do not exist in db
+		if (!isExisting(context)) {
 			
-			this.id = mAdaptee.getId();
-			this.username = mAdaptee.getUsername();
-			
-			return true;
+			if(mAdaptee.downloadOnline()){
+				
+				this.id = mAdaptee.getId();
+				this.username = mAdaptee.getUsername();
+				
+				return true;
+			}
 		}
+		
+		
 
 //		if (!isExisting(context)) {
 //			L.debug("Correspondent, downloadOnline");

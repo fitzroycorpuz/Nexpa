@@ -913,17 +913,14 @@ public class SQLiteHandler {
 
 	public Correspondent downloadCorrespondentByUserId(long userId) {
 		Cursor cursor = sqLiteDatabase.query(TABLE_CORRESPONDENTS,
-				new String[] { CORRESPONDENT_USER_ID, CORRESPONDENT_USERNAME, CORRESPONDENT_EMAIL,
-						CORRESPONDENT_FNAME },
+				new String[] { CORRESPONDENT_USER_ID, CORRESPONDENT_USERNAME},
 				CORRESPONDENT_USER_ID + " = ?", new String[] { Long.toString(userId) }, null, null, null);
 		Correspondent correspondent = null;
 		if (cursor.moveToFirst()) {
 
 			long id = cursor.getInt(cursor.getColumnIndex(CORRESPONDENT_USER_ID));
-			String email = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_EMAIL));
 			String username = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
-			String fname = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_FNAME));
-
+			
 			correspondent = new Correspondent(id, username);
 		}
 		cursor.close();
