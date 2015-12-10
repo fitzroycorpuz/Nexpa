@@ -26,6 +26,7 @@ import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
 import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
+import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -644,36 +645,61 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 						} else {
 							for (int i = 0; i < nearby_users.length(); i++) {
 								JSONObject c = nearby_users.getJSONObject(i);
-
+								
+								//Not sure what will be the effect,
+								//if I remove the other variables,
+								//so I will just initialized it with  default value 
+								//-ldonios
+								
 								// Storing each json item in variable
 								String id = c.getString(TAG_GEO_PID);
-								String uname = c.getString(TAG_GEO_USER);
-								String fname = c.getString(TAG_GEO_FNAME);
-								String lname = c.getString(TAG_GEO_LNAME);
+								
+								
+								String lname = ""/*c.getString(TAG_GEO_LNAME)*/;
 
-								String status = c.getString(TAG_GEO_STATUS);
-								String about_me = c.getString(TAG_GEO_ABOUTME);
-								String looking_type = c.getString(TAG_GEO_LOOKING_TYPE);
-								String email_address = c.getString(TAG_GEO_EMAIL);
+								String status = ""/*c.getString(TAG_GEO_STATUS)*/;
+								String about_me = ""/*c.getString(TAG_GEO_ABOUTME)*/;
+								String looking_type = ""/*c.getString(TAG_GEO_LOOKING_TYPE)*/;
+								String email_address = ""/*c.getString(TAG_GEO_EMAIL)*/;
 								
-								Date bday = du.convertStringToDateToLocal(c.getString(TAG_GEO_BIRTHDAY));
-								String age = du.getAge(bday);
+								Date bday = new Date()/*du.convertStringToDateToLocal(c.getString(TAG_GEO_BIRTHDAY))*/;
+								String age = ""/*du.getAge(bday)*/;
 								int distance = Math.round(Float.parseFloat(c.getString(TAG_GEO_DISTANCE)));
-								String sex = c.getString(TAG_GEO_GENDER);
+								String sex = ""/*c.getString(TAG_GEO_GENDER)*/;
 								
-								//profile pic info
+								//user profile
 								String userId 		= c.getString("user_id");
+								String uname = c.getString(TAG_GEO_USER);
+								String fname = uname;
+								String description = c.getString("description");
+								String title = c.getString("title");
+								String url0 = c.getString("url0");
+								String url1 = c.getString("url1");
+								String url2 = c.getString("url2");
+								String dateUpdated = c.getString("date_updated");
+								
+								//save profile of specific users
+								UserProfile userProfile = new UserProfile(
+										Long.parseLong(userId), uname, 
+										description, title, 
+										url0, url1, url2, 
+										dateUpdated);
+								
+								userProfile.updateOffline(AroundMeActivity.this);
+								
+								//replace geo id with userid
+								id = userId;
+								//profile pic info
 								String imgDir 		= c.getString("img_dir");
 								String imgFile 		= c.getString("img_file");
 								String dateCreated 	= c.getString("date_uploaded");
-								id = userId;
+								
 								//L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir.equalsIgnoreCase("null")+", imgFile "+imgFile);
 								if((imgDir!=null && !imgDir.isEmpty() && !imgDir.equalsIgnoreCase("null")) && (imgFile!=null && !imgFile.isEmpty() && !imgFile.equalsIgnoreCase("null"))){
 									L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir+", imgFile "+imgFile);
 									ProfilePicture profilePic = new ProfilePicture(Long.parseLong(userId), imgDir, imgFile, dateCreated);
 									profilePic.saveOffline(AroundMeActivity.this);
 								}
-								
 								
 								boolean containerContainsContent = org.apache.commons.lang.StringUtils.containsIgnoreCase(existingUsers, "." + id + ".");
 								if (containerContainsContent == true) {
@@ -721,6 +747,9 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 				ins_latitude = latitude;
 				ins_longitude = longitude;
 
+				
+				
+				
 				params.put("tag", "collect");
 				params.put("pid", ins_user);
 				params.put("longitude", ins_longitude + "");

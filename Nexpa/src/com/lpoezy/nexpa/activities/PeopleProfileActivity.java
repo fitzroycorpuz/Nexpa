@@ -1,6 +1,11 @@
 package com.lpoezy.nexpa.activities;
 
 import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.ProfilePicture;
+import com.lpoezy.nexpa.objects.UserProfile;
+import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.BmpFactory;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
 
@@ -17,7 +22,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class PeopleProfileActivity extends Activity {
+public class PeopleProfileActivity extends Activity implements Correspondent.OnCorrespondentUpdateListener{
 
 	private ImageView imgProfile;
 	private Button btnMessage;
@@ -40,6 +45,12 @@ public class PeopleProfileActivity extends Activity {
 	String looking_type;
 	String status;
 	private long userId;
+	private TextView mTvJobTitle;
+	private TextView mTvUname;
+	private TextView mTvUrl0;
+	private TextView mTvUrl1;
+	private TextView mTvUrl2;
+	protected Correspondent mCorrespondent;
 	public static boolean isRunning = false;
 
 	@Override
@@ -59,12 +70,12 @@ public class PeopleProfileActivity extends Activity {
 		setContentView(R.layout.activity_people_profile);
 
 		imgProfile = (ImageView) findViewById(R.id.img_profile);
-		RoundedImageView riv = new RoundedImageView(this);
-		Bitmap rawImage = BitmapFactory.decodeResource(this.getResources(),
-		R.drawable.pic_sample_girl);
-
-		Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
-		imgProfile.setImageBitmap(circImage);
+//		RoundedImageView riv = new RoundedImageView(this);
+//		Bitmap rawImage = BitmapFactory.decodeResource(this.getResources(),
+//		R.drawable.pic_sample_girl);
+//
+//		Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+//		imgProfile.setImageBitmap(circImage);
 
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
 			ActionBar actionBar = getActionBar();
@@ -73,8 +84,13 @@ public class PeopleProfileActivity extends Activity {
 		} else {
 			Log.e("NOTICE", "Device cannot handle ActionBar");
 		}
+		
+		Intent intent = getIntent();
+		userId = intent.getLongExtra("TAG_GEO_USER_ID", -1);
+		username = intent.getStringExtra("TAG_GEO_USER");
+		email = intent.getStringExtra("TAG_GEO_EMAIL");
 
-
+/*
 		txtFName = (TextView) findViewById(R.id.user_fname);
 		//txtLName = (TextView) findViewById(R.id.email);
 		txtAge = (TextView) findViewById(R.id.user_age);
@@ -130,15 +146,22 @@ public class PeopleProfileActivity extends Activity {
 		}
 
 		txtStatus.setText(status);
-
+		
+		*/
+		
+		
+		mTvJobTitle = (TextView)this.findViewById(R.id.tv_job_title);
+        mTvUname = (TextView)this.findViewById(R.id.tv_uname);
+        mTvUrl0 = (TextView)this.findViewById(R.id.tv_url0);
+        mTvUrl1 = (TextView)this.findViewById(R.id.tv_url1);
+        mTvUrl2 = (TextView)this.findViewById(R.id.tv_url2);
+		
 
 		btnMessage = (Button) findViewById(R.id.btn_mes);
 		btnMessage.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View view) {
 				Intent intentMes = new Intent(PeopleProfileActivity.this, ChatActivity.class);
-				
-				
 				intentMes.putExtra("userid", userId);
 				intentMes.putExtra("email", email);
 				intentMes.putExtra("username", username);
@@ -156,6 +179,8 @@ public class PeopleProfileActivity extends Activity {
 		super.onResume();
 		
 		isRunning = true;
+		resetProfilePic();
+		resetUserInfo();
 	}
 	
 	@Override
@@ -164,6 +189,96 @@ public class PeopleProfileActivity extends Activity {
 		super.onPause();
 		
 		isRunning = false;
+	}
+	
+	private void resetProfilePic(){
+		
+		String imgDecodableString = ProfilePicture.getUserImgDecodableString(this);
+		
+        Bitmap rawImage = BitmapFactory.decodeResource(getResources(),
+        R.drawable.pic_sample_girl);
+      
+        RoundedImageView riv = new RoundedImageView(this);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        imgProfile.setImageBitmap(circImage);
+        
+        mCorrespondent = new Correspondent();
+		mCorrespondent.setId(userId);
+		mCorrespondent.addListener(PeopleProfileActivity.this);
+        
+        new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				mCorrespondent.downloadProfilePicOnline(PeopleProfileActivity.this);
+				
+			}
+		}).start();
+	}
+	
+	private void resetUserInfo() {
+		
+		SQLiteHandler db = new SQLiteHandler(this);
+		db.openToRead();
+		
+		UserProfile profile = new UserProfile();
+		profile.setId(userId);
+		profile.downloadOffline(this);
+		
+		mTvJobTitle.setVisibility(View.GONE);
+		mTvUname.setVisibility(View.GONE);
+		mTvUrl0.setVisibility(View.GONE);
+		mTvUrl1.setVisibility(View.GONE);
+		mTvUrl2.setVisibility(View.GONE);
+		
+		if(profile.getProfession()!=null && !profile.getProfession().equalsIgnoreCase("null") && !profile.getProfession().equals("")){
+			mTvJobTitle.setVisibility(View.VISIBLE);
+			mTvJobTitle.setText(profile.getProfession());
+		}
+		
+		if(profile.getUsername()!=null &&!profile.getUsername().equalsIgnoreCase("null") && !profile.getUsername().equals("")){
+			mTvUname.setVisibility(View.VISIBLE);
+			mTvUname.setText(profile.getUsername());
+		}
+		
+		if(profile.getUrl0()!=null &&!profile.getUrl0().equalsIgnoreCase("null") && !profile.getUrl0().equals("")){
+			mTvUrl0.setVisibility(View.VISIBLE);
+			mTvUrl0.setText(profile.getUrl0());
+		}
+		
+		if(profile.getUrl1()!=null &&!profile.getUrl1().equalsIgnoreCase("null") && !profile.getUrl1().equals("")){
+			mTvUrl1.setVisibility(View.VISIBLE);
+			mTvUrl1.setText(profile.getUrl1());
+		}
+		
+		if(profile.getUrl2()!=null &&!profile.getUrl2().equalsIgnoreCase("null") && !profile.getUrl2().equals("")){
+			mTvUrl2.setVisibility(View.VISIBLE);
+			mTvUrl2.setText(profile.getUrl2());
+		}
+		
+		db.close();
+		
+	}
+
+	
+
+	@Override
+	public void onCorrespondentUpdate() {
+		Bitmap rawImage = mCorrespondent.getProfilePic();
+		
+		RoundedImageView riv = new RoundedImageView(PeopleProfileActivity.this);
+        final Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        
+        imgProfile.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				imgProfile.setImageBitmap(circImage);
+				
+			}
+		});
+		
 	}
 
 }
