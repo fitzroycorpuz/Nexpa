@@ -685,10 +685,15 @@ public class SQLiteHandler {
 		Map<String, String> sent = downloadLatestMsgSentOffline(senderId, receiverId);
 		try {
 			long receivedDate = DateUtils.simpleDateToMillis(receive.get(MSG_DATE_RECEIVED));
-			long sentDate = DateUtils.simpleDateToMillis(sent.get(MSG_DATE));
-
+			
+			//check if there is any msg sent
+			long sentDate = 0;
+			if(sent!=null && sent.size()!=0)sentDate = DateUtils.simpleDateToMillis(sent.get(MSG_DATE));
+				
+				
 			if (receivedDate > sentDate)
 				return receive;
+			
 
 		} catch (ParseException e) {
 			L.error("" + e);
