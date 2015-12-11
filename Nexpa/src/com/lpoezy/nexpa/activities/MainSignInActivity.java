@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.json.JSONException;
@@ -82,14 +83,11 @@ public class MainSignInActivity extends Activity {
 	String server_email;
 	String server_created_at;
 	String public_pass;
-	
-	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		
+
 		setContentView(R.layout.activity_main_sign_in);
 		imgRotator = (ImageView) findViewById(R.id.rotator_disp);
 		imgRotatorB = (ImageView) findViewById(R.id.rotator_disp_b);
@@ -272,78 +270,74 @@ public class MainSignInActivity extends Activity {
 								@Override
 								public void onXMPPConnected(XMPPConnection connection) {
 
-									new Thread(new Runnable() {
+									// download user profile pic info
+									ExecutorService exec = Executors.newCachedThreadPool();
+									exec.submit(new Runnable() {
 
 										@Override
 										public void run() {
-											// download user profile pic info
-											ExecutorService exec = Executors.newCachedThreadPool();
-											Future<ProfilePicture> f = exec.submit(new Callable<ProfilePicture>() {
+											HashMap<String, String> postDataParams = new HashMap<String, String>();
+											postDataParams.put("tag", "download_profile_and_pic_info");// download_profile_and_pic_info
+											postDataParams.put("user_id", server_uid);
 
-												@Override
-												public ProfilePicture call() throws Exception {
-
-													HashMap<String, String> postDataParams = new HashMap<String, String>();
-													postDataParams.put("tag", "download_profile_and_pic_info");// download_profile_and_pic_info
-													postDataParams.put("user_id", server_uid);
-
-													final String spec = AppConfig.URL_PROFILE_PIC;
-													String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-													JSONObject jResult = new JSONObject(webPage);
-
-													L.debug("MainSignInActivity, webPage: " + webPage);
-
-													if (!jResult.getBoolean("error")) {
-														
-														JSONObject profilePictureJson = jResult
-																.getJSONArray("profile_and_pic_info").getJSONObject(0);
-														
-														//reusing userid and username
-														long uId 			= Long.parseLong(server_uid);
-														String uname 		= server_name;
-														String description 	= profilePictureJson.getString("description");
-														String profession 	= profilePictureJson.getString("title");
-														String url0			= profilePictureJson.getString("url0");
-														String url1			= profilePictureJson.getString("url1");
-														String url2			= profilePictureJson.getString("url2");
-														String dateUpdated	= profilePictureJson.getString("date_updated");
-														
-														UserProfile profile = new UserProfile(uId, uname, description, profession, url0, url1, url2, dateUpdated);
-														profile.updateOffline(MainSignInActivity.this);
-
-														String imgDir = profilePictureJson.getString("img_dir");
-														String imgFile = profilePictureJson.getString("img_file");
-														String dateUploaded = profilePictureJson
-																.getString("date_uploaded");
-
-														ProfilePicture profilePicture = new ProfilePicture(uId,
-																imgDir, imgFile, dateUploaded);
-														profilePicture.downloadImageOnline();
-														profilePicture.saveOffline(MainSignInActivity.this);
-
-														return profilePicture;
-													}
-
-													return null;
-												}
-											});
-											exec.shutdown();
-
-											ProfilePicture profilePicture;
+											final String spec = AppConfig.URL_PROFILE_PIC;
+											String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+											JSONObject jResult;
+											long uId = Long.parseLong(server_uid);
+											String uname = server_name;
+											String description = "";
+											String profession = "";
+											String url0 = "";
+											String url1 = "";
+											String url2 = "";
+											String dateUpdated = "";
+										
 											try {
+												jResult = new JSONObject(webPage);
 
-												// AppConfig.URL+"/"+imgDir+"/"+imgFile
-												profilePicture = f.get();
+												JSONObject profilePictureJson;
+												if (!jResult.getBoolean("error")) {
 
-												// L.debug("MainSigninACtivity,
-												// imgUrl: "+imgUrl);
+													profilePictureJson = jResult
+															.getJSONArray("profile_and_pic_info")
+															.getJSONObject(0);
 
-											} catch (InterruptedException e) {
+													// reusing userid
+													// and username
+													
+													description = profilePictureJson.getString("description");
+													profession = profilePictureJson.getString("title");
+													url0 = profilePictureJson.getString("url0");
+													url1 = profilePictureJson.getString("url1");
+													url2 = profilePictureJson.getString("url2");
+													dateUpdated = profilePictureJson.getString("date_updated");
+
+													String imgDir = profilePictureJson.getString("img_dir");
+													String imgFile = profilePictureJson.getString("img_file");
+													String dateUploaded = profilePictureJson
+															.getString("date_uploaded");
+
+													ProfilePicture profilePicture = new ProfilePicture(uId,
+															imgDir, imgFile, dateUploaded);
+													profilePicture.downloadImageOnline();
+													profilePicture.saveOffline(MainSignInActivity.this);
+												}
+
+											} catch (JSONException e) {
 												L.error("" + e);
-											} catch (ExecutionException e) {
-												L.error("" + e);
+											} finally {
+
+												UserProfile profile = new UserProfile(uId, uname, description,
+														profession, url0, url1, url2, dateUpdated);
+												profile.updateOffline(MainSignInActivity.this);
+
 											}
 
+											L.debug("MainSignInActivity, server_uid: " + server_uid
+													+ ", server_name: " + server_name + ", webPage: "
+													+ webPage);
+											
+											
 											btnLogin.post(new Runnable() {
 
 												@Override
@@ -358,8 +352,15 @@ public class MainSignInActivity extends Activity {
 													hideDialog();
 												}
 											});
+											
 										}
-									}).start();
+									});
+									exec.shutdown();
+									try {
+										exec.awaitTermination(1, TimeUnit.HOURS);
+									} catch (InterruptedException e) {
+										L.error("" + e);
+									}
 
 								}
 
