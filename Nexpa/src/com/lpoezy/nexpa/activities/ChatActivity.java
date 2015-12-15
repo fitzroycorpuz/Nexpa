@@ -46,6 +46,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -605,7 +606,32 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 
 				countryName = new TextView(context);
 				countryName.setId(2);
-				RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(250, LayoutParams.WRAP_CONTENT);
+				
+				int width = 250;
+				DisplayMetrics metrics = new DisplayMetrics();
+			       getWindowManager().getDefaultDisplay().getMetrics(metrics);
+			       switch(metrics.densityDpi){
+			            case DisplayMetrics.DENSITY_LOW:
+			            	//L.debug("low density");
+			            	width = (int) (width*0.25);
+			                       break;
+			            case DisplayMetrics.DENSITY_MEDIUM:
+			            	//L.debug("medium density");
+			            	width = (int) (width*0.5);
+			                        break;
+			            case DisplayMetrics.DENSITY_HIGH:
+			            	//L.debug("high density");
+			            	width = width;
+			                        break;
+			            default:
+			            	//L.debug("x high density");
+			            	width = width*2;
+			            	break;
+			       }
+				
+				
+				
+				RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(width, LayoutParams.WRAP_CONTENT);
 				wrapper.addView(countryName, layoutParams1);
 
 			}
