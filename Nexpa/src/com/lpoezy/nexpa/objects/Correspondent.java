@@ -285,26 +285,26 @@ public class Correspondent {
 
 		conversation.addAll(OneComment.downloadAllMessagesByUserIdAndCorrespondentIdOnline(context, id));
 
-		for (OneComment comment : conversation) {
-
-			if (comment.dateReceived == null || comment.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")) {
-
-				long now = System.currentTimeMillis();
-				String dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
-				comment.dateReceived = dateReceived;
-				
-				comment.markAsReceivedOffline(context);
-			}
-			if (comment.isUnread) {
-				// marking messages read online is moved,
-				// to the sync button in the settings screen
-				// if (comment.markAsReadOnline(context, id)) {
-
-				comment.markAsReadOffline(context, id);
-
-				// }
-			}
-		}
+//		for (OneComment comment : conversation) {
+//
+//			if (comment.dateReceived == null || comment.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")) {
+//
+//				long now = System.currentTimeMillis();
+//				String dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+//				comment.dateReceived = dateReceived;
+//				
+//				comment.markAsReceivedOffline(context);
+//			}
+//			if (comment.isUnread) {
+//				// marking messages read online is moved,
+//				// to the sync button in the settings screen
+//				// if (comment.markAsReadOnline(context, id)) {
+//
+//				comment.markAsReadOffline(context, id);
+//
+//				// }
+//			}
+//		}
 
 	}
 
@@ -405,45 +405,70 @@ public class Correspondent {
 				final JSONArray jArr = result.getJSONArray("messages");
 				// L.debug("jArr.length() "+jArr.length());
 				if (jArr.length() != 0) {
-
+					int MAX_THREADS = 5;
+					int nThreads = jArr.length()>MAX_THREADS?MAX_THREADS:jArr.length();
+					ExecutorService exec = Executors.newFixedThreadPool(nThreads);
 					int n = jArr.length() < 5 && jArr.length() != 0 ? jArr.length() : 5;
 					StringBuilder sb = new StringBuilder();
 					for (int i = 0; i < jArr.length(); i++) {
+						final JSONObject jObj = jArr.getJSONObject(i);
+						exec.execute(new Runnable() {
+							
+							@Override
+							public void run() {
+								
+								
+								try {
+									long senderId = Long.parseLong(jObj.getString("user_id"));
+									final String senderName = jObj.getString("username");
+									final long receiverId = Long.parseLong(jObj.getString("correspondent_id"));// to
+									final String receiverName = jObj.getString("correspondent_name");
+									final long correspondentId = (Long.parseLong(userId) == senderId) ? receiverId : senderId;
+									final String correspondentName = (Long.parseLong(userId) == senderId)?receiverName: senderName;
+									final boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
+									final String comment = jObj.getString("message");
+									final boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
+									final String date = jObj.getString("date_created");
+									final String dateReceived = jObj.getString("date_received");
 
-						JSONObject jObj = jArr.getJSONObject(i);
-						final long senderId = Long.parseLong(jObj.getString("user_id"));// from
-						final String senderName = jObj.getString("username");
-						final long receiverId = Long.parseLong(jObj.getString("correspondent_id"));// to
-						final String receiverName = jObj.getString("correspondent_name");
-						final long correspondentId = (Long.parseLong(userId) == senderId) ? receiverId : senderId;
-						final String correspondentName = (Long.parseLong(userId) == senderId)?receiverName: senderName;
-						final boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
-						final String comment = jObj.getString("message");
-						final boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
-						final String date = jObj.getString("date_created");
-						final String dateReceived = jObj.getString("date_received");
+									final boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
+									
+									
+									//*
+									Correspondent correspondent = new Correspondent();
+									correspondent.setId(correspondentId);
+									correspondent.setUsername(correspondentName);
 
-						final boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
-						
-						
-						//*
-						Correspondent correspondent = new Correspondent();
-						correspondent.setId(correspondentId);
-						correspondent.setUsername(correspondentName);
+									// OneComment message = new OneComment(left, comment,
+									// success, date, isUnread);
+									
+									OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
+											dateReceived, isUnread, true);
 
-						// OneComment message = new OneComment(left, comment,
-						// success, date, isUnread);
-						
-						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
-								dateReceived, isUnread, true);
+									//message.dateReceived = dateReceived;
+									correspondent.addMessage(message);
 
-						//message.dateReceived = dateReceived;
-						correspondent.addMessage(message);
-
-						correspondent.saveOffline(context, senderId, receiverId, false);
-						//list.add(correspondent);
-						//*/
+									correspondent.saveOffline(context, senderId, receiverId, false);
+									//list.add(correspondent);
+									//*/
+									
+								} catch (NumberFormatException e) {
+									L.error(""+e);
+								} catch (JSONException e) {
+									L.error(""+e);
+								}// from
+								
+								
+							}
+						});
 						 
+					}
+					
+					exec.shutdown();
+					try {
+						exec.awaitTermination(10, TimeUnit.SECONDS);
+					} catch (InterruptedException e) {
+						L.error(""+e);
 					}
 					
 				}

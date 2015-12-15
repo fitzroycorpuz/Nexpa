@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -237,8 +244,10 @@ public class OneComment {
 		return count;
 	}
 
-	public static List<OneComment> downloadAllMessagesByUserIdAndCorrespondentIdOnline(Context context, long correspondentId) {
-
+	public static List<OneComment> downloadAllMessagesByUserIdAndCorrespondentIdOnline(final Context context, final long correspondentId) {
+		
+		L.debug("=============OneComment, downloadAllMessagesByUserIdAndCorrespondentIdOnline ================");
+		long last = System.currentTimeMillis();
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		String userId = db.getLoggedInID();
@@ -262,37 +271,89 @@ public class OneComment {
 		try {
 			result = new JSONObject(webPage);
 			if (!result.getBoolean("error")) {
-				JSONArray jArr = result.getJSONArray("messages");
+				final JSONArray jArr = result.getJSONArray("messages");
 				L.debug("jArr.length() " + jArr.length());
 				if (jArr.length() != 0) {
-
+					
+					int MAX_THREADS = 5;
+					int nThreads=jArr.length()> MAX_THREADS ? MAX_THREADS : jArr.length();
+					
+					Executor executor = Executors.newFixedThreadPool(nThreads);
+					ExecutorCompletionService<OneComment> ecs = new ExecutorCompletionService<OneComment>(executor);
+					
 					for (int i = 0; i < jArr.length(); i++) {
+						final JSONObject jObj = jArr.getJSONObject(i);
+						ecs.submit(new Callable<OneComment>() {
+							
+							@Override
+							public OneComment call() throws Exception {
+								
+								
+								// long correspondentId =
+								// jObj.getLong("correspondent_id");
+								long senderId = Long.parseLong(jObj.getString("user_id"));
+								long receiverId = Long.parseLong(jObj.getString("correspondent_id"));
+								String username = jObj.getString("firstname");
+								String email = "";
+								String fname = username;
+								//Correspondent correspondent = new Correspondent(correspondentId, username);
 
-						JSONObject jObj = jArr.getJSONObject(i);
+								boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
+								String comment = jObj.getString("message");
+								boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
+								String date = jObj.getString("date_created");
+								boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
+								String dateReceived = jObj.getString("date_received");
+								
+								OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, dateReceived, isUnread, true);
+								
+								if(!OneComment.isExisting(context, message)){
+									message.saveOffline(context, senderId, receiverId);
+									
+									
+									if (message.dateReceived == null || message.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")) {
 
-						// long correspondentId =
-						// jObj.getLong("correspondent_id");
-						long senderId = Long.parseLong(jObj.getString("user_id"));
-						long receiverId = Long.parseLong(jObj.getString("correspondent_id"));
-						String username = jObj.getString("firstname");
-						String email = "";
-						String fname = username;
-						Correspondent correspondent = new Correspondent(correspondentId, username);
+										long now = System.currentTimeMillis();
+										 
+										message.dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+										
+										message.markAsReceivedOffline(context);
+									}
+									
+									if (message.isUnread) {
+										// marking messages read online is moved,
+										// to the sync button in the settings screen
+										// if (comment.markAsReadOnline(context, id)) {
 
-						boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
-						String comment = jObj.getString("message");
-						boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
-						String date = jObj.getString("date_created");
-						boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
-						String dateReceived = jObj.getString("date_received");
+										message.markAsReadOffline(context, correspondentId);
+
+										// }
+									}
+									
+									
+								}
+								
+								return message;
+							}
+						});
 						
-						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, dateReceived, isUnread, true);
 						
-						messages.add(message);
-						correspondent.addMessage(message);
+						//correspondent.addMessage(message);
 						
-						correspondent.saveOffline(context, senderId, receiverId, true);
+						//correspondent.saveOffline(context, senderId, receiverId, true);
 
+					}
+					
+					for (int i = 0; i < jArr.length(); i++) {
+						try {
+							Future<OneComment> f = ecs.take();
+							
+							messages.add(f.get());
+						} catch (InterruptedException e) {
+							L.error(""+e);
+						} catch (ExecutionException e) {
+							L.error(""+e);
+						}
 					}
 
 				}
@@ -305,6 +366,12 @@ public class OneComment {
 		messages = db.downloadMessagesByIds(userId, Long.toString(correspondentId));
 		
 		db.close();
+		long now = System.currentTimeMillis();
+		L.debug("exec time "+(now-last) / 1000+" seconds");
+		
+		L.debug("================================================");
+		
+		
 		return messages;
 
 	}
