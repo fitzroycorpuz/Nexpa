@@ -206,43 +206,50 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 					// mCorrespondents =
 					// Correspondent.downloadAllReceivedOnline(getActivity());
-					List<Correspondent> correspondents = Correspondent.downloadAllMsgsOnline(getActivity());
-
-					final int MAX_THREAD = 5;
-					int n = correspondents.size() < MAX_THREAD && correspondents.size() != 0 ? correspondents.size()
-							: MAX_THREAD;
-					ExecutorService exec = Executors.newFixedThreadPool(n);
-					L.debug("correspondents.size() "+correspondents.size());
-					for (int i = 0; i < correspondents.size(); i++) {
+					final List<Correspondent> correspondents = Correspondent.downloadLatestMsgsOnline(getActivity());
+					
+					new Thread(new Runnable() {
 						
-						final Correspondent correspondent = correspondents.get(i);
-						//L.debug("xxxxxxxxxx correspondent username"+correspondent.getUsername()+", fname: "+correspondent.getFname()+"xxxxxxx");
-						correspondent.addListener(ChatHistoryListFragment.this);
+						@Override
+						public void run() {
+							
+							final int MAX_THREAD = 5;
+							int n = correspondents.size() < MAX_THREAD && correspondents.size() != 0 ? correspondents.size()
+									: MAX_THREAD;
+							ExecutorService exec = Executors.newFixedThreadPool(n);
+							//L.debug("correspondents.size() "+correspondents.size());
+							for (int i = 0; i < correspondents.size(); i++) {
+								
+								final Correspondent correspondent = correspondents.get(i);
+								//L.debug("xxxxxxxxxx correspondent username"+correspondent.getUsername()+"xxxxxxx");
+								correspondent.addListener(ChatHistoryListFragment.this);
 
-						mBuddys.clear();
-						mBuddys.addAll(correspondents);
-						onCorrespondentUpdate();
+								exec.execute(new Runnable() {
 
-						exec.execute(new Runnable() {
+									@Override
+									public void run() {
 
-							@Override
-							public void run() {
+										correspondent.downloadProfilePicOnline(getActivity());
+										// L.debug("ChatHistory, updateList
+										// "+correspondent.getId());
 
-								correspondent.downloadProfilePicOnline(getActivity());
-								// L.debug("ChatHistory, updateList
-								// "+correspondent.getId());
+									}
+								});
 
 							}
-						});
+							exec.shutdown();
+							try {
+								exec.awaitTermination(1, TimeUnit.MINUTES);
+							} catch (InterruptedException e) {
 
-					}
-					exec.shutdown();
-					try {
-						exec.awaitTermination(1, TimeUnit.HOURS);
-					} catch (InterruptedException e) {
-
-					}
-
+							}
+							
+						}
+					}).start();
+					
+					mBuddys.clear();
+					mBuddys.addAll(correspondents);
+					onCorrespondentUpdate();
 				}
 			}).start();
 

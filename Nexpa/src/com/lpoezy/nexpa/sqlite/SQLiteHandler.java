@@ -837,7 +837,7 @@ public class SQLiteHandler {
 				"(" + MSG_USER_ID + " = '" + userId + "' AND " + MSG_CORRESPONDENT_ID + " = '" + correspondentId
 						+ "') OR (" + MSG_USER_ID + " = '" + correspondentId + "' AND " + MSG_CORRESPONDENT_ID + " = '"
 						+ userId + "')",
-				null, null, null, MSG_DATE + " ASC");//
+				null, null, null, null);//MSG_DATE + " ASC"
 
 		List<OneComment> conversation = new ArrayList<OneComment>();
 		if (cursor.moveToFirst()) {

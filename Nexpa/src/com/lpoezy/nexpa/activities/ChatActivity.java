@@ -600,20 +600,13 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 
 				iv = new ImageView(context);
 				iv.setId(1);
-				RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(68, 68);
-				// layoutParams.addRule(RelativeLayout.LEFT_OF,
-				// countryName.getId());
-				// layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,
-				// countryName.getId());
-				wrapper.addView(iv, layoutParams);
+				RelativeLayout.LayoutParams layoutParams0 = new RelativeLayout.LayoutParams(68, 68);
+				wrapper.addView(iv, layoutParams0);
 
 				countryName = new TextView(context);
 				countryName.setId(2);
-				// RelativeLayout.LayoutParams layoutParams=new
-				// RelativeLayout.LayoutParams(80, 80);
-				// layoutParams.addRule(RelativeLayout.RIGHT_OF, iv.getId());
-
-				wrapper.addView(countryName);
+				RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(250, LayoutParams.WRAP_CONTENT);
+				wrapper.addView(countryName, layoutParams1);
 
 			}
 

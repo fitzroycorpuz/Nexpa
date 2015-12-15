@@ -189,6 +189,26 @@ public class Correspondent {
 		db.close();
 		return success;
 	}
+	
+	//only save correspondent
+	public void saveOffline(Context context) {
+		L.debug("Correspondent, saveOffline");
+		
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToWrite();
+
+		// correspondent does not exist in db
+		if (!isExisting(context)) {
+			// save correspondent
+
+			db.saveCorrespondent(Long.toString(id), username, "", "");
+		}
+
+		db.close();
+
+	}
+	
+	
 
 	// will save the correspondent queried online,
 	// plus all the messages pointing to the correspondent id
@@ -359,9 +379,96 @@ public class Correspondent {
 		}
 
 	}
+	
+	public static List<Correspondent> downloadLatestMsgsOnline(final Context context) {
+		L.debug("=============Correspondent, downloadLatestMsgsOnline ================");
+		long last = System.currentTimeMillis();
+		
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToWrite();
+		final String userId = db.getLoggedInID();
+		db.close();
+		
+		// will download all the latest messages info online
+		HashMap<String, String> postDataParams = new HashMap<String, String>();
+		postDataParams.put("tag", "download_latest_msgs_by_uid");
+		postDataParams.put("user_id", userId);
+		
+		final String spec = AppConfig.URL_MSG;
+		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+		 L.debug("userId: "+userId+", webPage: " + webPage);
+		
+		//List<Correspondent> list = new ArrayList<Correspondent>();
+		try {
+			JSONObject result = new JSONObject(webPage);
+			if (!result.getBoolean("error")) {
+				final JSONArray jArr = result.getJSONArray("messages");
+				// L.debug("jArr.length() "+jArr.length());
+				if (jArr.length() != 0) {
+
+					int n = jArr.length() < 5 && jArr.length() != 0 ? jArr.length() : 5;
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < jArr.length(); i++) {
+
+						JSONObject jObj = jArr.getJSONObject(i);
+						final long senderId = Long.parseLong(jObj.getString("user_id"));// from
+						final String senderName = jObj.getString("username");
+						final long receiverId = Long.parseLong(jObj.getString("correspondent_id"));// to
+						final String receiverName = jObj.getString("correspondent_name");
+						final long correspondentId = (Long.parseLong(userId) == senderId) ? receiverId : senderId;
+						final String correspondentName = (Long.parseLong(userId) == senderId)?receiverName: senderName;
+						final boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
+						final String comment = jObj.getString("message");
+						final boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
+						final String date = jObj.getString("date_created");
+						final String dateReceived = jObj.getString("date_received");
+
+						final boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
+						
+						
+						//*
+						Correspondent correspondent = new Correspondent();
+						correspondent.setId(correspondentId);
+						correspondent.setUsername(correspondentName);
+
+						// OneComment message = new OneComment(left, comment,
+						// success, date, isUnread);
+						
+						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
+								dateReceived, isUnread, true);
+
+						//message.dateReceived = dateReceived;
+						correspondent.addMessage(message);
+
+						correspondent.saveOffline(context, senderId, receiverId, false);
+						//list.add(correspondent);
+						//*/
+						 
+					}
+					
+				}
+			}
+		} catch (JSONException e) {
+			L.error("" + e);
+		}
+		
+		List<Correspondent> list = downloadAllOffline(context);
+		
+		long now = System.currentTimeMillis();
+		
+		L.debug("exec time "+(now-last) / 1000+" seconds");
+		
+		L.debug("================================================");
+		
+		return list;
+		
+	}
 
 	public static List<Correspondent> downloadAllMsgsOnline(final Context context) {
 		L.debug("=============Correspondent, downloadAllMsgsOnline================");
+		
+		long last = System.currentTimeMillis();
+		
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		final String userId = db.getLoggedInID();
@@ -372,12 +479,12 @@ public class Correspondent {
 		postDataParams.put("user_id", userId);
 
 		L.debug("Correspondent, getting all  msgs of " + userId + " online");
-
+		
 		final String spec = AppConfig.URL_MSG;
 		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-		// L.debug("webPage: " + webPage);
+		 //L.debug("webPage: " + webPage);
 		db.close();
-
+		List<Correspondent> list = new ArrayList<Correspondent>();
 		try {
 			JSONObject result = new JSONObject(webPage);
 			if (!result.getBoolean("error")) {
@@ -386,7 +493,7 @@ public class Correspondent {
 				if (jArr.length() != 0) {
 
 					int n = jArr.length() < 5 && jArr.length() != 0 ? jArr.length() : 5;
-
+					StringBuilder sb = new StringBuilder();
 					for (int i = 0; i < jArr.length(); i++) {
 
 						JSONObject jObj = jArr.getJSONObject(i);
@@ -401,7 +508,14 @@ public class Correspondent {
 						final String dateReceived = jObj.getString("date_received");
 
 						final boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
-
+						
+						if(!sb.toString().contains(""+correspondentId)){
+							sb.append(correspondentId+",");
+							
+							//if(i<jArr.length()-1)sb.append(",");
+						}
+						
+						/*
 						Correspondent correspondent = new Correspondent();
 						correspondent.setId(correspondentId);
 
@@ -413,25 +527,72 @@ public class Correspondent {
 						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
 								dateReceived, isUnread, true);
 
-						message.dateReceived = dateReceived;
+						//message.dateReceived = dateReceived;
 						correspondent.addMessage(message);
 
 						correspondent.saveOffline(context, senderId, receiverId, true);
+						//*/
+						 
+						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
+						dateReceived, isUnread, true);
+						
+						boolean isExisting = OneComment.isExisting(context, message);
+						// L.debug("comment "+comment.comment+", senderId:
+						// "+comment.senderId+", receiverId: "+comment.receiverId);
+						
+						if (!isExisting) {
+							message.isUnread = ChatActivity.isRunning ? false : true;
 
+							message.saveOffline(context, senderId, receiverId);
+						}
 					}
-
 					
-
+					String ids  = sb.deleteCharAt(sb.length()-1).toString();
+					L.debug("ids "+ids);
+					List<Correspondent> correspondents = Correspondent.downloadOnlineWithIds(ids);
+					
+					list.clear();
+					list.addAll(correspondents);
+					
+					if(correspondents!=null && !correspondents.isEmpty()){
+						for(Correspondent c : correspondents){
+							c.saveOffline(context);
+							c.downloadLatestMsgOffline(context);
+						}
+					}
 				}
 			}
 		} catch (JSONException e) {
 			L.error("" + e);
 		}
 
-		List<Correspondent> list = downloadAllOffline(context);
+		//List<Correspondent> list = downloadAllOffline(context);
+		
+		
+		long now = System.currentTimeMillis();
+		
+		L.debug("exec time "+(now-last) / 1000+" seconds");
+		
 		L.debug("================================================");
 		return list;
 
+	}
+
+	private static List<Correspondent> downloadOnlineWithIds(String ids) {
+		List<UserProfile> profiles = UserProfile.downloadOnlineWithIds(ids);
+		List<Correspondent> correspondents = new ArrayList<Correspondent>();
+		if(profiles!=null && !profiles.isEmpty()){
+			
+			for(UserProfile profile : profiles){
+				
+				Correspondent correspondent = new Correspondent(profile.getId(), profile.getUsername());
+				correspondents.add(correspondent);
+			}
+			return correspondents;
+		}
+		
+		return null;
+		
 	}
 
 	public boolean downloadOnline(Context context) {
@@ -482,65 +643,67 @@ public class Correspondent {
 		return false;
 	}
 
-	public static List<Correspondent> downloadAllMsgsReceivedOnline(Context context) {
-
-		SQLiteHandler db = new SQLiteHandler(context);
-		db.openToWrite();
-		String userId = db.getLoggedInID();
-
-		HashMap<String, String> postDataParams = new HashMap<String, String>();
-		postDataParams.put("tag", "download_all_received_msgs");
-		postDataParams.put("user_id", userId);
-
-		L.debug("Correspondent, getting all  msgs of " + userId + " online");
-
-		final String spec = AppConfig.URL_MSG;
-		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-		// L.debug("webPage: " + webPage);
-		db.close();
-
-		JSONObject result;
-		try {
-			result = new JSONObject(webPage);
-			if (!result.getBoolean("error")) {
-				JSONArray jArr = result.getJSONArray("messages");
-				L.debug("jArr.length() " + jArr.length());
-				if (jArr.length() != 0) {
-
-					for (int i = 0; i < jArr.length(); i++) {
-
-						JSONObject jObj = jArr.getJSONObject(i);
-						long senderId = jObj.getLong("user_id");// from
-						long receiverId = jObj.getLong("correspondent_id");// to
-						String username = jObj.getString("firstname");
-						
-						Correspondent correspondent = new Correspondent(senderId, username);
-
-						boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
-						String comment = jObj.getString("message");
-						boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
-						String date = jObj.getString("date_created");
-						String dateReceived = jObj.getString("date_received");
-
-						boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
-						OneComment message = new OneComment(left, comment, success, date, isUnread);
-						message.dateReceived = dateReceived;
-						correspondent.addMessage(message);
-
-						correspondent.saveOffline(context, senderId, receiverId, true);
-
-					}
-				}
-			}
-		} catch (JSONException e) {
-			L.error("" + e);
-		}
-
-		List<Correspondent> list = downloadAllOffline(context);
-
-		return list;
-
-	}
+//	public static List<Correspondent> downloadAllMsgsReceivedOnline(Context context) {
+//
+//		SQLiteHandler db = new SQLiteHandler(context);
+//		db.openToWrite();
+//		String userId = db.getLoggedInID();
+//
+//		HashMap<String, String> postDataParams = new HashMap<String, String>();
+//		postDataParams.put("tag", "download_all_received_msgs");
+//		postDataParams.put("user_id", userId);
+//
+//		L.debug("Correspondent, getting all  msgs of " + userId + " online");
+//
+//		final String spec = AppConfig.URL_MSG;
+//		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+//		// L.debug("webPage: " + webPage);
+//		db.close();
+//
+//		JSONObject result;
+//		
+//		
+//		try {
+//			result = new JSONObject(webPage);
+//			if (!result.getBoolean("error")) {
+//				JSONArray jArr = result.getJSONArray("messages");
+//				L.debug("jArr.length() " + jArr.length());
+//				if (jArr.length() != 0) {
+//
+//					for (int i = 0; i < jArr.length(); i++) {
+//
+//						JSONObject jObj = jArr.getJSONObject(i);
+//						long senderId = jObj.getLong("user_id");// from
+//						long receiverId = jObj.getLong("correspondent_id");// to
+//						String username = jObj.getString("firstname");
+//						
+//						Correspondent correspondent = new Correspondent(senderId, username);
+//
+//						boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
+//						String comment = jObj.getString("message");
+//						boolean success = StringFormattingUtils.getBoolean(jObj.getString("is_success"));
+//						String date = jObj.getString("date_created");
+//						String dateReceived = jObj.getString("date_received");
+//
+//						boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
+//						OneComment message = new OneComment(left, comment, success, date, isUnread);
+//						message.dateReceived = dateReceived;
+//						correspondent.addMessage(message);
+//
+//						correspondent.saveOffline(context, senderId, receiverId, true);
+//						
+//					}
+//				}
+//			}
+//		} catch (JSONException e) {
+//			L.error("" + e);
+//		}
+//
+//		List<Correspondent> list = downloadAllOffline(context);
+//
+//		return list;
+//
+//	}
 
 	public static List<Correspondent> downloadAllOffline(Context context) {
 

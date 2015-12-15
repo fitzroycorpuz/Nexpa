@@ -199,7 +199,6 @@ public class ChatMessagesService extends Service {
 									String dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
 									comment.dateReceived = dateReceived;
 									
-									
 									// comment.isUnread = true;
 									correspondent.addMessage(comment);
 									//marking messages received online is moved,

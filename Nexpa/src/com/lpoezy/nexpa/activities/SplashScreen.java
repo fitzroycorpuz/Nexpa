@@ -7,11 +7,13 @@ import com.lpoezy.nexpa.chatservice.ChatMessagesService;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
+import com.lpoezy.nexpa.utility.L;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.view.Window;
 
 public class SplashScreen extends Activity {
@@ -24,6 +26,26 @@ public class SplashScreen extends Activity {
        super.onCreate(savedInstanceState);
        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
        setContentView(R.layout.activity_splash);
+       
+       DisplayMetrics metrics = new DisplayMetrics();
+       getWindowManager().getDefaultDisplay().getMetrics(metrics);
+       switch(metrics.densityDpi){
+            case DisplayMetrics.DENSITY_LOW:
+            	L.debug("low density");
+                       break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+            	L.debug("medium density");
+                        break;
+            case DisplayMetrics.DENSITY_HIGH:
+            	L.debug("high density");
+                        break;
+            case DisplayMetrics.DENSITY_XHIGH:
+            	L.debug("x high density");
+                        break;
+            default:
+            	L.debug("x high density");
+            	break;
+       }
       
        SessionManager session = new SessionManager(getApplicationContext());
        if(session.isLoggedIn()){

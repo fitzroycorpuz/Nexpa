@@ -108,7 +108,8 @@ public class OneComment {
 		return false;
 	}
 
-	
+	//do not rely on members values while saving local data,
+	//senderId and receiverId can change anytime
 	public void saveOffline(Context context, long senderId, long receiverId) {
 
 		SQLiteHandler db = new SQLiteHandler(context);
@@ -373,7 +374,7 @@ public class OneComment {
 		String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
 		int isSyncedOnline 		= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
 		
-
+		L.error("msg: "+msg+", date "+date);
 		OneComment comment = new OneComment(Long.parseLong(senderId), 
 				Long.parseLong(receiverId), 
 				StringFormattingUtils.getBoolean(left), 
