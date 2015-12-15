@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
@@ -162,7 +163,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 	@Override
 	public void onResume() {
-
+		L.debug("ChatHistory, onResume");
 		super.onResume();
 
 		getActivity().registerReceiver(mReceivedMessage, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
@@ -188,7 +189,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 	private void downloadAllMsgsOffline() {
 
 		List<Correspondent> correspondents = Correspondent.downloadAllOffline(getActivity());
-
+		downloadProfilePics(correspondents);
 		mBuddys.clear();
 		mBuddys.addAll(correspondents);
 		onCorrespondentUpdate();
@@ -196,7 +197,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 	}
 
 	private void updateList() {
-
+		L.debug("ChatHistory, updateList");
 		if (SystemUtilz.isNetworkAvailable(getActivity())) {
 
 			new Thread(new Runnable() {
@@ -208,44 +209,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 					// Correspondent.downloadAllReceivedOnline(getActivity());
 					final List<Correspondent> correspondents = Correspondent.downloadLatestMsgsOnline(getActivity());
 					
-					new Thread(new Runnable() {
-						
-						@Override
-						public void run() {
-							
-							final int MAX_THREAD = 5;
-							int n = correspondents.size() < MAX_THREAD && correspondents.size() != 0 ? correspondents.size()
-									: MAX_THREAD;
-							ExecutorService exec = Executors.newFixedThreadPool(n);
-							//L.debug("correspondents.size() "+correspondents.size());
-							for (int i = 0; i < correspondents.size(); i++) {
-								
-								final Correspondent correspondent = correspondents.get(i);
-								//L.debug("xxxxxxxxxx correspondent username"+correspondent.getUsername()+"xxxxxxx");
-								correspondent.addListener(ChatHistoryListFragment.this);
-
-								exec.execute(new Runnable() {
-
-									@Override
-									public void run() {
-
-										correspondent.downloadProfilePicOnline(getActivity());
-										// L.debug("ChatHistory, updateList
-										// "+correspondent.getId());
-
-									}
-								});
-
-							}
-							exec.shutdown();
-							try {
-								exec.awaitTermination(1, TimeUnit.MINUTES);
-							} catch (InterruptedException e) {
-
-							}
-							
-						}
-					}).start();
+					downloadProfilePics(correspondents);
 					
 					mBuddys.clear();
 					mBuddys.addAll(correspondents);
@@ -258,6 +222,48 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 			downloadAllMsgsOffline();
 		}
 		// onCorrespondentUpdate();
+	}
+
+	protected void downloadProfilePics(final List<Correspondent> correspondents) {
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				final int MAX_THREAD = 5;
+				int n = correspondents.size() < MAX_THREAD && correspondents.size() != 0 ? correspondents.size()
+						: MAX_THREAD;
+				ExecutorService exec = Executors.newFixedThreadPool(n);
+				//L.debug("correspondents.size() "+correspondents.size());
+				for (int i = 0; i < correspondents.size(); i++) {
+					
+					final Correspondent correspondent = correspondents.get(i);
+					//L.debug("xxxxxxxxxx correspondent username"+correspondent.getUsername()+"xxxxxxx");
+					correspondent.addListener(ChatHistoryListFragment.this);
+
+					exec.execute(new Runnable() {
+
+						@Override
+						public void run() {
+
+							correspondent.downloadProfilePicOnline(getActivity());
+							 
+
+						}
+					});
+
+				}
+				exec.shutdown();
+				try {
+					exec.awaitTermination(1, TimeUnit.MINUTES);
+				} catch (InterruptedException e) {
+
+				}
+				
+			}
+		}).start();
+		
 	}
 
 	private class ChatHistoryAdapter extends RecyclerView.Adapter<ChatHistoryAdapter.ViewHolder> {
@@ -305,16 +311,19 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 			// L.debug("update view holder
 			// "+mBuddys.get(position).getProfilePic());
-
+			 Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
+				        R.drawable.pic_sample_girl);
 			if (mBuddys.get(position).getProfilePic() != null) {
 
-				RoundedImageView riv = new RoundedImageView(getActivity());
-				Bitmap circImage = riv.getCroppedBitmap(mBuddys.get(position).getProfilePic(), 68);
-
-				vh.imgProfilePic.setImageBitmap(circImage);
-
+				
+				rawImage = mBuddys.get(position).getProfilePic();
 			}
+			
+			RoundedImageView riv = new RoundedImageView(getActivity());
+			Bitmap circImage = riv.getCroppedBitmap(rawImage, 68);
 
+			vh.imgProfilePic.setImageBitmap(circImage);
+			
 			vh.tvMsg.setText(msg.comment);
 
 		}
