@@ -20,11 +20,13 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 		boolean isNetworkAvailable = SystemUtilz.isNetworkAvailable(context.getApplicationContext());
 		boolean isChatServiceRunning = ChatMessagesService.isRunning;
 		boolean isSyncDataRunning = SyncDataService.isRunning;
+		boolean isSyncProfileRunning = SyncProfileService.isRunning;
 		
 		if(isLoggegIn){
 			
 			Intent msgService = new Intent(context, ChatMessagesService.class);
-			Intent syncService = new Intent(context, SyncDataService.class);
+			Intent syncDataService = new Intent(context, SyncDataService.class);
+			Intent syncProfileService = new Intent(context, SyncProfileService.class);
 			
 			if(isNetworkAvailable){
 				
@@ -34,7 +36,11 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 				}
 				
 				if(!isSyncDataRunning){
-					context.startService(syncService);
+					context.startService(syncDataService);
+				}
+				
+				if(!isSyncProfileRunning){
+					context.startService(syncProfileService);
 				}
 				
 				
@@ -46,7 +52,12 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 				
 				if(isSyncDataRunning){
 					
-					context.stopService(syncService);
+					context.stopService(syncDataService);
+				}
+				
+				if(isSyncDataRunning){
+					
+					context.stopService(syncProfileService);
 				}
 			}
 		

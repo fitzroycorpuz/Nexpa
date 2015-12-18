@@ -65,13 +65,14 @@ public class SQLiteHandler {
 	public static final String USER_PROFILE_URL1 = "url1";
 	public static final String USER_PROFILE_URL2 = "url2";
 	public static final String USER_PROFILE_DATE_UPDATED = "date_updated";
+	public static final String USER_PROFILE_IS_SYNCED_ONLINE = "is_synced_online";
 
 	private static final String TABLE_CORRESPONDENTS = "correspondents";
 	public static final String CORRESPONDENT_ID = "_id";
-	public static final String CORRESPONDENT_USER_ID = "user_id";
-	public static final String CORRESPONDENT_USERNAME = "correspondent_username";
-	public static final String CORRESPONDENT_EMAIL = "correspondent_email";
-	public static final String CORRESPONDENT_FNAME = "correspondent_fname";
+	public static final String CORRESPONDENT_USER_ID = "user_id";//logged in id
+	public static final String CORRESPONDENT_USERNAME = "username";
+	public static final String CORRESPONDENT_EMAIL = "email";
+	public static final String CORRESPONDENT_FNAME = "fname";
 
 	private static final String TABLE_PROFILE_PICTURES = "profile_pictures";
 	public static final String IMG_ID = "_id";// KEY_ID
@@ -79,19 +80,20 @@ public class SQLiteHandler {
 	public static final String IMG_DIR = "img_dir";
 	public static final String IMG_FILE = "img_file";
 	public static final String IMG_DATE_UPLOADED = "date_uploaded";
+	public static final String IMG_IS_SYNCED_ONLINE = "is_synced_online";
 
 	// boolean left, String comment,boolean success, String date
 	private static final String TABLE_MESSAGES = "messages";
 	public static final String MSG_ID = "_id";// KEY_ID
-	public static final String MSG_USER_ID = "msg_user_id";// sender id
-	public static final String MSG_CORRESPONDENT_ID = "correspondent_id";
-	public static final String MSG_LEFT = "msg_left";
-	public static final String MSG_BODY = "msg_body";
-	public static final String MSG_SUCCESS = "msg_success";
-	public static final String MSG_DATE = "msg_date";
-	public static final String MSG_DATE_RECEIVED = "msg_date_received";
-	public static final String MSG_IS_UNREAD = "msg_is_unread";
-	public static final String MSG_IS_SYNCED_ONLINE = "msg_is_synced_online";
+	public static final String MSG_USER_ID = "user_id";// sender id
+	public static final String MSG_CORRESPONDENT_ID = "correspondent_id";//receiver id
+	public static final String MSG_LEFT = "left";
+	public static final String MSG_BODY = "body";
+	public static final String MSG_SUCCESS = "success";
+	public static final String MSG_CREATED_DATE = "created_date";
+	public static final String MSG_DATE_RECEIVED = "date_received";
+	public static final String MSG_IS_UNREAD = "is_unread";
+	public static final String MSG_IS_SYNCED_ONLINE = "is_synced_online";
 
 	private static final String DATABASE_TABLE_2 = "profile";
 	public static final String PROFILE_ID = "_id";
@@ -170,7 +172,7 @@ public class SQLiteHandler {
 			String CREATE_TABLE_USER_PROFILE = "CREATE TABLE " + TABLE_USER_PROFILE + "(" + USER_PROFILE_ID
 					+ " INTEGER PRIMARY KEY, "+USER_PROFILE_USER_ID+" INTEGER, "+ USER_PROFILE_USERNAME + " TEXT, " + USER_PROFILE_DESCRIPTION
 					+ " TEXT, " + USER_PROFILE_PROFESSION + " TEXT, " + USER_PROFILE_URL0 + " TEXT, "
-					+ USER_PROFILE_URL1 + " TEXT, " + USER_PROFILE_URL2 +" TEXT, "+ USER_PROFILE_DATE_UPDATED+" TEXT);";
+					+ USER_PROFILE_URL1 + " TEXT, " + USER_PROFILE_URL2 +" TEXT, "+ USER_PROFILE_DATE_UPDATED+" TEXT, "+USER_PROFILE_IS_SYNCED_ONLINE+" TEXT);";
 			db.execSQL(CREATE_TABLE_USER_PROFILE);
 
 			String CREATE_TABLE_CORRESPONDENTS = "CREATE TABLE " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_ID
@@ -181,12 +183,12 @@ public class SQLiteHandler {
 
 			String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID
 					+ " INTEGER PRIMARY KEY, " + IMG_USER_ID + " INTEGER, " + IMG_DIR + " TEXT, " + IMG_FILE + " TEXT,"
-					+ IMG_DATE_UPLOADED + " TEXT);";
+					+ IMG_DATE_UPLOADED + " TEXT, "+IMG_IS_SYNCED_ONLINE+" TEXT);";
 			db.execSQL(CREATE_TABLE_PROFILE_PICTURES);
 
 			String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "
 					+ MSG_USER_ID + " INTEGER, " + MSG_CORRESPONDENT_ID + " INTEGER, " + MSG_LEFT + " TEXT, " + MSG_BODY
-					+ " TEXT," + MSG_SUCCESS + " TEXT," + MSG_DATE + " TEXT, " + MSG_IS_UNREAD + " TEXT, "
+					+ " TEXT," + MSG_SUCCESS + " TEXT," + MSG_CREATED_DATE + " TEXT, " + MSG_IS_UNREAD + " TEXT, "
 					+ MSG_DATE_RECEIVED + " TEXT, " + MSG_IS_SYNCED_ONLINE + " TEXT);";
 			db.execSQL(CREATE_TABLE_MESSAGES);
 
@@ -394,6 +396,39 @@ public class SQLiteHandler {
 	 * newVersion) { db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOGIN);
 	 * onCreate(db); }
 	 */
+	
+	public Map<String, String> downloadMyUnsyncedDetails() {
+		L.debug("SqliteHandler, downloadMyUnsyncedDetailsOffline");
+		String[] columns = new String[]{
+				USER_PROFILE_USER_ID, USER_PROFILE_USERNAME, USER_PROFILE_DESCRIPTION, 
+				USER_PROFILE_PROFESSION,USER_PROFILE_URL0, USER_PROFILE_URL1, USER_PROFILE_URL2, USER_PROFILE_DATE_UPDATED, USER_PROFILE_IS_SYNCED_ONLINE};
+		String selection = USER_PROFILE_USER_ID+" = ? AND "+USER_PROFILE_IS_SYNCED_ONLINE+" = ?";
+		String[] selectionArgs= new String[]{getLoggedInID(), "0"};
+		Cursor c = sqLiteDatabase.query(TABLE_USER_PROFILE, columns, selection, selectionArgs, null, null, null);
+		
+		Map<String, String> map = null;
+		if(c.moveToFirst()){
+			
+			map = new HashMap<String, String>();
+			
+			map.put(USER_PROFILE_USER_ID, 		c.getString(c.getColumnIndex(USER_PROFILE_USER_ID)));
+			map.put(USER_PROFILE_USERNAME, 		c.getString(c.getColumnIndex(USER_PROFILE_USERNAME)));
+			map.put(USER_PROFILE_DESCRIPTION, 	c.getString(c.getColumnIndex(USER_PROFILE_DESCRIPTION)));
+			map.put(USER_PROFILE_PROFESSION, 	c.getString(c.getColumnIndex(USER_PROFILE_PROFESSION)));
+			map.put(USER_PROFILE_URL0, 			c.getString(c.getColumnIndex(USER_PROFILE_URL0)));
+			map.put(USER_PROFILE_URL1, 			c.getString(c.getColumnIndex(USER_PROFILE_URL1)));
+			map.put(USER_PROFILE_URL2, 			c.getString(c.getColumnIndex(USER_PROFILE_URL2)));
+			map.put(USER_PROFILE_DATE_UPDATED, 	c.getString(c.getColumnIndex(USER_PROFILE_DATE_UPDATED)));
+			map.put(USER_PROFILE_IS_SYNCED_ONLINE, 	c.getString(c.getColumnIndex(USER_PROFILE_IS_SYNCED_ONLINE)));
+			
+		}
+		
+		c.close();
+		
+		return map;
+	}
+	
+	
 
 	public Map<String, String> downloadUserProfile(long userId) {
 		L.debug("SqliteHandler, downloadUserProfile "+userId);
@@ -427,7 +462,7 @@ public class SQLiteHandler {
 	}
 	
 	public void saveUserProfile(long userid, String username, String description, String title, String url0,
-			String url1, String url2, String dateUpdated) {
+			String url1, String url2, String dateUpdated, boolean isUnsyncedOnline) {
 		
 		ContentValues values = new ContentValues();
 		values.put(USER_PROFILE_USER_ID, userid);
@@ -438,6 +473,7 @@ public class SQLiteHandler {
 		values.put(USER_PROFILE_URL1, url1);
 		values.put(USER_PROFILE_URL2, url2);
 		values.put(USER_PROFILE_DATE_UPDATED, dateUpdated);
+		values.put(USER_PROFILE_IS_SYNCED_ONLINE, StringFormattingUtils.getBoolean(isUnsyncedOnline));
 		long id = sqLiteDatabase.insert(TABLE_USER_PROFILE, null, values);
 		
 		if (id > 0) {
@@ -448,7 +484,7 @@ public class SQLiteHandler {
 	}
 	
 	
-	public void updateUserProfile(long userid, String username, String description, String title, String url0, String url1, String url2, String dateUpdated) {
+	public void updateUserProfile(long userid, String username, String description, String title, String url0, String url1, String url2, String dateUpdated, boolean isUnsyncedOnline) {
 
 		ContentValues values = new ContentValues();
 		values.put(USER_PROFILE_USERNAME, username);
@@ -458,6 +494,7 @@ public class SQLiteHandler {
 		values.put(USER_PROFILE_URL1, url1);
 		values.put(USER_PROFILE_URL2, url2);
 		values.put(USER_PROFILE_DATE_UPDATED, dateUpdated);
+		values.put(USER_PROFILE_IS_SYNCED_ONLINE, StringFormattingUtils.getBoolean(isUnsyncedOnline));
 		
 		int row = sqLiteDatabase.update(TABLE_USER_PROFILE, values, USER_PROFILE_USER_ID + " =? ",
 				new String[] { Long.toString(userid) });
@@ -514,7 +551,7 @@ public class SQLiteHandler {
 	public int getUnReadMsgCount(long id) {
 		L.debug("SqliteHandler, getUnReadMsgCount of " + id);
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
-				new String[] { MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_IS_UNREAD },
+				new String[] { MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE, MSG_IS_UNREAD },
 				MSG_CORRESPONDENT_ID + "=? AND " + MSG_IS_UNREAD + "=?",
 				new String[] { Long.toString(id), Integer.toString(1) }, null, null, null);
 		int count = 0;
@@ -536,7 +573,7 @@ public class SQLiteHandler {
 		ContentValues values = new ContentValues();
 		values.put(MSG_IS_SYNCED_ONLINE, "1");
 
-		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_DATE + " = ? AND "+ MSG_DATE_RECEIVED +" = ?",
+		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_CREATED_DATE + " = ? AND "+ MSG_DATE_RECEIVED +" = ?",
 				new String[] { Long.toString(senderId), date , dateReceived});
 		if (rowCount > 0) {
 			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as synced");
@@ -549,7 +586,7 @@ public class SQLiteHandler {
 		values.put(MSG_DATE_RECEIVED, dateReceived);
 		values.put(MSG_IS_SYNCED_ONLINE, "0");
 
-		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_DATE + " = ?",
+		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_CREATED_DATE + " = ?",
 				new String[] { Long.toString(senderId), date });
 		if (rowCount > 0) {
 			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as received");
@@ -563,7 +600,7 @@ public class SQLiteHandler {
 		values.put(MSG_IS_UNREAD, "0");
 		values.put(MSG_IS_SYNCED_ONLINE, "0");
 
-		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_DATE + " = ?",
+		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_CREATED_DATE + " = ?",
 				new String[] { Long.toString(senderId), date });
 		if (rowCount > 0) {
 			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as read");
@@ -574,7 +611,7 @@ public class SQLiteHandler {
 	public List<OneComment> downloadReceivedMsgs(Context context2) {
 		String id = getLoggedInID();
 
-		String[] columns = new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE,
+		String[] columns = new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
 				MSG_IS_UNREAD, MSG_DATE_RECEIVED, MSG_IS_SYNCED_ONLINE };
 		String selection = MSG_CORRESPONDENT_ID + " = ?";
 		String[] selectionArgs = new String[] { id };
@@ -599,9 +636,9 @@ public class SQLiteHandler {
 				+ ", dateCreated: " + dateCreated);
 		// SqliteHandler, downloadMsgBySenderIdAndDate
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
-				new String[] { MSG_ID, MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE,
+				new String[] { MSG_ID, MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
 						MSG_IS_UNREAD, MSG_DATE_RECEIVED },
-				MSG_USER_ID + "= ? AND " + MSG_CORRESPONDENT_ID + "=? AND " + MSG_DATE + " = ?",
+				MSG_USER_ID + "= ? AND " + MSG_CORRESPONDENT_ID + "=? AND " + MSG_CREATED_DATE + " = ?",
 				new String[] { Long.toString(senderId), Long.toString(receiverId), dateCreated }, null, null, null);
 
 		Map<String, String> map = new HashMap<String, String>();
@@ -615,7 +652,7 @@ public class SQLiteHandler {
 				String left = cursor.getString(cursor.getColumnIndex(MSG_LEFT));
 				String msg = cursor.getString(cursor.getColumnIndex(MSG_BODY));
 				String success = cursor.getString(cursor.getColumnIndex(MSG_SUCCESS));
-				String date = cursor.getString(cursor.getColumnIndex(MSG_DATE));
+				String date = cursor.getString(cursor.getColumnIndex(MSG_CREATED_DATE));
 				String isUnread = cursor.getString(cursor.getColumnIndex(MSG_IS_UNREAD));
 				String _dateReceived = cursor.getString(cursor.getColumnIndex(MSG_DATE_RECEIVED));
 
@@ -625,7 +662,7 @@ public class SQLiteHandler {
 				map.put(MSG_LEFT, left);
 				map.put(MSG_BODY, msg);
 				map.put(MSG_SUCCESS, success);
-				map.put(MSG_DATE, date);
+				map.put(MSG_CREATED_DATE, date);
 				map.put(MSG_IS_UNREAD, isUnread);
 				map.put(MSG_IS_UNREAD, _dateReceived);
 
@@ -650,8 +687,8 @@ public class SQLiteHandler {
 		String[] whereArgs = new String[] { Long.toString(senderId) };
 
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES, new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT,
-				MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_IS_UNREAD, MSG_DATE_RECEIVED }, where, whereArgs, null, null,
-				MSG_DATE + " DESC");// MSG_DATE_RECEIVED+"
+				MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE, MSG_IS_UNREAD, MSG_DATE_RECEIVED }, where, whereArgs, null, null,
+				MSG_CREATED_DATE + " DESC");// MSG_DATE_RECEIVED+"
 									// DESC"
 		Map<String, String> map = new HashMap<String, String>();
 
@@ -661,7 +698,7 @@ public class SQLiteHandler {
 			String left = cursor.getString(cursor.getColumnIndex(MSG_LEFT));
 			String msg = cursor.getString(cursor.getColumnIndex(MSG_BODY));
 			String success = cursor.getString(cursor.getColumnIndex(MSG_SUCCESS));
-			String date = cursor.getString(cursor.getColumnIndex(MSG_DATE));
+			String date = cursor.getString(cursor.getColumnIndex(MSG_CREATED_DATE));
 			String isUnread = cursor.getString(cursor.getColumnIndex(MSG_IS_UNREAD));
 			String dateReceived = cursor.getString(cursor.getColumnIndex(MSG_DATE_RECEIVED));
 
@@ -670,7 +707,7 @@ public class SQLiteHandler {
 			map.put(MSG_LEFT, left);
 			map.put(MSG_BODY, msg);
 			map.put(MSG_SUCCESS, success);
-			map.put(MSG_DATE, date);
+			map.put(MSG_CREATED_DATE, date);
 			map.put(MSG_IS_UNREAD, isUnread);
 			map.put(MSG_DATE_RECEIVED, dateReceived);
 
@@ -701,7 +738,7 @@ public class SQLiteHandler {
 			
 			//check if there is any msg sent
 			long sentDate = 0;
-			if(sent!=null && sent.size()!=0)sentDate = DateUtils.simpleDateToMillis(sent.get(MSG_DATE));
+			if(sent!=null && sent.size()!=0)sentDate = DateUtils.simpleDateToMillis(sent.get(MSG_CREATED_DATE));
 				
 				
 			if (receivedDate > sentDate)
@@ -722,7 +759,7 @@ public class SQLiteHandler {
 		String userId = getLoggedInID();
 		
 		String table = TABLE_MESSAGES;
-		String[] columns = new String[]{MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_DATE_RECEIVED, MSG_IS_UNREAD, MSG_IS_SYNCED_ONLINE};
+		String[] columns = new String[]{MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE, MSG_DATE_RECEIVED, MSG_IS_UNREAD, MSG_IS_SYNCED_ONLINE};
 		String selection = "("+MSG_USER_ID + " = ? OR "+MSG_CORRESPONDENT_ID+" = ? ) AND "+ MSG_IS_UNREAD +" = ? AND "+ MSG_IS_SYNCED_ONLINE+" = ?";
 		String[] selectionArgs = new String[]{userId, userId, "0", "0"};
 		Cursor c = sqLiteDatabase.query(table, columns, selection, selectionArgs, null, null, null);
@@ -749,10 +786,10 @@ public class SQLiteHandler {
 		L.debug("SQLiteHandler, getting last sent msg of senderId : " + senderId);
 
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
-				new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE,
+				new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
 						MSG_IS_UNREAD, MSG_DATE_RECEIVED },
 				MSG_USER_ID + "= ? AND " + MSG_CORRESPONDENT_ID + "= ?",
-				new String[] { Long.toString(senderId), Long.toString(receiverId) }, null, null, MSG_DATE + " DESC");// MSG_DATE_RECEIVED+"
+				new String[] { Long.toString(senderId), Long.toString(receiverId) }, null, null, MSG_CREATED_DATE + " DESC");// MSG_DATE_RECEIVED+"
 		// DESC"
 		Map<String, String> map = new HashMap<String, String>();
 
@@ -763,7 +800,7 @@ public class SQLiteHandler {
 			String left = cursor.getString(cursor.getColumnIndex(MSG_LEFT));
 			String msg = cursor.getString(cursor.getColumnIndex(MSG_BODY));
 			String success = cursor.getString(cursor.getColumnIndex(MSG_SUCCESS));
-			String date = cursor.getString(cursor.getColumnIndex(MSG_DATE));
+			String date = cursor.getString(cursor.getColumnIndex(MSG_CREATED_DATE));
 			String isUnread = cursor.getString(cursor.getColumnIndex(MSG_IS_UNREAD));
 			String dateReceived = cursor.getString(cursor.getColumnIndex(MSG_DATE_RECEIVED));
 
@@ -772,7 +809,7 @@ public class SQLiteHandler {
 			map.put(MSG_LEFT, left);
 			map.put(MSG_BODY, msg);
 			map.put(MSG_SUCCESS, success);
-			map.put(MSG_DATE, date);
+			map.put(MSG_CREATED_DATE, date);
 			map.put(MSG_IS_UNREAD, isUnread);
 			map.put(MSG_DATE_RECEIVED, dateReceived);
 
@@ -792,7 +829,7 @@ public class SQLiteHandler {
 		long id = Long.parseLong(getLoggedInID());
 
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
-				new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE,
+				new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
 						MSG_IS_UNREAD, MSG_DATE_RECEIVED },
 				MSG_USER_ID + "= ?", new String[] { Long.toString(senderId) }, null, null, MSG_DATE_RECEIVED + " DESC");// MSG_DATE_RECEIVED+"
 																														// DESC"
@@ -805,7 +842,7 @@ public class SQLiteHandler {
 			String left = cursor.getString(cursor.getColumnIndex(MSG_LEFT));
 			String msg = cursor.getString(cursor.getColumnIndex(MSG_BODY));
 			String success = cursor.getString(cursor.getColumnIndex(MSG_SUCCESS));
-			String date = cursor.getString(cursor.getColumnIndex(MSG_DATE));
+			String date = cursor.getString(cursor.getColumnIndex(MSG_CREATED_DATE));
 			String isUnread = cursor.getString(cursor.getColumnIndex(MSG_IS_UNREAD));
 			String dateReceived = cursor.getString(cursor.getColumnIndex(MSG_DATE_RECEIVED));
 
@@ -814,7 +851,7 @@ public class SQLiteHandler {
 			map.put(MSG_LEFT, left);
 			map.put(MSG_BODY, msg);
 			map.put(MSG_SUCCESS, success);
-			map.put(MSG_DATE, date);
+			map.put(MSG_CREATED_DATE, date);
 			map.put(MSG_IS_UNREAD, isUnread);
 			map.put(MSG_DATE_RECEIVED, dateReceived);
 
@@ -872,7 +909,7 @@ public class SQLiteHandler {
 		// WHERE (msg_user_id = '2 AND correspondent_id = '23') OR (msg_user_id
 		// = '23 AND correspondent_id = '2') ORDER BY msg_date ASC
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
-				new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE,
+				new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
 						MSG_IS_UNREAD, MSG_DATE_RECEIVED, MSG_IS_SYNCED_ONLINE },
 				"(" + MSG_USER_ID + " = '" + userId + "' AND " + MSG_CORRESPONDENT_ID + " = '" + correspondentId
 						+ "') OR (" + MSG_USER_ID + " = '" + correspondentId + "' AND " + MSG_CORRESPONDENT_ID + " = '"
@@ -929,7 +966,7 @@ public class SQLiteHandler {
 	public List<OneComment> downloadMessages(long id) {
 		Log.e("SQLiteHandler", "getting messages");
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
-				new String[] { MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_IS_UNREAD },
+				new String[] { MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE, MSG_IS_UNREAD },
 				MSG_CORRESPONDENT_ID + "= '" + id + "'", null, null, null, null);
 
 		List<OneComment> conversation = null;
@@ -940,7 +977,7 @@ public class SQLiteHandler {
 				int left = cursor.getInt(cursor.getColumnIndex(MSG_LEFT));
 				String msg = cursor.getString(cursor.getColumnIndex(MSG_BODY));
 				int success = cursor.getInt(cursor.getColumnIndex(MSG_SUCCESS));
-				String date = cursor.getString(cursor.getColumnIndex(MSG_DATE));
+				String date = cursor.getString(cursor.getColumnIndex(MSG_CREATED_DATE));
 				int isUnread = cursor.getInt(cursor.getColumnIndex(MSG_IS_UNREAD));
 
 				OneComment comment = new OneComment(StringFormattingUtils.getBoolean(left), msg,
@@ -1001,7 +1038,7 @@ public class SQLiteHandler {
 		values.put(MSG_LEFT, StringFormattingUtils.getBoolean(left));
 		values.put(MSG_BODY, comment);
 		values.put(MSG_SUCCESS, StringFormattingUtils.getBoolean(success));
-		values.put(MSG_DATE, date);
+		values.put(MSG_CREATED_DATE, date);
 		values.put(MSG_IS_UNREAD, StringFormattingUtils.getBoolean(isUnread));
 		values.put(MSG_DATE_RECEIVED, dateReceived);
 		values.put(MSG_IS_SYNCED_ONLINE, StringFormattingUtils.getBoolean(isSyncedOnline));
@@ -1708,6 +1745,8 @@ public class SQLiteHandler {
 		sqLiteDatabase.delete(TABLE_USER_PROFILE, null, null);
 		
 	}
+
+	
 
 	
 

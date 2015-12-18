@@ -15,6 +15,7 @@ import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
+import com.lpoezy.nexpa.utility.StringFormattingUtils;
 
 import android.content.Context;
 
@@ -28,6 +29,7 @@ public class UserProfile {
 	private String url1;
 	private String url2;
 	private String dateUpdated;
+	private boolean isUnsyncedOnline;
 
 	public UserProfile() {
 	}
@@ -45,7 +47,7 @@ public class UserProfile {
 	}
 
 	public UserProfile(long id, String username, String description, String profession, String url0, String url1,
-			String url2, String dateUpdated) {
+			String url2, String dateUpdated, boolean isUnsyncedOnline) {
 
 		this.id = id;
 		this.username = username;
@@ -55,8 +57,10 @@ public class UserProfile {
 		this.url1 = url1;
 		this.url2 = url2;
 		this.dateUpdated = dateUpdated;
-
+		this.isUnsyncedOnline = isUnsyncedOnline;
 	}
+	
+	
 
 	public long getId() {
 		return id;
@@ -121,6 +125,14 @@ public class UserProfile {
 	public void setDateUpdated(String dateUpdated) {
 		this.dateUpdated = dateUpdated;
 	}
+	
+	public boolean isUnsyncedOnline() {
+		return isUnsyncedOnline;
+	}
+
+	public void setUnsyncedOnline(boolean isUnsyncedOnline) {
+		this.isUnsyncedOnline = isUnsyncedOnline;
+	}
 
 	public void updateOffline(Context context) {
 		L.debug("start updating user info offline");
@@ -132,16 +144,16 @@ public class UserProfile {
 		// check if user id alredy exist in local db
 		if (db.downloadUserProfile(id) != null) {
 			// update if existing
-			db.updateUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated);
+			db.updateUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated, isUnsyncedOnline);
 		} else {
 			// insert new user profile if not
-			db.saveUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated);
+			db.saveUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated, isUnsyncedOnline);
 		}
 
 		db.close();
 	}
 
-	public String saveOnline(Context context) {
+	public boolean saveOnline(Context context) {
 		L.debug("start updating user info online");
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToRead();
@@ -158,16 +170,26 @@ public class UserProfile {
 		postDataParams.put("url1", this.url1);
 		postDataParams.put("url2", this.url2);
 		postDataParams.put("date_updated", this.dateUpdated);
-
+//{"tag":"profile_update","error":false,"msg":" profile update sucess!"}
 		final String spec = AppConfig.URL_USER_PROFILES;
 		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
 
 		L.debug("UserProfile, webPage: " + webPage);
-
+		
 		db.close();
-		L.debug("updating user info online complete");
-
-		return webPage;
+		
+		boolean isOk = false;
+		try {
+			JSONObject result = new JSONObject(webPage);
+			L.debug("updating user info online complete");
+			if(!result.getBoolean("error"))return true;
+			
+			
+		} catch (JSONException e) {
+			L.error(""+e);
+		}
+		
+		return false;
 	}
 
 	public boolean downloadOnline() {
@@ -207,6 +229,31 @@ public class UserProfile {
 		}
 
 		return false;
+	}
+	
+	public void downloadMyUnsyncedDetailsOffline(Context context) {
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToRead();
+		
+		
+		Map<String, String> map = db.downloadMyUnsyncedDetails();
+		 
+		if (map != null) {
+			this.id = Long.parseLong(map.get(SQLiteHandler.USER_PROFILE_USER_ID));
+			this.username = map.get(SQLiteHandler.USER_PROFILE_USERNAME);
+			this.description = map.get(SQLiteHandler.USER_PROFILE_DESCRIPTION);
+			this.profession = map.get(SQLiteHandler.USER_PROFILE_PROFESSION);
+			this.url0 = map.get(SQLiteHandler.USER_PROFILE_URL0);
+			this.url1 = map.get(SQLiteHandler.USER_PROFILE_URL1);
+			this.url2 = map.get(SQLiteHandler.USER_PROFILE_URL2);
+			this.dateUpdated = map.get(SQLiteHandler.USER_PROFILE_DATE_UPDATED);
+			this.isUnsyncedOnline = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.USER_PROFILE_IS_SYNCED_ONLINE));
+			
+			
+		}
+		
+		db.close();
+		
 	}
 
 	public void downloadOffline(Context context) {
@@ -265,7 +312,7 @@ public class UserProfile {
 					String dateUpdated = jProfile.getString("date_updated");
 
 					UserProfile prof = new UserProfile(id, username, description, profession, url0, url1, url2,
-							dateUpdated);
+							dateUpdated, true);
 					
 					profiles.add(prof);
 				}
@@ -280,5 +327,7 @@ public class UserProfile {
 		return null;
 
 	}
+
+	
 
 }

@@ -714,7 +714,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 								// save profile of specific users
 								UserProfile userProfile = new UserProfile(Long.parseLong(userId), uname, description,
-										title, url0, url1, url2, dateUpdated);
+										title, url0, url1, url2, dateUpdated, true);
 
 								userProfile.updateOffline(AroundMeActivity.this);
 

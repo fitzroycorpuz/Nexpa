@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.lpoezy.nexpa.objects.ProfilePicture;
+import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.L;
 
@@ -15,7 +17,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 
-public class SyncDataService extends Service {
+public class SyncProfileService extends Service {
 	
 	private static final int MINUTE =  1000 * 60;
 
@@ -30,8 +32,8 @@ public class SyncDataService extends Service {
 	public static boolean isRunning;
 	
 	public class LocalBinder extends Binder{
-		public SyncDataService getService(){
-			return SyncDataService.this;
+		public SyncProfileService getService(){
+			return SyncProfileService.this;
 			
 		}
 	}
@@ -63,7 +65,7 @@ public class SyncDataService extends Service {
 		super.onCreate();
 		isRunning = true;
 		
-		HandlerThread t = new HandlerThread("SynchDataService");
+		HandlerThread t = new HandlerThread("SynchProfileService");
 		t.start();
 		
 		mServiceLooper = t.getLooper();
@@ -72,26 +74,21 @@ public class SyncDataService extends Service {
 //			L.debug(""+(2<<n));
 //		}
 		
-		
 		mServiceHandler = new Handler(mServiceLooper);
 		mServiceHandler.postDelayed(new Runnable() {
 			
 			@Override
 			public void run() {
 				
-				//check if there is unsync msg
-				List<OneComment> list = OneComment.downloadMyUnsyncReadMsgsOffline(getApplicationContext());
+				UserProfile userProfile = new UserProfile();
+				userProfile.setUnsyncedOnline(true);
+				userProfile.downloadMyUnsyncedDetailsOffline(getApplicationContext());
 				
-				if(list!=null && !list.isEmpty()){
+				if(!userProfile.isUnsyncedOnline()){
 					
-					try {
-						if(OneComment.markMsgsAsReadOnline(list)){
-							for(OneComment msg : list){
-								msg.markAsSyncedOffline(getApplicationContext());
-							}
-						}
-					} catch (JsonProcessingException e) {
-						L.error(""+e);
+					if(userProfile.saveOnline(getApplicationContext())){
+						userProfile.setUnsyncedOnline(true);
+						userProfile.updateOffline(getApplicationContext());
 					}
 					retry = MINUTE;
 				}else{
@@ -99,9 +96,9 @@ public class SyncDataService extends Service {
 					retry = (2<<n)* MINUTE;
 					n++;
 					
-					L.debug("SyncDAtaService, no msgs to update online");
+					L.debug("SyncProfileService, no changes to update online");
 				}
-				L.debug("SyncDAtaService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
+				L.debug("SyncProfileService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
 				mServiceHandler.postDelayed(this, retry);
 			}
 		}, retry);

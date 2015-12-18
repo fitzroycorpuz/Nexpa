@@ -283,6 +283,8 @@ public class MainSignInActivity extends Activity {
 											final String spec = AppConfig.URL_PROFILE_PIC;
 											String webPage = HttpUtilz.makeRequest(spec, postDataParams);
 											JSONObject jResult;
+											// reusing userid
+											// and username
 											long uId = Long.parseLong(server_uid);
 											String uname = server_name;
 											String description = "";
@@ -302,8 +304,6 @@ public class MainSignInActivity extends Activity {
 															.getJSONArray("profile_and_pic_info")
 															.getJSONObject(0);
 
-													// reusing userid
-													// and username
 													
 													description = profilePictureJson.getString("description");
 													profession = profilePictureJson.getString("title");
@@ -325,13 +325,13 @@ public class MainSignInActivity extends Activity {
 
 											} catch (JSONException e) {
 												L.error("" + e);
-											} finally {
-
-												UserProfile profile = new UserProfile(uId, uname, description,
-														profession, url0, url1, url2, dateUpdated);
-												profile.updateOffline(MainSignInActivity.this);
-
 											}
+
+											UserProfile profile = new UserProfile(uId, uname, description,
+														profession, url0, url1, url2, dateUpdated, true);
+											profile.updateOffline(MainSignInActivity.this);
+
+											
 
 											L.debug("MainSignInActivity, server_uid: " + server_uid
 													+ ", server_name: " + server_name + ", webPage: "

@@ -13,6 +13,8 @@ import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.Profile;
 import com.lpoezy.nexpa.chatservice.ChatMessagesService;
+import com.lpoezy.nexpa.chatservice.SyncDataService;
+import com.lpoezy.nexpa.chatservice.SyncProfileService;
 import com.lpoezy.nexpa.objects.Announcement;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
@@ -217,7 +219,15 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
         
         if(ChatMessagesService.isRunning){
         	context.stopService(new Intent(context, ChatMessagesService.class));
-	   }
+	    }
+        
+        if(SyncDataService.isRunning){
+        	context.stopService(new Intent(context, SyncDataService.class));
+	    }
+        
+        if(SyncProfileService.isRunning){
+        	context.stopService(new Intent(context, SyncProfileService.class));
+	    }
         
         if(callback!=null){
         	((onUserIsLoggedOutListener)callback).onUserIsLoggedOut();

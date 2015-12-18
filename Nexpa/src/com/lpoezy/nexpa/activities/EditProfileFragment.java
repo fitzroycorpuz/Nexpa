@@ -139,16 +139,6 @@ public class EditProfileFragment extends DialogFragment {
 			@Override
 			public void onClick(View v) {
 
-				// check internet connection before performing http request
-				if (!SystemUtilz.isNetworkAvailable(getActivity())) {
-
-					String msg = getResources().getString(R.string.msg_no_internet);
-					L.error(msg);
-					// L.makeText(SettingsActivity.this, msg,
-					// AppMsg.STYLE_INFO);
-					return;
-				}
-
 				pDialog = new ProgressDialog(getActivity());
 				pDialog.setCancelable(false);
 				pDialog.setMessage("Saving ...");
@@ -195,8 +185,8 @@ public class EditProfileFragment extends DialogFragment {
 		String url0 = edtUrl0.getText().toString();
 		String url1 = edtUrl1.getText().toString();
 		String url2 = edtUrl2.getText().toString();
-		
-		UserProfile userProfile = new UserProfile(uId, uname, description, profession, url0, url1, url2, dateUpdated);
+		boolean isSyncedOnline = false;
+		UserProfile userProfile = new UserProfile(uId, uname, description, profession, url0, url1, url2, dateUpdated, isSyncedOnline);
 
 		//moved to sync in settings screen
 		//String result = userProfile.saveOnline(getActivity());

@@ -3,6 +3,7 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.ChatMessagesService;
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.chatservice.SyncDataService;
+import com.lpoezy.nexpa.chatservice.SyncProfileService;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -55,6 +56,9 @@ public class TabHostActivity extends TabActivity {
 		
 		Intent syncDataService = new Intent(this, SyncDataService.class);
 		startService(syncDataService);
+		
+		Intent syncProfileService = new Intent(this, SyncProfileService.class);
+		startService(syncProfileService);
 		
 		registerReceiver(mUpdateMsgCount, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
 		isRunning = true;

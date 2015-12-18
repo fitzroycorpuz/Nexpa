@@ -280,7 +280,7 @@ public class OneComment {
 			this.left = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_LEFT));
 			this.comment = map.get(SQLiteHandler.MSG_BODY);
 			this.success = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_SUCCESS));
-			this.date = map.get(SQLiteHandler.MSG_DATE);
+			this.date = map.get(SQLiteHandler.MSG_CREATED_DATE);
 			this.isUnread = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_UNREAD));
 			
 		}
@@ -502,7 +502,7 @@ public class OneComment {
 		int left 				= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_LEFT));
 		String msg 				= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_BODY));
 		int success 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_SUCCESS));
-		String date 			= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE));
+		String date 			= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_CREATED_DATE));
 		int isUnread 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_UNREAD));
 		String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
 		int isSyncedOnline 		= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
