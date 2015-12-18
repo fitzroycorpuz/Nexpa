@@ -396,7 +396,7 @@ public class Correspondent {
 		
 		final String spec = AppConfig.URL_MSG;
 		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-		 L.debug("userId: "+userId+", webPage: " + webPage);
+		 //L.debug("userId: "+userId+", webPage: " + webPage);
 		
 		//List<Correspondent> list = new ArrayList<Correspondent>();
 		try {

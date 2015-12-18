@@ -35,7 +35,6 @@ import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.MyLocation;
 import com.lpoezy.nexpa.utility.MyLocation.LocationResult;
 
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -68,12 +67,12 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
-
-public class AroundMeActivity  extends AppCompatActivity implements OnRefreshListener, Correspondent.OnCorrespondentUpdateListener {
+public class AroundMeActivity extends AppCompatActivity
+		implements OnRefreshListener, Correspondent.OnCorrespondentUpdateListener {
 	private static final String TAG = AroundMeActivity.class.getSimpleName();
-	//Button btnUpdate;
+	// Button btnUpdate;
 	LocationManager locationManager;
-//	MyLocationListener locationListener;
+	// MyLocationListener locationListener;
 	float ftLatitude = 0;
 	float ftLongitude = 0;
 	Handler mHandler;
@@ -81,25 +80,25 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	CustomGrid adapter;
 	SQLiteHandler db;
 	float i = 0;
-	ArrayList < String > web = new ArrayList < String > ();
-	ArrayList < String > availabilty = new ArrayList < String > ();
-	ArrayList < Integer > distance = new ArrayList < Integer > ();
-	ArrayList < Integer > imageId = new ArrayList < Integer > ();
-	ArrayList < Bitmap > images = new ArrayList < Bitmap > ();
-	ArrayList < Correspondent > 	arr_correspondents = new ArrayList < Correspondent > ();
-	ArrayList < String > arr_fname = new ArrayList < String > ();
-	ArrayList < String > arr_age = new ArrayList < String > ();
-	ArrayList < String > arr_uname = new ArrayList < String > ();
-	ArrayList < String > arr_gender = new ArrayList < String > ();
-	ArrayList < String > arr_looking_type = new ArrayList < String > ();
-	ArrayList < String > arr_date_seen = new ArrayList < String > ();
-	ArrayList < String > arr_about = new ArrayList < String > ();
-	ArrayList < String > arr_email = new ArrayList < String > ();
-	ArrayList < String > arr_status = new ArrayList < String > ();
+	ArrayList<String> web = new ArrayList<String>();
+	ArrayList<String> availabilty = new ArrayList<String>();
+	ArrayList<Integer> distance = new ArrayList<Integer>();
+	ArrayList<Integer> imageId = new ArrayList<Integer>();
+	ArrayList<Bitmap> images = new ArrayList<Bitmap>();
+	ArrayList<Correspondent> arr_correspondents = new ArrayList<Correspondent>();
+	ArrayList<String> arr_fname = new ArrayList<String>();
+	ArrayList<String> arr_age = new ArrayList<String>();
+	ArrayList<String> arr_uname = new ArrayList<String>();
+	ArrayList<String> arr_gender = new ArrayList<String>();
+	ArrayList<String> arr_looking_type = new ArrayList<String>();
+	ArrayList<String> arr_date_seen = new ArrayList<String>();
+	ArrayList<String> arr_about = new ArrayList<String>();
+	ArrayList<String> arr_email = new ArrayList<String>();
+	ArrayList<String> arr_status = new ArrayList<String>();
 
-	ArrayList < Users > us = new ArrayList < Users > ();
+	ArrayList<Users> us = new ArrayList<Users>();
 	ArrayList<Users> list = new ArrayList<Users>();
-	
+
 	SwipeRefreshLayout mSwipeRefreshLayout;
 
 	boolean gps_enabled = false;
@@ -113,16 +112,16 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	float ins_latitude = 0;
 	float ins_longitude = 0;
 	String existingUsers;
-	
+
 	DateUtils du;
-	private AsyncTask < String, String, String > mTask;
+	private AsyncTask<String, String, String> mTask;
 
 	JSONParser jsonParser = new JSONParser();
 
 	private static final String TAG_SUCCESS = "success";
 
 	JSONParser jParser = new JSONParser();
-	ArrayList < HashMap < String, String >> userList;
+	ArrayList<HashMap<String, String>> userList;
 	JSONArray nearby_users = null;
 
 	// JSON Node names
@@ -146,212 +145,202 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	private static final String TAG_GEO_STATUS = "status";
 
 	private static final String TAG_GEO_EMAIL = "email_address";
-	
+
 	public static boolean isRunning = false;
 	private int dst;
 	private int oldDst;
-	
-//	@Override
-//	public void onBackPressed() {
-//		
-//		//super.onBackPressed();
-//		SessionManager session = new SessionManager(getApplicationContext());
-//		if(session.isLoggedIn()){
-//			UserProfileActivity.promptYesNoDialog("Quit Toucan?",
-//					"Are you sure you want to log off?",
-//   					this,
-//   					"DEAC",
-//   					true);
-//		}
-//	}
+
+	// @Override
+	// public void onBackPressed() {
+	//
+	// //super.onBackPressed();
+	// SessionManager session = new SessionManager(getApplicationContext());
+	// if(session.isLoggedIn()){
+	// UserProfileActivity.promptYesNoDialog("Quit Toucan?",
+	// "Are you sure you want to log off?",
+	// this,
+	// "DEAC",
+	// true);
+	// }
+	// }
 
 	@Override
-	  public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.toolbar, menu);
-	    return true;
-	  } 
-	
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.toolbar, menu);
+		return true;
+	}
+
 	Dialog dialogPref;
 	RangeBar rbDistance;
 	EditText rbDistance1;
 	String distTick = "";
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
-	        
-	        case R.id.action_distance:
-	        	dialogPref = new Dialog(AroundMeActivity.this);
-				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialogPref.setContentView(R.layout.activity_profile_distance_settings);
+		switch (item.getItemId()) {
 
-				rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
-				rbDistance.setRangeBarEnabled(false);
-					dst = 100;
-	        		try{
-	        			dst = Integer.parseInt(db.getBroadcastDist());
-	        		}
-	        		catch (Exception e){
-	        			dst = 100;
-	        		}
-	                rbDistance.setSeekPinByValue(dst);
+		case R.id.action_distance:
+			dialogPref = new Dialog(AroundMeActivity.this);
+			dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			dialogPref.setContentView(R.layout.activity_profile_distance_settings);
 
-				rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
-				rbDistance.setConnectingLineColor(getResources().getColor(R.color.EDWARD));
-				rbDistance.setSelectorColor(getResources().getColor(R.color.EDWARD));
-				rbDistance.setPinRadius(30f);
-				rbDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
-					@Override
-					public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
-							String leftPinValue, String rightPinValue) {
-						distTick = rightPinValue;
+			rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
+			rbDistance.setRangeBarEnabled(false);
+			dst = 100;
+			try {
+				dst = Integer.parseInt(db.getBroadcastDist());
+			} catch (Exception e) {
+				dst = 100;
+			}
+			rbDistance.setSeekPinByValue(dst);
+
+			rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
+			rbDistance.setConnectingLineColor(getResources().getColor(R.color.EDWARD));
+			rbDistance.setSelectorColor(getResources().getColor(R.color.EDWARD));
+			rbDistance.setPinRadius(30f);
+			rbDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+				@Override
+				public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
+						String leftPinValue, String rightPinValue) {
+					distTick = rightPinValue;
+				}
+			});
+
+			Button dialogButton = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
+			dialogButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+
+					db.updateBroadcastDist(distTick);
+					dst = Integer.parseInt(distTick);
+					tryGridToUpdate();
+					dialogPref.dismiss();
+				}
+			});
+			WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+			lp.copyFrom(dialogPref.getWindow().getAttributes());
+			lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+			lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+			dialogPref.show();
+			dialogPref.getWindow().setAttributes(lp);
+			return true;
+
+		case R.id.action_distance_test:
+			dialogPref = new Dialog(AroundMeActivity.this);
+			dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			dialogPref.setContentView(R.layout.android_profile_distance_tester);
+
+			rbDistance1 = (EditText) dialogPref.findViewById(R.id.rbDistance);
+			dst = 100;
+			try {
+				dst = Integer.parseInt(db.getBroadcastDist());
+			} catch (Exception e) {
+				dst = 100;
+			}
+
+			Button dialogButton1 = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
+			dialogButton1.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+
+					try {
+						dst = Integer.parseInt(rbDistance1.getText().toString());
+					} catch (Exception e) {
+						dst = 100;
 					}
-				});
+					Log.e("dst", dst + " c");
+					db.updateBroadcastDist(distTick);
+					tryGridToUpdate();
+					dialogPref.dismiss();
+				}
+			});
 
-				Button dialogButton = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
-				dialogButton.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
+			WindowManager.LayoutParams lp1 = new WindowManager.LayoutParams();
+			lp1.copyFrom(dialogPref.getWindow().getAttributes());
+			lp1.width = WindowManager.LayoutParams.MATCH_PARENT;
+			lp1.height = WindowManager.LayoutParams.WRAP_CONTENT;
+			dialogPref.show();
+			dialogPref.getWindow().setAttributes(lp1);
+			return true;
 
-						db.updateBroadcastDist(distTick);
-						dst = Integer.parseInt(distTick);
-						tryGridToUpdate();
-						dialogPref.dismiss();
-					}
-				});
-				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-				lp.copyFrom(dialogPref.getWindow().getAttributes());
-				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-				dialogPref.show();
-				dialogPref.getWindow().setAttributes(lp);
-	            return true;
+		default:
+			// If we got here, the user's action was not recognized.
+			// Invoke the superclass to handle it.
+			return super.onOptionsItemSelected(item);
 
-	        case R.id.action_distance_test:
-	        	dialogPref = new Dialog(AroundMeActivity.this);
-				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialogPref.setContentView(R.layout.android_profile_distance_tester);
-
-				rbDistance1 = (EditText) dialogPref.findViewById(R.id.rbDistance);
-					dst = 100;
-	        		try{
-	        			dst = Integer.parseInt(db.getBroadcastDist());
-	        		}
-	        		catch (Exception e){
-	        			dst = 100;
-	        		}
-	               
-				Button dialogButton1 = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
-				dialogButton1.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-
-					
-						
-						try{
-							dst = Integer.parseInt(rbDistance1.getText().toString());
-						}
-						catch(Exception e){
-							dst = 100;
-						}
-						Log.e("dst", dst+ " c");
-						db.updateBroadcastDist(distTick);
-						tryGridToUpdate();
-						dialogPref.dismiss();
-					}
-				});
-				
-				WindowManager.LayoutParams lp1 = new WindowManager.LayoutParams();
-				lp1.copyFrom(dialogPref.getWindow().getAttributes());
-				lp1.width = WindowManager.LayoutParams.MATCH_PARENT;
-				lp1.height = WindowManager.LayoutParams.WRAP_CONTENT;
-				dialogPref.show();
-				dialogPref.getWindow().setAttributes(lp1);
-	            return true;
-	            
-	        default:
-	            // If we got here, the user's action was not recognized.
-	            // Invoke the superclass to handle it.
-	            return super.onOptionsItemSelected(item);
-
-	    }
+		}
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_around_me);
 
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-	    setSupportActionBar(myToolbar);
-	    myToolbar.setLogo(R.drawable.icon_nexpa);
-	    myToolbar.setTitle("");
-	 	oldDst = 0;
-		
+		setSupportActionBar(myToolbar);
+		myToolbar.setLogo(R.drawable.icon_nexpa);
+		myToolbar.setTitle("");
+		oldDst = 0;
+
 		du = new DateUtils();
 		db = new SQLiteHandler(this);
 		db.openToWrite();
-		userList = new ArrayList < HashMap < String, String >> ();
+		userList = new ArrayList<HashMap<String, String>>();
 
 		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
-		mSwipeRefreshLayout.setColorSchemeResources(
-		R.color.niagara,
-		R.color.buttercup,
-		R.color.niagara
-		);
+		mSwipeRefreshLayout.setColorSchemeResources(R.color.niagara, R.color.buttercup, R.color.niagara);
 		mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.carrara));
 		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-			
+
 			@Override
 			public void onRefresh() {
 
-				new Handler().postDelayed(new Runnable() {@Override
-					public void run() {	
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
 						getNewLoc();
 					}
 				}, 2000);
 			}
 		});
 
-		//web.add(0, "You");
-		//distance.add(0, 0);
-		//imageId.add(0, R.drawable.pic_sample_girl);
-		//availabilty.add(0, "Online");
-		adapter = new CustomGrid(AroundMeActivity.this, web, arr_correspondents/*imageId*/, availabilty, distance);
-		 mHandler = new Handler()
-			{
-			    public void handleMessage(android.os.Message msg)
-			    {			    
-			    	
-			    	if (msg.what == 1){
-			    		mSwipeRefreshLayout.setRefreshing(false);
-			    		makeNotify("Failed To Retrieve GPS Location", AppMsg.STYLE_ALERT);
-				    }
-			    	else{
-			    		Log.e("UU","CANNOT");
-			    	}
-			 	}
-			};
-			
-			grid = (GridView) findViewById(R.id.grid);
+		// web.add(0, "You");
+		// distance.add(0, 0);
+		// imageId.add(0, R.drawable.pic_sample_girl);
+		// availabilty.add(0, "Online");
+		adapter = new CustomGrid(AroundMeActivity.this, web, arr_correspondents/* imageId */, availabilty, distance);
+		mHandler = new Handler() {
+			public void handleMessage(android.os.Message msg) {
+
+				if (msg.what == 1) {
+					mSwipeRefreshLayout.setRefreshing(false);
+					makeNotify("Failed To Retrieve GPS Location", AppMsg.STYLE_ALERT);
+				} else {
+					Log.e("UU", "CANNOT");
+				}
+			}
+		};
+
+		grid = (GridView) findViewById(R.id.grid);
 
 		grid.setAdapter(adapter);
 		grid.setBackgroundColor(Color.WHITE);
 		grid.setVerticalSpacing(1);
 		grid.setHorizontalSpacing(1);
-		
+
 		grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView <? > parent, View view,
-			int position, long id) {
-				ArrayList < Users > us = new ArrayList < Users > ();
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				ArrayList<Users> us = new ArrayList<Users>();
 				try {
-					//  Toast.makeText(AroundMeActivity.this, "You Clicked at " +arr_fname.get(position) , Toast.LENGTH_SHORT).show();
+					// Toast.makeText(AroundMeActivity.this, "You Clicked at "
+					// +arr_fname.get(position) , Toast.LENGTH_SHORT).show();
 					Intent intent = new Intent(AroundMeActivity.this, PeopleProfileActivity.class);
 					Log.e("ccc", arr_about.get(position));
-					//intent.putExtra("TAG_GEO_PID", us.get(position).getId());
-					
+					// intent.putExtra("TAG_GEO_PID", us.get(position).getId());
+
 					intent.putExtra("TAG_GEO_USER_ID", arr_correspondents.get(position).getId());
 					intent.putExtra("TAG_GEO_USER", arr_uname.get(position));
 					intent.putExtra("TAG_GEO_EMAIL", arr_email.get(position));
@@ -362,187 +351,179 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 					intent.putExtra("TAG_GEO_ABOUTME", arr_about.get(position));
 					intent.putExtra("TAG_GEO_LOOKING_TYPE", arr_looking_type.get(position));
 					intent.putExtra("TAG_GEO_STATUS", arr_status.get(position));
-					
+
 					startActivity(intent);
-				} catch (Exception e) {}
+				} catch (Exception e) {
+				}
 				// finish();
 			}
 		});
 
 		updateGrid("0");
-		
-		
+
 	}
 
-	
-	private void getNewLoc(){
+	private void getNewLoc() {
 		String dtUpdate = db.getLocationDateUpdate();
-    	if ((dtUpdate == "")||(du.hoursAgo(dtUpdate))){
-    		Log.e("LOCATION INTELLIGENCE","Update needed...");
-    		LocationResult locationResult = new LocationResult(){
-			    @Override
-			    public void gotLocation(Location location){
-			    	if (location != null){
-			    		ftLatitude = (float) location.getLatitude();
-					    ftLongitude =   (float) location.getLongitude();
-					    latitude = ftLatitude;
-					    longitude = ftLongitude;
-					    db.insertLocation(longitude, latitude);
-					    SendLocToServer();
-					    
-			    	}
-			    	else{
-			    		//Looper.prepare();
-			    		
-			    		try{
-			    			
-			    			mHandler.sendEmptyMessage(1);
-			    		}
-			    		catch(Exception e){
-			    			Log.e("FAIL","FAILED A:LL");
-			    		}
-			    	//	makeNotify("Failed To Retrieve GPS Location", AppMsg.STYLE_INFO);
-				//		mSwipeRefreshLayout.setRefreshing(false);
-			    	}
-			    }
-			};
-			
-		PackageManager packMan = getPackageManager();
-		hasGps = packMan.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
+		if ((dtUpdate == "") || (du.hoursAgo(dtUpdate))) {
+			Log.e("LOCATION INTELLIGENCE", "Update needed...");
+			LocationResult locationResult = new LocationResult() {
+				@Override
+				public void gotLocation(Location location) {
+					if (location != null) {
+						ftLatitude = (float) location.getLatitude();
+						ftLongitude = (float) location.getLongitude();
+						latitude = ftLatitude;
+						longitude = ftLongitude;
+						db.insertLocation(longitude, latitude);
+						SendLocToServer();
 
-		MyLocation myLocation = new MyLocation();
-		boolean availLoc = myLocation.getLocation(this, locationResult);
-		if (availLoc == false){
-			makeNotify("GPS Services Unavailable", AppMsg.STYLE_ALERT);
-			mSwipeRefreshLayout.setRefreshing(false);
+					} else {
+						// Looper.prepare();
+
+						try {
+
+							mHandler.sendEmptyMessage(1);
+						} catch (Exception e) {
+							Log.e("FAIL", "FAILED A:LL");
+						}
+						// makeNotify("Failed To Retrieve GPS Location",
+						// AppMsg.STYLE_INFO);
+						// mSwipeRefreshLayout.setRefreshing(false);
+					}
+				}
+			};
+
+			PackageManager packMan = getPackageManager();
+			hasGps = packMan.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
+
+			MyLocation myLocation = new MyLocation();
+			boolean availLoc = myLocation.getLocation(this, locationResult);
+			if (availLoc == false) {
+				makeNotify("GPS Services Unavailable", AppMsg.STYLE_ALERT);
+				mSwipeRefreshLayout.setRefreshing(false);
+			}
+		} else {
+			Log.e("LOCATION INTELLIGENCE", "Getting db location...");
+			ftLatitude = Float.parseFloat(db.getLocationLatitude());
+			ftLongitude = Float.parseFloat(db.getLocationLongitude());
+			latitude = ftLatitude;
+			longitude = ftLongitude;
+			SendLocToServer();
 		}
-    	}
-    	else{
-    		Log.e("LOCATION INTELLIGENCE","Getting db location...");
-    		ftLatitude = Float.parseFloat(db.getLocationLatitude());
-		    ftLongitude =   Float.parseFloat(db.getLocationLongitude());
-		    latitude = ftLatitude;
-		    longitude = ftLongitude;
-		    SendLocToServer();
-    	}
 	}
-	
+
 	private void updateGrid(String sentType) {
 		us = null;
-		us = new ArrayList < Users > ();
-		list = new ArrayList < Users > ();
+		us = new ArrayList<Users>();
+		list = new ArrayList<Users>();
 		int dst = 100;
-		
+
 		try {
 			dst = Integer.parseInt(db.getBroadcastDist());
 		} catch (Exception e) {
 			dst = 100;
 		}
-		
+
 		grid.invalidateViews();
 		list = db.getNearByUserDetails();
-		
+
 		imageId.clear();
 		availabilty.clear();
 		web.clear();
 		distance.clear();
-		
-		Comparator < Users > comparator = new Comparator < Users > () {@Override
+
+		Comparator<Users> comparator = new Comparator<Users>() {
+			@Override
 			public int compare(Users lhs, Users rhs) {
 				return lhs.getDistance() - rhs.getDistance();
 			}
 		};
 		Collections.sort(list, comparator);
-		
+
 		us = list;
-		
+
 		Animation in = AnimationUtils.loadAnimation(this, R.anim.anim_fade_in_r);
 		Animation out = AnimationUtils.loadAnimation(this, R.anim.anim_fade_out_r);
-		
+
 		int userSize = us.size();
 		int disSize = distance.size();
-		
-		/*try {
-			if (userSize < disSize) {
-				for (int i = disSize; i > userSize; i--) {
-					adapter.removeItem(i - 1);
-				}
-			}
-			if (sentType.equals("1")) {
-				if (userSize > disSize) {
-					for (int i = disSize; i < userSize; i++) {
-						imageId.add(i - 1, R.drawable.pic_sample_girl);
-						availabilty.add(i - 1, "");
-						web.add(i - 1, "");
-						distance.add(i - 1, 9999);
-					}
-				}
-			}
-		} catch (Exception e) {}
-		*/
-		
+
+		/*
+		 * try { if (userSize < disSize) { for (int i = disSize; i > userSize;
+		 * i--) { adapter.removeItem(i - 1); } } if (sentType.equals("1")) { if
+		 * (userSize > disSize) { for (int i = disSize; i < userSize; i++) {
+		 * imageId.add(i - 1, R.drawable.pic_sample_girl); availabilty.add(i -
+		 * 1, ""); web.add(i - 1, ""); distance.add(i - 1, 9999); } } } } catch
+		 * (Exception e) {}
+		 */
+
 		for (int j = 0; j < us.size(); j++) {
-			//L.debug("userID: "+us.get(j).getUserId()+", username: "+us.get(j).getUserName());
-			
+			// L.debug("userID: "+us.get(j).getUserId()+", username:
+			// "+us.get(j).getUserName());
+
 			final Correspondent correspondent = new Correspondent();
-		
-	    	correspondent.addListener(this);
-	   		correspondent.setId(Long.parseLong(Integer.toString(us.get(j).getUserId())));
-			
-	   	
-			arr_correspondents.add(j,correspondent);
-			
+
+			correspondent.addListener(this);
+			correspondent.setId(Long.parseLong(Integer.toString(us.get(j).getUserId())));
+
+			arr_correspondents.add(j, correspondent);
+
 			new Thread(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					correspondent.downloadProfilePicOnline(AroundMeActivity.this);
-					
+
 				}
 			}).start();
-			
-			if (sentType.equals("1")) {//user is already added
-				//if (us.get(j).getShown().equals("0")) {
-					imageId.add(j, R.drawable.pic_sample_girl);
-					availabilty.add(j, "INSERTED");
-					web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
-					
-					distance.add(j, us.get(j).getDistance());
-					arr_uname.add(j, us.get(j).getUserName());
-					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
-					arr_age.add(j, us.get(j).getAge());
-					arr_gender.add(j, us.get(j).getGender());
-					arr_looking_type.add(j, us.get(j).getLookingType());
-					arr_about.add(j, us.get(j).getAboutMe());
-					arr_email.add(j, us.get(j).getEmail());
-					arr_status.add(j, us.get(j).getStatus());
-					//}
-					
-				//} 
-				//else
-				/*else if (us.get(j).getShown().equals("1")) 
-				{
-					us.get(j).setShown("1");
-					availabilty.set(j, "UPDATED");
-					web.set(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
-					arr_user_id.add(j,Long.parseLong(Integer.toString(us.get(j).getUserId())));
-					distance.set(j, us.get(j).getDistance());
-					arr_uname.add(j, us.get(j).getUserName());
-					arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
-					arr_age.add(j, us.get(j).getAge());
-					arr_gender.add(j, us.get(j).getGender());
-					arr_looking_type.add(j, us.get(j).getLookingType());
-					arr_about.add(j, us.get(j).getAboutMe());
-					arr_email.add(j, us.get(j).getEmail());
-					arr_status.add(j, us.get(j).getStatus());
-				}*/
+
+			if (sentType.equals("1")) {// user is already added
+				// if (us.get(j).getShown().equals("0")) {
+				imageId.add(j, R.drawable.pic_sample_girl);
+				availabilty.add(j, "INSERTED");
+				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", "
+						+ displayAge(us.get(j).getAge()));
+
+				distance.add(j, us.get(j).getDistance());
+				arr_uname.add(j, us.get(j).getUserName());
+				arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
+				arr_age.add(j, us.get(j).getAge());
+				arr_gender.add(j, us.get(j).getGender());
+				arr_looking_type.add(j, us.get(j).getLookingType());
+				arr_about.add(j, us.get(j).getAboutMe());
+				arr_email.add(j, us.get(j).getEmail());
+				arr_status.add(j, us.get(j).getStatus());
+				// }
+
+				// }
+				// else
+				/*
+				 * else if (us.get(j).getShown().equals("1")) {
+				 * us.get(j).setShown("1"); availabilty.set(j, "UPDATED");
+				 * web.set(j, displayGridCellName(us.get(j).getFName(),
+				 * us.get(j).getUserName()) + ", " +
+				 * displayAge(us.get(j).getAge()));
+				 * arr_user_id.add(j,Long.parseLong(Integer.toString(us.get(j).
+				 * getUserId()))); distance.set(j, us.get(j).getDistance());
+				 * arr_uname.add(j, us.get(j).getUserName()); arr_fname.add(j,
+				 * displayGridCellName(us.get(j).getFName(),
+				 * us.get(j).getUserName())); arr_age.add(j,
+				 * us.get(j).getAge()); arr_gender.add(j,
+				 * us.get(j).getGender()); arr_looking_type.add(j,
+				 * us.get(j).getLookingType()); arr_about.add(j,
+				 * us.get(j).getAboutMe()); arr_email.add(j,
+				 * us.get(j).getEmail()); arr_status.add(j,
+				 * us.get(j).getStatus()); }
+				 */
 			} else if (sentType.equals("0")) {//
 				imageId.add(j, R.drawable.pic_sample_girl);
 				availabilty.add(j, "ADDED");
-				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", " + displayAge(us.get(j).getAge()));
+				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", "
+						+ displayAge(us.get(j).getAge()));
 				distance.add(j, us.get(j).getDistance());
-				//arr_correspondents.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
-				
+				// arr_correspondents.add(Long.parseLong(Integer.toString(us.get(j).getUserId())));
+
 				arr_uname.add(j, us.get(j).getUserName());
 				arr_fname.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()));
 				arr_age.add(j, us.get(j).getAge());
@@ -558,7 +539,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	}
 
 	private String displayGridCellName(String fname, String user) {
-		
+
 		if (fname.equals("")) {
 			return user;
 		} else {
@@ -576,8 +557,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 
 	private void SendLocToServer() {
 		String tag_string_req = "getgeo";
-		StringRequest strReq = new StringRequest(Method.POST,
-		AppConfig.URL_GETGEO, new Response.Listener < String > () {
+		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_GETGEO, new Response.Listener<String>() {
 
 			@Override
 			public void onResponse(String response) {
@@ -599,7 +579,6 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 						Log.e("JSON", "Error occurred in registration");
 						String errorMsg = jObj.getString("error_msg");
 
-
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -611,14 +590,16 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 			public void onErrorResponse(VolleyError error) {
 				Log.e(TAG, "Error: " + error.getMessage());
 				makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
-				// Toast.makeText(getApplicationContext(),error.getMessage(), Toast.LENGTH_LONG).show();
+				// Toast.makeText(getApplicationContext(),error.getMessage(),
+				// Toast.LENGTH_LONG).show();
 				mSwipeRefreshLayout.setRefreshing(false);
-				//hideDialog();
+				// hideDialog();
 			}
-		}) {@Override
-			protected Map < String, String > getParams() {
+		}) {
+			@Override
+			protected Map<String, String> getParams() {
 				// Posting params to register url
-				Map < String, String > params = new HashMap < String, String > ();
+				Map<String, String> params = new HashMap<String, String>();
 
 				ins_user = db.getLoggedInID();
 				ins_latitude = latitude;
@@ -634,9 +615,8 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 				params.put("p_latitude", ins_latitude + "");
 				params.put("p_gps_provider", ins_g_provider);
 				params.put("p_date_update", curDate);
-				//   params.put("$user_id", longitude +"");
+				// params.put("$user_id", longitude +"");
 				// params.put("latitude", latitude +"");
-
 
 				return params;
 			}
@@ -645,7 +625,6 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
 	}
 
-
 	private void makeNotify(CharSequence con, Style style) {
 		AppMsg.makeText(this, con, style).show();
 	}
@@ -653,8 +632,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 	private void GetNearbyUsers() {
 		// Tag used to cancel the request
 		String tag_string_req = "collect";
-		StringRequest strReq = new StringRequest(Method.POST,
-		AppConfig.URL_NEARBY, new Response.Listener < String > () {
+		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_NEARBY, new Response.Listener<String>() {
 
 			@Override
 			public void onResponse(String response) {
@@ -670,15 +648,12 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 
 						nearby_users = jObj.getJSONArray("geo");
 
-
 						existingUsers = db.getExistingOnDBUsers();
 
-
-						//JSONObject json = new JSONObject(jsonString);
-						//JSONArray jArray = jObj.getJSONArray("geo");
+						// JSONObject json = new JSONObject(jsonString);
+						// JSONArray jArray = jObj.getJSONArray("geo");
 
 						Log.e("LOG", "*****JARRAY*****" + nearby_users.length());
-
 
 						///////////////////////
 						if (nearby_users.length() == 0) {
@@ -686,30 +661,48 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 						} else {
 							for (int i = 0; i < nearby_users.length(); i++) {
 								JSONObject c = nearby_users.getJSONObject(i);
-								
-								//Not sure what will be the effect,
-								//if I remove the other variables,
-								//so I will just initialized it with  default value 
-								//-ldonios
-								
+
+								// Not sure what will be the effect,
+								// if I remove the other variables,
+								// so I will just initialized it with default
+								// value
+								// -ldonios
+
 								// Storing each json item in variable
 								String id = c.getString(TAG_GEO_PID);
-								
-								
-								String lname = ""/*c.getString(TAG_GEO_LNAME)*/;
 
-								String status = ""/*c.getString(TAG_GEO_STATUS)*/;
-								String about_me = ""/*c.getString(TAG_GEO_ABOUTME)*/;
-								String looking_type = ""/*c.getString(TAG_GEO_LOOKING_TYPE)*/;
-								String email_address = ""/*c.getString(TAG_GEO_EMAIL)*/;
-								
-								Date bday = new Date()/*du.convertStringToDateToLocal(c.getString(TAG_GEO_BIRTHDAY))*/;
-								String age = ""/*du.getAge(bday)*/;
+								String lname = ""/*
+													 * c.getString(TAG_GEO_LNAME)
+													 */;
+
+								String status = ""/*
+													 * c.getString(TAG_GEO_STATUS)
+													 */;
+								String about_me = ""/*
+													 * c.getString(
+													 * TAG_GEO_ABOUTME)
+													 */;
+								String looking_type = ""/*
+														 * c.getString(
+														 * TAG_GEO_LOOKING_TYPE)
+														 */;
+								String email_address = ""/*
+															 * c.getString(
+															 * TAG_GEO_EMAIL)
+															 */;
+
+								Date bday = new Date()/*
+														 * du.
+														 * convertStringToDateToLocal
+														 * (c.getString(
+														 * TAG_GEO_BIRTHDAY))
+														 */;
+								String age = ""/* du.getAge(bday) */;
 								int distance = Math.round(Float.parseFloat(c.getString(TAG_GEO_DISTANCE)));
-								String sex = ""/*c.getString(TAG_GEO_GENDER)*/;
-								
-								//user profile
-								String userId 		= c.getString("user_id");
+								String sex = ""/* c.getString(TAG_GEO_GENDER) */;
+
+								// user profile
+								String userId = c.getString("user_id");
 								String uname = c.getString(TAG_GEO_USER);
 								String fname = uname;
 								String description = c.getString("description");
@@ -718,42 +711,52 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 								String url1 = c.getString("url1");
 								String url2 = c.getString("url2");
 								String dateUpdated = c.getString("date_updated");
-								
-								//save profile of specific users
-								UserProfile userProfile = new UserProfile(
-										Long.parseLong(userId), uname, 
-										description, title, 
-										url0, url1, url2, 
-										dateUpdated);
-								
+
+								// save profile of specific users
+								UserProfile userProfile = new UserProfile(Long.parseLong(userId), uname, description,
+										title, url0, url1, url2, dateUpdated);
+
 								userProfile.updateOffline(AroundMeActivity.this);
-								
-								//replace geo id with userid
+
+								// replace geo id with userid
 								id = userId;
-								//profile pic info
-								String imgDir 		= c.getString("img_dir");
-								String imgFile 		= c.getString("img_file");
-								String dateCreated 	= c.getString("date_uploaded");
-								
-								//L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir.equalsIgnoreCase("null")+", imgFile "+imgFile);
-								if((imgDir!=null && !imgDir.isEmpty() && !imgDir.equalsIgnoreCase("null")) && (imgFile!=null && !imgFile.isEmpty() && !imgFile.equalsIgnoreCase("null"))){
-									L.debug("getting profile picture of userId: "+userId+", imgDir "+imgDir+", imgFile "+imgFile);
-									ProfilePicture profilePic = new ProfilePicture(Long.parseLong(userId), imgDir, imgFile, dateCreated);
+								// profile pic info
+								String imgDir = c.getString("img_dir");
+								String imgFile = c.getString("img_file");
+								String dateCreated = c.getString("date_uploaded");
+
+								// L.debug("getting profile picture of userId:
+								// "+userId+", imgDir
+								// "+imgDir.equalsIgnoreCase("null")+", imgFile
+								// "+imgFile);
+								if ((imgDir != null && !imgDir.isEmpty() && !imgDir.equalsIgnoreCase("null"))
+										&& (imgFile != null && !imgFile.isEmpty()
+												&& !imgFile.equalsIgnoreCase("null"))) {
+									L.debug("getting profile picture of userId: " + userId + ", imgDir " + imgDir
+											+ ", imgFile " + imgFile);
+									ProfilePicture profilePic = new ProfilePicture(Long.parseLong(userId), imgDir,
+											imgFile, dateCreated);
 									profilePic.saveOffline(AroundMeActivity.this);
 								}
-								
-								boolean containerContainsContent = org.apache.commons.lang.StringUtils.containsIgnoreCase(existingUsers, "." + id + ".");
+
+								boolean containerContainsContent = org.apache.commons.lang.StringUtils
+										.containsIgnoreCase(existingUsers, "." + id + ".");
 								if (containerContainsContent == true) {
-									if (distance <= dst){
-										db.updateUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 1, about_me, looking_type, status, email_address,"1");
-									}
-									else{
-										db.updateUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,"0");
+									if (distance <= dst) {
+										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
+												"2012-12-12 09:09:09", 1, about_me, looking_type, status, email_address,
+												"1");
+									} else {
+										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
+												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
+												"0");
 									}
 								} else {
-									if (distance <= dst){
-										
-									db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "", "2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,"1");
+									if (distance <= dst) {
+
+										db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "",
+												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
+												"1");
 									}
 								}
 
@@ -764,7 +767,7 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 							}
 						}
 					} else {
-						 makeNotify("Error occurred while collecting users", AppMsg.STYLE_ALERT);
+						makeNotify("Error occurred while collecting users", AppMsg.STYLE_ALERT);
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -775,30 +778,27 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				Log.e(TAG, "Error: " + error.getMessage());
-				Toast.makeText(getApplicationContext(),
-				error.getMessage(), Toast.LENGTH_LONG).show();
-				//hideDialog();
+				Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+				// hideDialog();
 				mSwipeRefreshLayout.setRefreshing(false);
 			}
-		}) {@Override
-			protected Map < String, String > getParams() {
+		}) {
+			@Override
+			protected Map<String, String> getParams() {
 				// Posting params to register url
-				Map < String, String > params = new HashMap < String, String > ();
+				Map<String, String> params = new HashMap<String, String>();
 
 				ins_latitude = latitude;
 				ins_longitude = longitude;
 
-				
-				
-				
 				params.put("tag", "collect");
 				params.put("pid", ins_user);
 				params.put("longitude", ins_longitude + "");
 				params.put("latitude", +ins_latitude + "");
 
-				// Log.e("MAP", ins_user + " + "+ins_longitude+" : "+ins_latitude);
+				// Log.e("MAP", ins_user + " + "+ins_longitude+" :
+				// "+ins_latitude);
 				// params.put("latitude", latitude +"");
-
 
 				return params;
 			}
@@ -806,59 +806,59 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 		// Adding request to request queue
 		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
 	}
-	
+
 	@Override
 	public void onRefresh() {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
 	protected void onResume() {
-		
+
 		super.onResume();
 		isRunning = true;
-		
+
 		dst = 100;
-		try{
+		try {
 			dst = Integer.parseInt(db.getBroadcastDist());
-		}
-		catch (Exception e){
+		} catch (Exception e) {
 			dst = 100;
 		}
-		
-		if (oldDst != dst){
-			//force grid update when new distance detected
+
+		if (oldDst != dst) {
+			// force grid update when new distance detected
 			tryGridToUpdate();
 			oldDst = dst;
 		}
 		adapter.notifyDataSetChanged();
-		
+
 	}
-	
-	private void tryGridToUpdate(){
+
+	private void tryGridToUpdate() {
 		mSwipeRefreshLayout.post(new Runnable() {
-		    @Override
-		    public void run() {
-		        mSwipeRefreshLayout.setRefreshing(true);
-		    }
+			@Override
+			public void run() {
+				mSwipeRefreshLayout.setRefreshing(true);
+			}
 		});
-		new Handler().postDelayed(new Runnable() {@Override
-			public void run() {	
-			mSwipeRefreshLayout.setRefreshing(true);
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				mSwipeRefreshLayout.setRefreshing(true);
 				getNewLoc();
 			}
 		}, 2000);
 	}
+
 	protected void onPause() {
 		super.onPause();
-		//locationManager.removeUpdates(locationListener);
+		// locationManager.removeUpdates(locationListener);
 		isRunning = false;
 		Log.e("ON PAUSE", "APP PAUSE");
-		
-		
+
 	}
-	
+
 	@Override
 	public void onCorrespondentUpdate() {
 		this.runOnUiThread(new Runnable() {
@@ -866,7 +866,6 @@ public class AroundMeActivity  extends AppCompatActivity implements OnRefreshLis
 				adapter.notifyDataSetChanged();
 			}
 		});
-		
-		
+
 	}
 }

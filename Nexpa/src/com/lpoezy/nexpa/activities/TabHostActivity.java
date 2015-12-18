@@ -2,6 +2,7 @@ package com.lpoezy.nexpa.activities;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.ChatMessagesService;
 import com.lpoezy.nexpa.chatservice.OneComment;
+import com.lpoezy.nexpa.chatservice.SyncDataService;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -47,10 +48,13 @@ public class TabHostActivity extends TabActivity {
 		
 		super.onResume();
 		
-		//start chat service here,
+		//start chat service here and syncdata service,
 		//this will only be stop when the user deactivated/cancel their account
-		Intent service = new Intent(this, ChatMessagesService.class);
-		startService(service);
+		Intent msgService = new Intent(this, ChatMessagesService.class);
+		startService(msgService);
+		
+		Intent syncDataService = new Intent(this, SyncDataService.class);
+		startService(syncDataService);
 		
 		registerReceiver(mUpdateMsgCount, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
 		isRunning = true;

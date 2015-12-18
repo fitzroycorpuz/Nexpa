@@ -530,6 +530,19 @@ public class SQLiteHandler {
 
 		return count;
 	}
+	
+	public void markMessageAsSynced(long senderId, String date, String dateReceived) {
+		L.debug("SQLiteHandler, markMessageAsSynced");
+		ContentValues values = new ContentValues();
+		values.put(MSG_IS_SYNCED_ONLINE, "1");
+
+		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_DATE + " = ? AND "+ MSG_DATE_RECEIVED +" = ?",
+				new String[] { Long.toString(senderId), date , dateReceived});
+		if (rowCount > 0) {
+			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as synced");
+		}
+
+	}
 
 	public void markMessageAsReceived(long senderId, String date, String dateReceived) {
 		ContentValues values = new ContentValues();
@@ -539,13 +552,13 @@ public class SQLiteHandler {
 		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_DATE + " = ?",
 				new String[] { Long.toString(senderId), date });
 		if (rowCount > 0) {
-			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as read");
+			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as received");
 		}
 
 	}
 
 	public void markMessageAsRead(long senderId, String date) {
-
+		
 		ContentValues values = new ContentValues();
 		values.put(MSG_IS_UNREAD, "0");
 		values.put(MSG_IS_SYNCED_ONLINE, "0");
@@ -553,7 +566,7 @@ public class SQLiteHandler {
 		int rowCount = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_USER_ID + "= ? AND " + MSG_DATE + " = ?",
 				new String[] { Long.toString(senderId), date });
 		if (rowCount > 0) {
-			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as received");
+			L.debug("SQLiteHandler, marking  msg of sender id: " + senderId + " as read");
 		}
 
 	}
@@ -669,7 +682,7 @@ public class SQLiteHandler {
 		// if there is no latest message receive,
 		// just get the latest msg sent
 		if (map.size() == 0) {
-			map = downloadLatestMsgSentOffline(senderId, receiverId);
+			map = downloadLatestMsgSent(senderId, receiverId);
 
 			// compare the latest receved and sent message,
 			// then show the most recent message
@@ -682,7 +695,7 @@ public class SQLiteHandler {
 
 	private Map<String, String> compareWithLatestSentMsg(Map<String, String> receive, long senderId, long receiverId) {
 
-		Map<String, String> sent = downloadLatestMsgSentOffline(senderId, receiverId);
+		Map<String, String> sent = downloadLatestMsgSent(senderId, receiverId);
 		try {
 			long receivedDate = DateUtils.simpleDateToMillis(receive.get(MSG_DATE_RECEIVED));
 			
@@ -701,8 +714,35 @@ public class SQLiteHandler {
 
 		return sent;
 	}
+	
+	public List<OneComment> downloadMyUnsyncReadMsgs() {
+		
+		L.debug("SqliteHandler, downloadMyUnsyncMsgsOffline");
+		
+		String userId = getLoggedInID();
+		
+		String table = TABLE_MESSAGES;
+		String[] columns = new String[]{MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_DATE_RECEIVED, MSG_IS_UNREAD, MSG_IS_SYNCED_ONLINE};
+		String selection = "("+MSG_USER_ID + " = ? OR "+MSG_CORRESPONDENT_ID+" = ? ) AND "+ MSG_IS_UNREAD +" = ? AND "+ MSG_IS_SYNCED_ONLINE+" = ?";
+		String[] selectionArgs = new String[]{userId, userId, "0", "0"};
+		Cursor c = sqLiteDatabase.query(table, columns, selection, selectionArgs, null, null, null);
+		
+		if(c.moveToFirst()){
+			
+			List<OneComment> list = new ArrayList<OneComment>();
+			do{
+				//L.debug(">>> "+c.getInt(c.getColumnIndex(SQLiteHandler.MSG_IS_UNREAD)));
+				OneComment unsyncMsg = OneComment.getMsg(c);
+				list.add(unsyncMsg);
+			}while(c.moveToNext());
+			
+			return list;
+		}
+		
+		return null;
+	}
 
-	public Map<String, String> downloadLatestMsgSentOffline(long receiverId, long senderId) {
+	public Map<String, String> downloadLatestMsgSent(long receiverId, long senderId) {
 
 		L.debug("========================================");
 		L.debug("SqliteHandler, downloadLatestMsgSentOffline");
@@ -744,7 +784,7 @@ public class SQLiteHandler {
 		return map;
 	}
 
-	public Map<String, String> downloadLatestMsgReceivedOffline(long receiverId, long senderId) {
+	public Map<String, String> downloadLatestMsgReceived(long receiverId, long senderId) {
 		L.debug("========================================");
 		L.debug("SqliteHandler, downloadLatestMsgOffline");
 		L.debug("SQLiteHandler, getting last received msg of senderId : " + senderId);
@@ -949,9 +989,9 @@ public class SQLiteHandler {
 			boolean isUnread, String dateReceived, boolean isSyncedOnline) {
 		ContentValues values = new ContentValues();
 
-		L.debug("SqliteHandler, inserting new msg  into sqlite senderId: " + senderId + ", receiverId: " + receiverId
-				+ " left: " + left + ", msg: " + comment + ", success: " + success + ", isUnread: " + isUnread
-				+ ", date: " + date + "dateReceived " + dateReceived + ", isSyncedOnline " + isSyncedOnline);
+//		L.debug("SqliteHandler, inserting new msg  into sqlite senderId: " + senderId + ", receiverId: " + receiverId
+//				+ " left: " + left + ", msg: " + comment + ", success: " + success + ", isUnread: " + isUnread
+//				+ ", date: " + date + "dateReceived " + dateReceived + ", isSyncedOnline " + isSyncedOnline);
 		// String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "("
 		// + MSG_ID + " INTEGER PRIMARY KEY, "+ MSG_CORRESPONDENT_ID + "
 		// INTEGER, "+ MSG_LEFT + " TEXT, " + MSG_BODY + " TEXT," + MSG_SUCCESS
@@ -1668,6 +1708,8 @@ public class SQLiteHandler {
 		sqLiteDatabase.delete(TABLE_USER_PROFILE, null, null);
 		
 	}
+
+	
 
 
 }

@@ -447,77 +447,77 @@ public class SettingsActivity extends Activity {
 			}
 		});
 		
-		ln_sync = (LinearLayout) findViewById(R.id.ln_sync);
-		ln_sync.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				//check if there is network connection
-				if(!SystemUtilz.isNetworkAvailable(SettingsActivity.this)){
-					String msg = getResources().getString(R.string.msg_no_internet);
-					L.makeText(SettingsActivity.this, msg, AppMsg.STYLE_ALERT);
-					
-					return;
-				}
-				
-				pDialog = new ProgressDialog(SettingsActivity.this);
-				pDialog.setCancelable(false);
-				pDialog.setMessage("Syncing ...");
-				pDialog.show();
-				
-				new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						
-						SQLiteHandler db = new SQLiteHandler(SettingsActivity.this);
-						db.openToRead();
-						long userId = Long.parseLong(db.getLoggedInID());
-						
-						UserProfile userProfile = new UserProfile();
-						userProfile.setId(userId);
-						userProfile.downloadOffline(SettingsActivity.this);
-						
-						userProfile.saveOnline(SettingsActivity.this);
-						
-						
-						ProfilePicture pic = new ProfilePicture();
-						pic.setUserId(userId);
-						pic.downloadOffline(SettingsActivity.this);
-						pic.saveImgOnline(SettingsActivity.this);
-						
-						db.close();
-						
-						//check if there is any new msgs online
-						Correspondent.downloadAllMsgsOnline(SettingsActivity.this);
-						
-						
-						//get all received msgs offline
-						List<OneComment> msgs = OneComment.downloadReceivedMsgsOffline(getApplicationContext());
-						
-						for(OneComment msg: msgs){
-							L.debug("msg.isSyncedOnline "+msg.isSyncedOnline);
-							if(!msg.isSyncedOnline){
-								msg.markAsReceivedOnline();
-							}
-						}
-						
-						ln_sync.post(new Runnable() {
-							
-							@Override
-							public void run() {
-								pDialog.dismiss();
-								
-							}
-						});
-						
-					}
-				}).start();
-				
-				
-			}
-		});
+//		ln_sync = (LinearLayout) findViewById(R.id.ln_sync);
+//		ln_sync.setOnClickListener(new View.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				
+//				//check if there is network connection
+//				if(!SystemUtilz.isNetworkAvailable(SettingsActivity.this)){
+//					String msg = getResources().getString(R.string.msg_no_internet);
+//					L.makeText(SettingsActivity.this, msg, AppMsg.STYLE_ALERT);
+//					
+//					return;
+//				}
+//				
+//				pDialog = new ProgressDialog(SettingsActivity.this);
+//				pDialog.setCancelable(false);
+//				pDialog.setMessage("Syncing ...");
+//				pDialog.show();
+//				
+//				new Thread(new Runnable() {
+//					
+//					@Override
+//					public void run() {
+//						
+//						SQLiteHandler db = new SQLiteHandler(SettingsActivity.this);
+//						db.openToRead();
+//						long userId = Long.parseLong(db.getLoggedInID());
+//						
+//						UserProfile userProfile = new UserProfile();
+//						userProfile.setId(userId);
+//						userProfile.downloadOffline(SettingsActivity.this);
+//						
+//						userProfile.saveOnline(SettingsActivity.this);
+//						
+//						
+//						ProfilePicture pic = new ProfilePicture();
+//						pic.setUserId(userId);
+//						pic.downloadOffline(SettingsActivity.this);
+//						pic.saveImgOnline(SettingsActivity.this);
+//						
+//						db.close();
+//						
+//						//check if there is any new msgs online
+//						Correspondent.downloadAllMsgsOnline(SettingsActivity.this);
+//						
+//						
+//						//get all received msgs offline
+//						List<OneComment> msgs = OneComment.downloadReceivedMsgsOffline(getApplicationContext());
+//						
+//						for(OneComment msg: msgs){
+//							L.debug("msg.isSyncedOnline "+msg.isSyncedOnline);
+//							if(!msg.isSyncedOnline){
+//								msg.markMsgAsReceivedOnline();
+//							}
+//						}
+//						
+//						ln_sync.post(new Runnable() {
+//							
+//							@Override
+//							public void run() {
+//								pDialog.dismiss();
+//								
+//							}
+//						});
+//						
+//					}
+//				}).start();
+//				
+//				
+//			}
+//		});
 
 		ln_settings = (LinearLayout) findViewById(R.id.ln_settings);
 		ln_settings.setOnClickListener(new View.OnClickListener() {

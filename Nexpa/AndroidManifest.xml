@@ -101,6 +101,7 @@
         </receiver>
         <activity android:name=".activities.SettingsActivity"
              android:theme="@style/AppTheme"/>
+        <service android:name=".chatservice.SyncDataService"></service>
       
         
         

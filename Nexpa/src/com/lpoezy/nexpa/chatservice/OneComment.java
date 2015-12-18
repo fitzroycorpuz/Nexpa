@@ -21,6 +21,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lpoezy.nexpa.activities.ChatActivity;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent;
@@ -59,7 +63,18 @@ public class OneComment {
 		this.isUnread = isUnread;
 	}
 	
-	public OneComment(long senderId, long receiverId, boolean left, String comment, boolean success, String date, String dateReceived, boolean isUnread, boolean isSyncedOnline) {
+	@JsonCreator
+	public OneComment(
+			@JsonProperty("senderId")long senderId, 
+			@JsonProperty("receiverId")long receiverId, 
+			@JsonProperty("left")boolean left, 
+			@JsonProperty("comment")String comment, 
+			@JsonProperty("success")boolean success, 
+			@JsonProperty("date")String date, 
+			@JsonProperty("dateReceived")String dateReceived, 
+			@JsonProperty("isUnread")boolean isUnread, 
+			@JsonProperty("isSyncedOnline")boolean isSyncedOnline) {
+		
 		this.senderId = senderId;
 		this.receiverId = receiverId;
 		this.left = left;
@@ -128,8 +143,39 @@ public class OneComment {
 		db.close();
 
 	}
+	public static boolean markMsgsAsReadOnline(List<OneComment> list) throws JsonProcessingException {
+		L.debug("============================================");
+		L.debug("OneComment, markMsgsAsReadOnline");
+		ObjectMapper mapper = new ObjectMapper();
+		String msgs = mapper.writeValueAsString(list);
+		L.debug("msgs "+msgs);
+		
+		HashMap<String, String> postDataParams = new HashMap<String, String>();
+		postDataParams.put("tag", "mark_msgs_as_read");
+		postDataParams.put("msgs_to_update", msgs);
+		
+		final String spec = AppConfig.URL_MSG;
+		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+		L.debug("webPage: " + webPage);
+		
+		try {
+			JSONObject result = new JSONObject(webPage);
+			if (!result.getBoolean("error")) {
+				return true;
+			}
+
+		} catch (JSONException e) {
+			L.error("" + e);
+		}
+		L.debug("============================================");
+		return false;
+		
+	}
 	
-	public boolean markAsReceivedOnline() {
+	
+	
+	
+	public boolean markMsgAsReceivedOnline() {
 		
 
 		HashMap<String, String> postDataParams = new HashMap<String, String>();
@@ -191,6 +237,15 @@ public class OneComment {
 		return false;
 
 	}
+	
+	public void markAsSyncedOffline(Context context) {
+		
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToWrite();
+		db.markMessageAsSynced(senderId, date, dateReceived);
+		db.close();
+	}
+	
 	
 	public void markAsReceivedOffline(Context context) {
 		
@@ -400,11 +455,22 @@ public class OneComment {
 		return list;
 
 	}
+	
+	public static List<OneComment> downloadMyUnsyncReadMsgsOffline(Context context) {
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToRead();
+		
+		List<OneComment> list = db.downloadMyUnsyncReadMsgs();
+		db.close();
+		
+		return list;
+		
+	}
 
 	public static List<OneComment> downloadAllMessagesOffline(Context context, long correspondentId) {
 
 		SQLiteHandler db = new SQLiteHandler(context);
-		db.openToWrite();
+		db.openToRead();
 
 		List<OneComment> list = db.downloadMessages(correspondentId);
 		db.close();
@@ -441,7 +507,7 @@ public class OneComment {
 		String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
 		int isSyncedOnline 		= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
 		
-		L.error("msg: "+msg+", date "+date);
+		//L.error("msg: "+msg+", date "+date+", isSyncedOnline "+isSyncedOnline);
 		OneComment comment = new OneComment(Long.parseLong(senderId), 
 				Long.parseLong(receiverId), 
 				StringFormattingUtils.getBoolean(left), 
@@ -457,5 +523,4 @@ public class OneComment {
 	}
 
 	
-
 }
