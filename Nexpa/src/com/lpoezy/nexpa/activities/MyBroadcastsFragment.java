@@ -313,8 +313,9 @@ public class MyBroadcastsFragment extends Fragment {
             int targetH = mImgProfile.getHeight();
             
             BmpFactory  bmpFactory = new BmpFactory();
-        	rawImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
         	
+        	Bitmap newImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
+        	if(newImage!=null)rawImage = newImage;
         }
         
         L.debug("imgDecodableString "+imgDecodableString+", rawImage "+rawImage);

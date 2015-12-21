@@ -182,7 +182,7 @@ public class SQLiteHandler {
 			db.execSQL(CREATE_TABLE_CORRESPONDENTS);
 
 			String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID
-					+ " INTEGER PRIMARY KEY, " + IMG_USER_ID + " INTEGER, " + IMG_DIR + " TEXT, " + IMG_FILE + " TEXT,"
+					+ " INTEGER PRIMARY KEY, " + IMG_USER_ID + " INTEGER UNIQUE, " + IMG_DIR + " TEXT, " + IMG_FILE + " TEXT,"
 					+ IMG_DATE_UPLOADED + " TEXT, "+IMG_IS_SYNCED_ONLINE+" TEXT);";
 			db.execSQL(CREATE_TABLE_PROFILE_PICTURES);
 
@@ -561,13 +561,23 @@ public class SQLiteHandler {
 		values.put(IMG_IS_SYNCED_ONLINE, StringFormattingUtils.getBoolean(isSyncOnline));
 
 		L.debug("saving " + userId + ", " + imgDir + ", " + imgFile + ", " + dateUploaded+", "+isSyncOnline);
-		if (downloadProfilePicture(userId) == null) {
-			sqLiteDatabase.insert(TABLE_PROFILE_PICTURES, null, values);
-			L.debug(TAG + " new picture inserted into sqlite:" + imgFile);
-		} else {
-			sqLiteDatabase.update(TABLE_PROFILE_PICTURES, values, IMG_USER_ID + "=?",
-					new String[] { Long.toString(userId) });
-			L.debug(TAG + " picture updated into sqlite: " + imgFile);
+		
+//		if (downloadProfilePicture(userId) == null) {
+//			sqLiteDatabase.insert(TABLE_PROFILE_PICTURES, null, values);
+//			L.debug(TAG + " new picture inserted into sqlite:" + imgFile);
+//		} else {
+//			sqLiteDatabase.update(TABLE_PROFILE_PICTURES, values, IMG_USER_ID + "=?",
+//					new String[] { Long.toString(userId) });
+//			L.debug(TAG + " picture updated into sqlite: " + imgFile);
+//		}
+		
+		long id = sqLiteDatabase.insertWithOnConflict(TABLE_PROFILE_PICTURES, null, values, 
+	            SQLiteDatabase.CONFLICT_IGNORE);
+		
+		if(id == -1){
+			
+			sqLiteDatabase.update(TABLE_PROFILE_PICTURES, values, IMG_USER_ID + "=?", new String[] { Long.toString(userId) });
+			
 		}
 
 	}

@@ -335,7 +335,9 @@ public class EditProfileFragment extends DialogFragment {
 				int targetH = profilePic.getHeight();
 
 				BmpFactory bmpFactory = new BmpFactory();
-				rawImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
+				Bitmap newImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
+				if(newImage!=null)rawImage = newImage;
+				
 			}
 
 			profilePic.setImageBitmap(rawImage);

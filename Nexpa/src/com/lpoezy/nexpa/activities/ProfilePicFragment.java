@@ -67,6 +67,14 @@ public class ProfilePicFragment extends DialogFragment {
 
 		}
 	}
+	
+	@Override
+	public void onDestroy() {
+		
+		super.onDestroy();
+		
+		Utilz.saveToSharedPref(getActivity(), ProfilePicture.TEMP_LOC, "");
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
