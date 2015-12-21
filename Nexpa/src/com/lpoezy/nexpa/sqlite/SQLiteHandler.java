@@ -505,12 +505,34 @@ public class SQLiteHandler {
 		}
 
 	}
+	
+	public HashMap<String, String> downloadMyUnsyncedPicProfile() {
+		
+		Cursor c = sqLiteDatabase.query(TABLE_PROFILE_PICTURES,
+				new String[] { IMG_USER_ID, IMG_DIR, IMG_FILE, IMG_DATE_UPLOADED, IMG_IS_SYNCED_ONLINE}, 
+				IMG_USER_ID + "=? AND "+IMG_IS_SYNCED_ONLINE+" = ?",
+				new String[] { getLoggedInID(), "0"}, null, null, null);
+		
+		if (c.moveToFirst()) {
+
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put(IMG_USER_ID, c.getString(c.getColumnIndex(IMG_USER_ID)));
+			map.put(IMG_DIR, c.getString(c.getColumnIndex(IMG_DIR)));
+			map.put(IMG_FILE, c.getString(c.getColumnIndex(IMG_FILE)));
+			map.put(IMG_DATE_UPLOADED, c.getString(c.getColumnIndex(IMG_DATE_UPLOADED)));
+			map.put(IMG_IS_SYNCED_ONLINE, c.getString(c.getColumnIndex(IMG_IS_SYNCED_ONLINE)));
+			// L.debug("downloadProfilePicture, userId "+userId+",
+			// "+map.get(IMG_DIR)+", "+map.get(IMG_FILE));
+			return map;
+		}
+		return null;
+	}
 
 	// will always return the latest profile pic info
 	public HashMap<String, String> downloadProfilePicture(long userId) {
 
 		Cursor c = sqLiteDatabase.query(TABLE_PROFILE_PICTURES,
-				new String[] { IMG_USER_ID, IMG_DIR, IMG_FILE, IMG_DATE_UPLOADED }, IMG_USER_ID + "=?",
+				new String[] { IMG_USER_ID, IMG_DIR, IMG_FILE, IMG_DATE_UPLOADED, IMG_IS_SYNCED_ONLINE }, IMG_USER_ID + "=?",
 				new String[] { Long.toString(userId) }, null, null, IMG_DATE_UPLOADED + " DESC");
 
 		if (c.moveToFirst()) {
@@ -520,6 +542,7 @@ public class SQLiteHandler {
 			map.put(IMG_DIR, c.getString(c.getColumnIndex(IMG_DIR)));
 			map.put(IMG_FILE, c.getString(c.getColumnIndex(IMG_FILE)));
 			map.put(IMG_DATE_UPLOADED, c.getString(c.getColumnIndex(IMG_DATE_UPLOADED)));
+			map.put(IMG_IS_SYNCED_ONLINE, c.getString(c.getColumnIndex(IMG_IS_SYNCED_ONLINE)));
 			// L.debug("downloadProfilePicture, userId "+userId+",
 			// "+map.get(IMG_DIR)+", "+map.get(IMG_FILE));
 			return map;
@@ -528,15 +551,16 @@ public class SQLiteHandler {
 
 	}
 
-	public void saveProfilePicture(long userId, String imgDir, String imgFile, String dateUploaded) {
+	public void saveProfilePicture(long userId, String imgDir, String imgFile, String dateUploaded, boolean isSyncOnline) {
 
 		ContentValues values = new ContentValues();
 		values.put(IMG_USER_ID, userId);
 		values.put(IMG_DIR, imgDir);
 		values.put(IMG_FILE, imgFile);
 		values.put(IMG_DATE_UPLOADED, dateUploaded);
+		values.put(IMG_IS_SYNCED_ONLINE, StringFormattingUtils.getBoolean(isSyncOnline));
 
-		L.debug("saving " + userId + ", " + imgDir + ", " + imgFile + ", " + dateUploaded);
+		L.debug("saving " + userId + ", " + imgDir + ", " + imgFile + ", " + dateUploaded+", "+isSyncOnline);
 		if (downloadProfilePicture(userId) == null) {
 			sqLiteDatabase.insert(TABLE_PROFILE_PICTURES, null, values);
 			L.debug(TAG + " new picture inserted into sqlite:" + imgFile);
@@ -1745,10 +1769,5 @@ public class SQLiteHandler {
 		sqLiteDatabase.delete(TABLE_USER_PROFILE, null, null);
 		
 	}
-
-	
-
-	
-
 
 }

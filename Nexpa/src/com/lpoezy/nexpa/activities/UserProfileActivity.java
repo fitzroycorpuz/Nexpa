@@ -1,10 +1,4 @@
 package com.lpoezy.nexpa.activities;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import org.jivesoftware.smack.XMPPConnection;
 
 import com.appyvet.rangebar.RangeBar;
@@ -14,15 +8,13 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.JSON.Profile;
 import com.lpoezy.nexpa.chatservice.ChatMessagesService;
 import com.lpoezy.nexpa.chatservice.SyncDataService;
-import com.lpoezy.nexpa.chatservice.SyncProfileService;
-import com.lpoezy.nexpa.objects.Announcement;
+import com.lpoezy.nexpa.chatservice.SyncProfilePictureService;
+import com.lpoezy.nexpa.chatservice.SyncUserProfileService;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
-import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.NiceDialog;
-import com.lpoezy.nexpa.utility.RoundedImageView;
 import com.lpoezy.nexpa.utility.Utilz;
 
 import android.app.Activity;
@@ -31,24 +23,15 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -225,8 +208,12 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
         	context.stopService(new Intent(context, SyncDataService.class));
 	    }
         
-        if(SyncProfileService.isRunning){
-        	context.stopService(new Intent(context, SyncProfileService.class));
+        if(SyncUserProfileService.isRunning){
+        	context.stopService(new Intent(context, SyncUserProfileService.class));
+	    }
+        
+        if(SyncProfilePictureService.isRunning){
+        	context.stopService(new Intent(context, SyncProfilePictureService.class));
 	    }
         
         if(callback!=null){

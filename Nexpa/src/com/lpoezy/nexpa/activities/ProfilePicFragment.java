@@ -149,26 +149,27 @@ public class ProfilePicFragment extends DialogFragment {
 			
 			if(resultCode == Activity.RESULT_OK){
 				//L.debug("ProfilePicFragment, mCurrentPhotoPath: "+mCurrentPhotoPath);
-				//Utilz.saveToSharedPref(getActivity(), UserProfile.PROFILE_PIC_LOC, mCurrentPhotoPath);
+				Utilz.saveToSharedPref(getActivity(), ProfilePicture.TEMP_LOC, mCurrentPhotoPath);
 				
 				
-				 int pos = mCurrentPhotoPath.lastIndexOf("/");
-				 
-				String imgDir = mCurrentPhotoPath.substring(0 , pos);
-				String imgFile = Uri.parse(mCurrentPhotoPath).getLastPathSegment();
-				L.debug("ProfilePicFragment, imgDir: "+imgDir+", imgFile: "+imgFile+", pos "+pos);
-				
-				long userId = -1;
-				SQLiteHandler db = new SQLiteHandler(getActivity());
-				db.openToRead();
-				userId = Long.parseLong(db.getLoggedInID());
-				db.close();
-				
-				long now = System.currentTimeMillis();
-				
-				String dateCreated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
-				ProfilePicture pic = new ProfilePicture(userId, imgDir, imgFile, dateCreated);
-				pic.saveOffline(getActivity());
+//				int pos = mCurrentPhotoPath.lastIndexOf("/");
+//				 
+//				String imgDir = mCurrentPhotoPath.substring(0 , pos);
+//				String imgFile = Uri.parse(mCurrentPhotoPath).getLastPathSegment();
+//				L.debug("ProfilePicFragment, imgDir: "+imgDir+", imgFile: "+imgFile+", pos "+pos);
+//				
+//				long userId = -1;
+//				SQLiteHandler db = new SQLiteHandler(getActivity());
+//				db.openToRead();
+//				userId = Long.parseLong(db.getLoggedInID());
+//				db.close();
+//				
+//				long now = System.currentTimeMillis();
+//				
+//				String dateCreated = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+//				boolean isSyncedOnline = false;
+//				ProfilePicture pic = new ProfilePicture(userId, imgDir, imgFile, dateCreated, isSyncedOnline);
+//				pic.saveOffline(getActivity());
 				
 			}
 		

@@ -102,9 +102,8 @@
         <activity android:name=".activities.SettingsActivity"
              android:theme="@style/AppTheme"/>
         <service android:name=".chatservice.SyncDataService"></service>
-        <service android:name=".chatservice.SyncProfileService"></service>
-      
-        
+        <service android:name=".chatservice.SyncUserProfileService"></service>
+        <service android:name=".chatservice.SyncProfilePictureService"></service>
         
     </application>
 

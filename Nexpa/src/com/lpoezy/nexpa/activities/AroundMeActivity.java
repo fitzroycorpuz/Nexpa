@@ -735,7 +735,7 @@ public class AroundMeActivity extends AppCompatActivity
 									L.debug("getting profile picture of userId: " + userId + ", imgDir " + imgDir
 											+ ", imgFile " + imgFile);
 									ProfilePicture profilePic = new ProfilePicture(Long.parseLong(userId), imgDir,
-											imgFile, dateCreated);
+											imgFile, dateCreated, true);
 									profilePic.saveOffline(AroundMeActivity.this);
 								}
 

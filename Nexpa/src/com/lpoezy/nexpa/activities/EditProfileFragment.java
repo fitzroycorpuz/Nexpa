@@ -65,6 +65,7 @@ public class EditProfileFragment extends DialogFragment {
 	private EditText edtUrl0;
 	private EditText edtUrl1;
 	private EditText edtUrl2;
+	private ProfilePicture mProfilePicture;
 	
 	 public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 	      super.onActivityResult(requestCode, resultCode, intent);
@@ -149,8 +150,7 @@ public class EditProfileFragment extends DialogFragment {
 					@Override
 					public void run() {
 
-						//saveProfilePicOffline();
-
+						saveProfilePicOffline();
 						saveUserInfoOffline();
 
 						profilePic.post(new Runnable() {
@@ -207,13 +207,20 @@ public class EditProfileFragment extends DialogFragment {
 	}
 
 	protected void saveProfilePicOffline() {
+//		SQLiteHandler db = new SQLiteHandler(getActivity());
+//		db.openToRead();
+//		ProfilePicture pic = new ProfilePicture();
+//		pic.setUserId(Long.parseLong(db.getLoggedInID()));
 		
-		SQLiteHandler db = new SQLiteHandler(getActivity());
-		db.openToRead();
-		ProfilePicture pic = new ProfilePicture();
-		pic.setUserId(Long.parseLong(db.getLoggedInID()));
-		pic.saveImgOnline(getActivity());
-		db.close();
+		long now = System.currentTimeMillis();
+		
+		String dateUploaded = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+		
+		mProfilePicture.setDateUploaded(dateUploaded);
+		mProfilePicture.setSyncedOnline(false);
+		
+		mProfilePicture.saveOffline(getActivity());
+//		db.close();
 		
 	}
 
@@ -275,26 +282,53 @@ public class EditProfileFragment extends DialogFragment {
 		
 
 		if (profilePic != null) {
-			// String imgDecodableString =
-			// Utilz.getDataFrmSharedPref(SettingsActivity.this,
-			// UserProfile.PROFILE_PIC_LOC, "");
-
+			 String imgDecodableString = Utilz.getDataFrmSharedPref(getActivity().getApplicationContext(), ProfilePicture.TEMP_LOC, "");
+			 
+			if(mProfilePicture==null) mProfilePicture = new ProfilePicture();
+			//ProfilePicture pic = new ProfilePicture();
+//			pic.setUserId(userId);
+//			pic.downloadOffline(getActivity());
+			 
 			long userId = -1;
 			SQLiteHandler db = new SQLiteHandler(getActivity());
 			db.openToRead();
 			userId = Long.parseLong(db.getLoggedInID());
+			mProfilePicture.setUserId(userId);
 			db.close();
-
-			ProfilePicture pic = new ProfilePicture();
-			pic.setUserId(userId);
-			pic.downloadOffline(getActivity());
-
-			String imgDecodableString = pic.getImgDir() + "/" + pic.getImgFile();
+			 
+			 
+			 if(imgDecodableString!=null && !imgDecodableString.equalsIgnoreCase("")){
+				int pos = imgDecodableString.lastIndexOf("/");
+				
+				String imgDir = imgDecodableString.substring(0 , pos);
+				String imgFile = Uri.parse(imgDecodableString).getLastPathSegment();
+				
+				mProfilePicture.setImgDir(imgDir);
+				mProfilePicture.setImgFile(imgFile);
+				
+			 }else{
+				 
+				 mProfilePicture.downloadOffline(getActivity());
+				 imgDecodableString = mProfilePicture.getImgDir() + "/" + mProfilePicture.getImgFile();
+			 }
+			 
+			 
+				
+				//ProfilePicture pic = new ProfilePicture(userId, imgDir, imgFile, dateCreated, isSyncedOnline);
+				//pic.saveOffline(getActivity());
+			 
+			
+//			ProfilePicture pic = new ProfilePicture();
+//			pic.setUserId(userId);
+//			pic.downloadOffline(getActivity());
+//
+//			
+//			String imgDecodableString = pic.getImgDir() + "/" + pic.getImgFile();
 
 			Bitmap rawImage = BitmapFactory.decodeResource(getResources(), R.drawable.pic_sample_girl);
 
-			if ((pic.getImgDir() != null && !pic.getImgDir().isEmpty())
-					&& (pic.getImgFile() != null && !pic.getImgFile().isEmpty())) {
+			if ((mProfilePicture.getImgDir() != null && !mProfilePicture.getImgDir().isEmpty())
+					&& (mProfilePicture.getImgFile() != null && !mProfilePicture.getImgFile().isEmpty())) {
 				L.debug("SettingsActivity, imgDecodableString " + imgDecodableString);
 				// Get the dimensions of the View
 				int targetW = profilePic.getWidth();

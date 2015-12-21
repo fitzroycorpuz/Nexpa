@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.devspark.appmsg.AppMsg;
+import com.lpoezy.nexpa.activities.SettingsActivity;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent.OnCorrespondentUpdateListener;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
@@ -18,6 +19,7 @@ import com.lpoezy.nexpa.utility.BmpFactory;
 import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
+import com.lpoezy.nexpa.utility.StringFormattingUtils;
 import com.lpoezy.nexpa.utility.SystemUtilz;
 import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 
@@ -30,24 +32,26 @@ import android.os.Environment;
 
 public class ProfilePicture {
 	
-	public static final String LOC = "PROFILE_PIC_LOC";
+	public static final String TEMP_LOC = "PROFILE_PIC_LOC";
+	
 	private long userId;
 	private String imgDir;
 	private String imgFile;
 	private String dateUploaded;
 	private Bitmap img;
+	private boolean isSyncedOnline;
 	
 	
 	
 	public ProfilePicture(){}
 
-	public ProfilePicture(long userId, String imgDir, String imgFile, String dateCreated) {
+	public ProfilePicture(long userId, String imgDir, String imgFile, String dateCreated, boolean isSyncOnline) {
 		
 		this.userId 		= userId;
 		this.imgDir 		= imgDir;
 		this.imgFile 		= imgFile;
 		this.dateUploaded 	= dateCreated;
-		
+		this.isSyncedOnline = isSyncOnline;
 	}
 
 	public long getUserId() {
@@ -96,11 +100,19 @@ public class ProfilePicture {
 		notifyListeners();
 	}
 	
-	public void saveImgOnline(Context context){
+	public boolean isSyncedOnline() {
+		return isSyncedOnline;
+	}
+
+	public void setSyncedOnline(boolean isSyncedOnline) {
+		this.isSyncedOnline = isSyncedOnline;
+	}
+
+	public boolean saveImgOnline(Context context){
 		
 		String imgDecodableString = getUserImgDecodableString(context);
 		
-		if(imgDecodableString==null)return;
+		if(imgDecodableString==null)return false;
 		
 		L.debug("started sending profile pic to server directory...");
 		
@@ -140,17 +152,20 @@ public class ProfilePicture {
 		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
 
 		L.debug("ProfilePicture, webPage: " + webPage);
+		boolean success = false;
 		// {"tag":"upload","error":false,"msg":"9a89cdbd7bb2909289a89cdbd7bb290928female2.jpg Image upload complete!!"}
 		try {
 			JSONObject result = new JSONObject(webPage);
-			boolean error = result.getBoolean("error");
-			
+			 boolean error = result.getBoolean("error");
+			 
+			if(!error)success = true;
+			 
 			if(error)L.makeText((Activity)context, "Failed to save picture", AppMsg.STYLE_ALERT);
 			
 		} catch (JSONException e) {
 			L.error(""+e);
 		}
-		
+		return success;
 		
 	}
 
@@ -162,13 +177,31 @@ public class ProfilePicture {
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		//save picture info offline 
-		db.saveProfilePicture(userId, imgDir, imgFile, dateUploaded);
+		db.saveProfilePicture(userId, imgDir, imgFile, dateUploaded, isSyncedOnline);
 		db.close();
 	}
 	
 	public void downloadOnline(){
 		
 		
+	}
+	
+	public void downloadMyUnsyncPicProfileOffline(Context context) {
+		
+		L.debug("ProfilePicture, downloadMyUnsyncPicProfileOffline");
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToRead();
+		//download picture info offline 
+		HashMap<String, String> map = db.downloadMyUnsyncedPicProfile();
+		if(map!=null){
+			this.userId = Long.parseLong(map.get(SQLiteHandler.IMG_USER_ID));
+			this.imgDir = map.get(SQLiteHandler.IMG_DIR);
+			this.imgFile = map.get(SQLiteHandler.IMG_FILE);
+			this.dateUploaded = map.get(SQLiteHandler.IMG_DATE_UPLOADED);
+			this.isSyncedOnline = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.IMG_IS_SYNCED_ONLINE));
+		}
+		
+		db.close();
 	}
 	
 	public void downloadOffline(Context context){
@@ -182,7 +215,7 @@ public class ProfilePicture {
 			this.imgDir = map.get(SQLiteHandler.IMG_DIR);
 			this.imgFile = map.get(SQLiteHandler.IMG_FILE);
 			this.dateUploaded = map.get(SQLiteHandler.IMG_DATE_UPLOADED);
-			
+			this.isSyncedOnline = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.IMG_IS_SYNCED_ONLINE));
 		}
 		
 		db.close();
@@ -249,5 +282,7 @@ public class ProfilePicture {
 		
 		public void onProfilePictureUpdate();
 	}
+
+	
 
 }

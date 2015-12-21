@@ -29,7 +29,7 @@ public class UserProfile {
 	private String url1;
 	private String url2;
 	private String dateUpdated;
-	private boolean isUnsyncedOnline;
+	private boolean isSyncedOnline;
 
 	public UserProfile() {
 	}
@@ -57,7 +57,7 @@ public class UserProfile {
 		this.url1 = url1;
 		this.url2 = url2;
 		this.dateUpdated = dateUpdated;
-		this.isUnsyncedOnline = isUnsyncedOnline;
+		this.isSyncedOnline = isUnsyncedOnline;
 	}
 	
 	
@@ -126,12 +126,12 @@ public class UserProfile {
 		this.dateUpdated = dateUpdated;
 	}
 	
-	public boolean isUnsyncedOnline() {
-		return isUnsyncedOnline;
+	public boolean isSyncedOnline() {
+		return isSyncedOnline;
 	}
 
-	public void setUnsyncedOnline(boolean isUnsyncedOnline) {
-		this.isUnsyncedOnline = isUnsyncedOnline;
+	public void setSyncedOnline(boolean isSyncedOnline) {
+		this.isSyncedOnline = isSyncedOnline;
 	}
 
 	public void updateOffline(Context context) {
@@ -144,10 +144,10 @@ public class UserProfile {
 		// check if user id alredy exist in local db
 		if (db.downloadUserProfile(id) != null) {
 			// update if existing
-			db.updateUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated, isUnsyncedOnline);
+			db.updateUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated, isSyncedOnline);
 		} else {
 			// insert new user profile if not
-			db.saveUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated, isUnsyncedOnline);
+			db.saveUserProfile(id, username, description, profession, url0, url1, url2, dateUpdated, isSyncedOnline);
 		}
 
 		db.close();
@@ -247,7 +247,7 @@ public class UserProfile {
 			this.url1 = map.get(SQLiteHandler.USER_PROFILE_URL1);
 			this.url2 = map.get(SQLiteHandler.USER_PROFILE_URL2);
 			this.dateUpdated = map.get(SQLiteHandler.USER_PROFILE_DATE_UPDATED);
-			this.isUnsyncedOnline = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.USER_PROFILE_IS_SYNCED_ONLINE));
+			this.isSyncedOnline = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.USER_PROFILE_IS_SYNCED_ONLINE));
 			
 			
 		}

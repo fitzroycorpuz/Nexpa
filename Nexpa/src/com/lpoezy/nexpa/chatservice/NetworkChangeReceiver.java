@@ -20,13 +20,15 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 		boolean isNetworkAvailable = SystemUtilz.isNetworkAvailable(context.getApplicationContext());
 		boolean isChatServiceRunning = ChatMessagesService.isRunning;
 		boolean isSyncDataRunning = SyncDataService.isRunning;
-		boolean isSyncProfileRunning = SyncProfileService.isRunning;
+		boolean isSyncUserProfileRunning = SyncUserProfileService.isRunning;
+		boolean isSyncProfilePictureRunning = SyncProfilePictureService.isRunning;
 		
 		if(isLoggegIn){
 			
 			Intent msgService = new Intent(context, ChatMessagesService.class);
 			Intent syncDataService = new Intent(context, SyncDataService.class);
-			Intent syncProfileService = new Intent(context, SyncProfileService.class);
+			Intent syncUserProfileService = new Intent(context, SyncUserProfileService.class);
+			Intent syncProfilePictureService = new Intent(context, SyncProfilePictureService.class);
 			
 			if(isNetworkAvailable){
 				
@@ -39,8 +41,12 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 					context.startService(syncDataService);
 				}
 				
-				if(!isSyncProfileRunning){
-					context.startService(syncProfileService);
+				if(!isSyncUserProfileRunning){
+					context.startService(syncUserProfileService);
+				}
+				
+				if(!isSyncProfilePictureRunning){
+					context.startService(syncProfilePictureService);
 				}
 				
 				
@@ -55,9 +61,14 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 					context.stopService(syncDataService);
 				}
 				
-				if(isSyncDataRunning){
+				if(isSyncUserProfileRunning){
 					
-					context.stopService(syncProfileService);
+					context.stopService(syncUserProfileService);
+				}
+				
+				if(isSyncProfilePictureRunning){
+					
+					context.stopService(syncProfilePictureService);
 				}
 			}
 		

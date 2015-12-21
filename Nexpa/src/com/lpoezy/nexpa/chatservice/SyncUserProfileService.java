@@ -17,7 +17,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 
-public class SyncProfileService extends Service {
+public class SyncUserProfileService extends Service {
 	
 	private static final int MINUTE =  1000 * 60;
 
@@ -32,8 +32,8 @@ public class SyncProfileService extends Service {
 	public static boolean isRunning;
 	
 	public class LocalBinder extends Binder{
-		public SyncProfileService getService(){
-			return SyncProfileService.this;
+		public SyncUserProfileService getService(){
+			return SyncUserProfileService.this;
 			
 		}
 	}
@@ -65,7 +65,7 @@ public class SyncProfileService extends Service {
 		super.onCreate();
 		isRunning = true;
 		
-		HandlerThread t = new HandlerThread("SynchProfileService");
+		HandlerThread t = new HandlerThread("SyncUserProfileService");
 		t.start();
 		
 		mServiceLooper = t.getLooper();
@@ -81,13 +81,13 @@ public class SyncProfileService extends Service {
 			public void run() {
 				
 				UserProfile userProfile = new UserProfile();
-				userProfile.setUnsyncedOnline(true);
+				userProfile.setSyncedOnline(true);
 				userProfile.downloadMyUnsyncedDetailsOffline(getApplicationContext());
 				
-				if(!userProfile.isUnsyncedOnline()){
+				if(!userProfile.isSyncedOnline()){
 					
 					if(userProfile.saveOnline(getApplicationContext())){
-						userProfile.setUnsyncedOnline(true);
+						userProfile.setSyncedOnline(true);
 						userProfile.updateOffline(getApplicationContext());
 					}
 					retry = MINUTE;
@@ -96,9 +96,9 @@ public class SyncProfileService extends Service {
 					retry = (2<<n)* MINUTE;
 					n++;
 					
-					L.debug("SyncProfileService, no changes to update online");
+					L.debug("SyncUserProfileService, no changes to update online");
 				}
-				L.debug("SyncProfileService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
+				L.debug("SyncUserProfileService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
 				mServiceHandler.postDelayed(this, retry);
 			}
 		}, retry);

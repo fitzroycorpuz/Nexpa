@@ -318,7 +318,7 @@ public class MainSignInActivity extends Activity {
 															.getString("date_uploaded");
 
 													ProfilePicture profilePicture = new ProfilePicture(uId,
-															imgDir, imgFile, dateUploaded);
+															imgDir, imgFile, dateUploaded, true);
 													profilePicture.downloadImageOnline();
 													profilePicture.saveOffline(MainSignInActivity.this);
 												}
