@@ -149,6 +149,13 @@ public class EditProfileFragment extends DialogFragment {
 
 					@Override
 					public void run() {
+						//this will make sure,
+						//that the progress will be visible
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							L.error(""+e);
+						}
 
 						saveProfilePicOffline();
 						saveUserInfoOffline();

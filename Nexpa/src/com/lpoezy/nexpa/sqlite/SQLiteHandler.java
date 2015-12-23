@@ -14,15 +14,18 @@ import com.lpoezy.nexpa.objects.Announcement;
 import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.utility.DateUtils;
+import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.StringFormattingUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.EventLogTags.Description;
 import android.util.Log;
 
@@ -172,7 +175,7 @@ public class SQLiteHandler {
 			String CREATE_TABLE_USER_PROFILE = "CREATE TABLE " + TABLE_USER_PROFILE + "(" + USER_PROFILE_ID
 					+ " INTEGER PRIMARY KEY, "+USER_PROFILE_USER_ID+" INTEGER, "+ USER_PROFILE_USERNAME + " TEXT, " + USER_PROFILE_DESCRIPTION
 					+ " TEXT, " + USER_PROFILE_PROFESSION + " TEXT, " + USER_PROFILE_URL0 + " TEXT, "
-					+ USER_PROFILE_URL1 + " TEXT, " + USER_PROFILE_URL2 +" TEXT, "+ USER_PROFILE_DATE_UPDATED+" TEXT, "+USER_PROFILE_IS_SYNCED_ONLINE+" TEXT);";
+					+ USER_PROFILE_URL1 + " TEXT, " + USER_PROFILE_URL2 +" TEXT, "+ USER_PROFILE_DATE_UPDATED+" TEXT, "+USER_PROFILE_IS_SYNCED_ONLINE+" INTEGER);";
 			db.execSQL(CREATE_TABLE_USER_PROFILE);
 
 			String CREATE_TABLE_CORRESPONDENTS = "CREATE TABLE " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_ID
@@ -183,13 +186,20 @@ public class SQLiteHandler {
 
 			String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID
 					+ " INTEGER PRIMARY KEY, " + IMG_USER_ID + " INTEGER UNIQUE, " + IMG_DIR + " TEXT, " + IMG_FILE + " TEXT,"
-					+ IMG_DATE_UPLOADED + " TEXT, "+IMG_IS_SYNCED_ONLINE+" TEXT);";
+					+ IMG_DATE_UPLOADED + " TEXT, "+IMG_IS_SYNCED_ONLINE+" INTEGER);";
 			db.execSQL(CREATE_TABLE_PROFILE_PICTURES);
+			
+//			String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "
+//					+ MSG_USER_ID + " INTEGER, " + MSG_CORRESPONDENT_ID + " INTEGER, " + MSG_LEFT + " TEXT, " + MSG_BODY
+//					+ " TEXT," + MSG_SUCCESS + " TEXT," + MSG_CREATED_DATE + " TEXT, " + MSG_IS_UNREAD + " TEXT, "
+//					+ MSG_DATE_RECEIVED + " TEXT," + MSG_IS_SYNCED_ONLINE + " TEXT);";
+//			db.execSQL(CREATE_TABLE_MESSAGES);
 
-			String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER PRIMARY KEY, "
-					+ MSG_USER_ID + " INTEGER, " + MSG_CORRESPONDENT_ID + " INTEGER, " + MSG_LEFT + " TEXT, " + MSG_BODY
-					+ " TEXT," + MSG_SUCCESS + " TEXT," + MSG_CREATED_DATE + " TEXT, " + MSG_IS_UNREAD + " TEXT, "
-					+ MSG_DATE_RECEIVED + " TEXT, " + MSG_IS_SYNCED_ONLINE + " TEXT);";
+			String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES + "(" + MSG_ID + " INTEGER, "+
+					 MSG_USER_ID + " INTEGER, " + MSG_CORRESPONDENT_ID + " INTEGER, " + MSG_LEFT + " INTEGER, " + MSG_BODY
+					+ " TEXT," + MSG_SUCCESS + " INTEGER," + MSG_CREATED_DATE + " TEXT, " + MSG_IS_UNREAD + " INTEGER, "
+					+ MSG_DATE_RECEIVED + " TEXT," + MSG_IS_SYNCED_ONLINE + " INTEGER, PRIMARY KEY ("+
+					MSG_ID+"), UNIQUE("+MSG_CREATED_DATE+"));";
 			db.execSQL(CREATE_TABLE_MESSAGES);
 
 			String DATABASE_CREATE_2 = "create table " + DATABASE_TABLE_2 + "(" + PROFILE_ID
@@ -670,7 +680,7 @@ public class SQLiteHandler {
 				+ ", dateCreated: " + dateCreated);
 		// SqliteHandler, downloadMsgBySenderIdAndDate
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
-				new String[] { MSG_ID, MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
+				new String[] { /*MSG_ID,*/ MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
 						MSG_IS_UNREAD, MSG_DATE_RECEIVED },
 				MSG_USER_ID + "= ? AND " + MSG_CORRESPONDENT_ID + "=? AND " + MSG_CREATED_DATE + " = ?",
 				new String[] { Long.toString(senderId), Long.toString(receiverId), dateCreated }, null, null, null);
@@ -680,7 +690,7 @@ public class SQLiteHandler {
 
 			if (cursor.moveToFirst()) {
 
-				String id = cursor.getString(cursor.getColumnIndex(MSG_ID));
+				/*String id = cursor.getString(cursor.getColumnIndex(MSG_ID));*/
 				String senderId_ = cursor.getString(cursor.getColumnIndex(MSG_USER_ID));
 				String receiverId_ = cursor.getString(cursor.getColumnIndex(MSG_CORRESPONDENT_ID));
 				String left = cursor.getString(cursor.getColumnIndex(MSG_LEFT));
@@ -690,7 +700,7 @@ public class SQLiteHandler {
 				String isUnread = cursor.getString(cursor.getColumnIndex(MSG_IS_UNREAD));
 				String _dateReceived = cursor.getString(cursor.getColumnIndex(MSG_DATE_RECEIVED));
 
-				map.put(MSG_ID, id);
+				/*map.put(MSG_ID, id);*/
 				map.put(MSG_USER_ID, senderId_);
 				map.put(MSG_CORRESPONDENT_ID, receiverId_);
 				map.put(MSG_LEFT, left);
@@ -717,12 +727,12 @@ public class SQLiteHandler {
 		L.debug("========================================");
 		L.debug("SQLiteHandler, getting last received msg of senderId : " + senderId + ", receiverId: " + receiverId);
 
-		String where = MSG_USER_ID + " = ? ";
+		String where = MSG_USER_ID + " = ? OR "+CORRESPONDENT_ID+" = ?";
 		String[] whereArgs = new String[] { Long.toString(senderId) };
 
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES, new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT,
 				MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE, MSG_IS_UNREAD, MSG_DATE_RECEIVED }, where, whereArgs, null, null,
-				MSG_CREATED_DATE + " DESC");// MSG_DATE_RECEIVED+"
+				MSG_ID + " DESC");// MSG_DATE_RECEIVED+"
 									// DESC"
 		Map<String, String> map = new HashMap<String, String>();
 
@@ -938,10 +948,7 @@ public class SQLiteHandler {
 
 	public List<OneComment> downloadMessagesByIds(String userId, String correspondentId) {
 		L.error("SQLiteHandler, getting messages between " + userId + " and " + correspondentId);
-		// SELECT msg_user_id, correspondent_id, msg_left, msg_body,
-		// msg_success, msg_date, msg_is_unread, msg_date_received FROM messages
-		// WHERE (msg_user_id = '2 AND correspondent_id = '23') OR (msg_user_id
-		// = '23 AND correspondent_id = '2') ORDER BY msg_date ASC
+		
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
 				new String[] { MSG_USER_ID, MSG_CORRESPONDENT_ID, MSG_LEFT, MSG_BODY, MSG_SUCCESS, MSG_CREATED_DATE,
 						MSG_IS_UNREAD, MSG_DATE_RECEIVED, MSG_IS_SYNCED_ONLINE },
@@ -954,40 +961,7 @@ public class SQLiteHandler {
 		if (cursor.moveToFirst()) {
 
 			do {
-
-				// String senderId =
-				// cursor.getString(cursor.getColumnIndex(MSG_USER_ID));
-				// String receiverId =
-				// cursor.getString(cursor.getColumnIndex(MSG_CORRESPONDENT_ID));
-				// int left = cursor.getInt(cursor.getColumnIndex(MSG_LEFT));
-				// String msg =
-				// cursor.getString(cursor.getColumnIndex(MSG_BODY));
-				// int success =
-				// cursor.getInt(cursor.getColumnIndex(MSG_SUCCESS));
-				// String date =
-				// cursor.getString(cursor.getColumnIndex(MSG_DATE));
-				// int isUnread =
-				// cursor.getInt(cursor.getColumnIndex(MSG_IS_UNREAD));
-				// String dateReceived =
-				// cursor.getString(cursor.getColumnIndex(MSG_DATE_RECEIVED));
-				// int isSyncedOnline =
-				// cursor.getInt(cursor.getColumnIndex(MSG_IS_SYNCED_ONLINE));
-				//
-				//// OneComment comment = new
-				// OneComment(StringFormattingUtils.getBoolean(left), msg,
-				//// StringFormattingUtils.getBoolean(success), date,
-				// StringFormattingUtils.getBoolean(isUnread));
-				//
-				// OneComment comment = new OneComment(Long.parseLong(senderId),
-				// Long.parseLong(receiverId),
-				// StringFormattingUtils.getBoolean(left),
-				// msg,
-				// StringFormattingUtils.getBoolean(success),
-				// date, dateReceived,
-				// StringFormattingUtils.getBoolean(isUnread),
-				// StringFormattingUtils.getBoolean(isSyncedOnline)
-				// );
-
+				
 				conversation.add(OneComment.getMsg(cursor));
 
 			} while (cursor.moveToNext());
@@ -1055,6 +1029,76 @@ public class SQLiteHandler {
 		L.debug(TAG + " new correspondent inserted into sqlite: " + userId + " : " + fname);
 		return id;
 	}
+	
+	public void saveMultipleCorrespondents(List<Correspondent> correspondentsForBulkInsert) {
+		
+		L.debug("SQLiteHandler, saveMultipleCorrespondents "+correspondentsForBulkInsert.size());
+		long now = System.currentTimeMillis();
+		 
+		String sql = "INSERT  OR IGNORE INTO "+TABLE_CORRESPONDENTS+
+				"("+CORRESPONDENT_USER_ID+", "+CORRESPONDENT_USERNAME+") VALUES(?, ?);";
+		sqLiteDatabase.beginTransaction();
+		SQLiteStatement statement = sqLiteDatabase.compileStatement(sql);
+		
+		for(int i=0;i<correspondentsForBulkInsert.size();i++){
+			
+			statement.bindLong(1, correspondentsForBulkInsert.get(i).getId());
+			statement.bindString(2, correspondentsForBulkInsert.get(i).getUsername());
+			
+			statement.execute();
+			statement.clearBindings();
+		}
+		
+		sqLiteDatabase.setTransactionSuccessful();
+		sqLiteDatabase.endTransaction();
+	}
+	
+	public void saveMultipleMsgs(List<OneComment> mMessages) {
+		
+		
+		
+		
+	}
+	
+	
+	
+	public void saveMultipleMsgsAndMarkAsReceived(List<OneComment> msgsForBulkInsert) {
+		L.debug("SQLiteHandler, saveMultipleMsgsAndMarkAsReceived "+msgsForBulkInsert.size());
+		long now = System.currentTimeMillis();
+		 
+		String dateReceived 	= DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+		boolean isUnread 		= false;
+		boolean isSyncedOnline 	= false;
+		
+		String sql = "INSERT  OR IGNORE INTO "+TABLE_MESSAGES+
+				"("+MSG_USER_ID+", "+MSG_CORRESPONDENT_ID+", "+MSG_LEFT+", "+MSG_BODY+", "+
+				MSG_SUCCESS+", "+MSG_CREATED_DATE+", "+MSG_DATE_RECEIVED+", "+MSG_IS_UNREAD+", "+
+				MSG_IS_SYNCED_ONLINE+") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		sqLiteDatabase.beginTransaction();
+		SQLiteStatement statement = sqLiteDatabase.compileStatement(sql);
+		
+		for(int i=0;i<msgsForBulkInsert.size();i++){
+			
+			statement.bindLong(1, msgsForBulkInsert.get(i).senderId);
+			statement.bindLong(2, msgsForBulkInsert.get(i).receiverId);
+			statement.bindString(3, StringFormattingUtils.getBoolean(msgsForBulkInsert.get(i).left));
+			statement.bindString(4, msgsForBulkInsert.get(i).comment);
+			statement.bindString(5, StringFormattingUtils.getBoolean(msgsForBulkInsert.get(i).success));
+			statement.bindString(6, msgsForBulkInsert.get(i).date);
+			statement.bindString(7, dateReceived);
+			statement.bindString(8, Boolean.toString(isUnread));
+			statement.bindString(9, Boolean.toString(isSyncedOnline));
+			
+			statement.execute();
+			statement.clearBindings();
+		}
+		
+		sqLiteDatabase.setTransactionSuccessful();
+		sqLiteDatabase.endTransaction();
+				
+	}
+	
+	
 
 	public void saveMessage(long senderId, long receiverId, boolean left, String comment, boolean success, String date,
 			boolean isUnread, String dateReceived, boolean isSyncedOnline) {

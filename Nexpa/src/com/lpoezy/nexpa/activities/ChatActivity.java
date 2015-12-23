@@ -449,6 +449,13 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 					String msg = intent.getStringExtra("msg");
 
 					final long userId = intent.getLongExtra("userid", -1);
+					
+					//don't reveal msg,
+					//if the sender is not the current correspondent,
+					//of the user
+					if(userId != mCorrespondentId)return;
+					
+					
 					// mCorrespondentId = userId;
 					mCorrespondent.setId(userId);
 					L.debug("msg received from ..." + userId);

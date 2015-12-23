@@ -129,7 +129,19 @@ public class OneComment {
 
 		return false;
 	}
+	
+	public static void saveMultipleOffline(Context context, List<OneComment> msgsForBulkInsert) {
+		
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToWrite();
 
+		//long userId = Long.valueOf(db.getUserDetails().get("uid"));
+
+		db.saveMultipleMsgsAndMarkAsReceived(msgsForBulkInsert);
+		db.close();
+
+	}
+	
 	//do not rely on members values while saving local data,
 	//senderId and receiverId can change anytime
 	public void saveOffline(Context context, long senderId, long receiverId) {
@@ -348,9 +360,9 @@ public class OneComment {
 								// jObj.getLong("correspondent_id");
 								long senderId = Long.parseLong(jObj.getString("user_id"));
 								long receiverId = Long.parseLong(jObj.getString("correspondent_id"));
-								String username = jObj.getString("firstname");
-								String email = "";
-								String fname = username;
+								//String username = jObj.getString("firstname");
+								//String email = "";
+								//String fname = username;
 								//Correspondent correspondent = new Correspondent(correspondentId, username);
 
 								boolean left = StringFormattingUtils.getBoolean(jObj.getString("is_left"));
@@ -362,31 +374,32 @@ public class OneComment {
 								
 								OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, dateReceived, isUnread, true);
 								
-								if(!OneComment.isExisting(context, message)){
-									message.saveOffline(context, senderId, receiverId);
-									
-									
-									if (message.dateReceived == null || message.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")) {
-
-										long now = System.currentTimeMillis();
-										 
-										message.dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
-										
-										message.markAsReceivedOffline(context);
-									}
-									
-									if (message.isUnread) {
-										// marking messages read online is moved,
-										// to the sync button in the settings screen
-										// if (comment.markAsReadOnline(context, id)) {
-
-										message.markAsReadOffline(context, correspondentId);
-
-										// }
-									}
-									
-									
-								}
+								
+//								if(!OneComment.isExisting(context, message)){
+//									message.saveOffline(context, senderId, receiverId);
+//									
+//									
+//									if (message.dateReceived == null || message.dateReceived.equalsIgnoreCase("0000-00-00 00:00:00")) {
+//
+//										long now = System.currentTimeMillis();
+//										 
+//										message.dateReceived = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
+//										
+//										message.markAsReceivedOffline(context);
+//									}
+//									
+//									if (message.isUnread) {
+//										// marking messages read online is moved,
+//										// to the sync button in the settings screen
+//										// if (comment.markAsReadOnline(context, id)) {
+//
+//										message.markAsReadOffline(context, correspondentId);
+//
+//										// }
+//									}
+//									
+//									
+//								}
 								
 								return message;
 							}
@@ -399,17 +412,25 @@ public class OneComment {
 
 					}
 					
+					
+					List<OneComment> msgsForBulkInsert = new ArrayList<OneComment>();
 					for (int i = 0; i < jArr.length(); i++) {
 						try {
-							Future<OneComment> f = ecs.take();
 							
-							messages.add(f.get());
+							Future<OneComment> f = ecs.take();
+							OneComment msg = f.get();
+							//messages.add(msg);
+							
+							msgsForBulkInsert.add(msg);
+						
 						} catch (InterruptedException e) {
 							L.error(""+e);
 						} catch (ExecutionException e) {
 							L.error(""+e);
 						}
 					}
+					
+					OneComment.saveMultipleOffline(context, msgsForBulkInsert);
 
 				}
 			}
@@ -431,6 +452,8 @@ public class OneComment {
 
 	}
 	
+	
+
 	public static List<OneComment> downloadReceivedMsgsOffline(Context context) {
 
 		SQLiteHandler db = new SQLiteHandler(context);
@@ -507,7 +530,7 @@ public class OneComment {
 		String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
 		int isSyncedOnline 		= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
 		
-		//L.error("msg: "+msg+", date "+date+", isSyncedOnline "+isSyncedOnline);
+		L.error("msg: "+msg+", date "+date+", isSyncedOnline "+isSyncedOnline);
 		OneComment comment = new OneComment(Long.parseLong(senderId), 
 				Long.parseLong(receiverId), 
 				StringFormattingUtils.getBoolean(left), 

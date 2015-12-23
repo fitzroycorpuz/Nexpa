@@ -1,6 +1,5 @@
 package com.lpoezy.nexpa.activities;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -11,10 +10,10 @@ import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.Correspondents;
+import com.lpoezy.nexpa.objects.Messages;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.utility.BmpFactory;
 import com.lpoezy.nexpa.utility.DividerItemDecoration;
-import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
 import com.lpoezy.nexpa.utility.SystemUtilz;
@@ -31,13 +30,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -208,6 +203,12 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 					// mCorrespondents =
 					// Correspondent.downloadAllReceivedOnline(getActivity());
 					final List<Correspondent> correspondents = Correspondent.downloadLatestMsgsOnline(getActivity());
+					Messages messages = new Messages();
+					messages.downloadMyMsgsOnline(getActivity());
+					
+					
+					
+					
 					
 					downloadProfilePics(correspondents);
 					
