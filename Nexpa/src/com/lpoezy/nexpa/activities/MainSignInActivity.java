@@ -253,6 +253,7 @@ public class MainSignInActivity extends Activity {
 					boolean error = jObj.getBoolean("error");
 
 					if (!error) {
+						
 						server_uid = jObj.getString("uid");
 						JSONObject user = jObj.getJSONObject("user");
 						server_name = user.getString("name");
@@ -331,8 +332,6 @@ public class MainSignInActivity extends Activity {
 														profession, url0, url1, url2, dateUpdated, true);
 											profile.updateOffline(MainSignInActivity.this);
 
-											
-
 											L.debug("MainSignInActivity, server_uid: " + server_uid
 													+ ", server_name: " + server_name + ", webPage: "
 													+ webPage);
@@ -367,12 +366,14 @@ public class MainSignInActivity extends Activity {
 							});
 
 						} else {
+							
 							Account ac = new Account();
 							ac.ReTryCreateChatAccount(MainSignInActivity.this, server_name, password, server_email);
 							public_pass = password;
 							timer = new Timer();
 							initializeTimerTask();
 							timer.scheduleAtFixedRate(showMainPageIntent, 1000, 3000);
+							
 						}
 					} else {
 						hideDialog();
@@ -428,6 +429,7 @@ public class MainSignInActivity extends Activity {
 							finish();
 							timer.cancel();
 						} else {
+							
 							if (loader < 0) {
 								hideDialog();
 								NiceDialog.promptDialog("Failed to sync on server",

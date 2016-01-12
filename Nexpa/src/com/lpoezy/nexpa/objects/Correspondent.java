@@ -435,7 +435,7 @@ public class Correspondent {
 						// success, date, isUnread);
 
 						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
-								dateReceived, isUnread, true);
+								 isUnread, true);
 						
 						messages.add(message);
 						// message.dateReceived = dateReceived;
@@ -716,7 +716,9 @@ public class Correspondent {
 	// }
 
 	 
-	
+	public void downloadByUsernameOffline(Context context, String name){
+		
+	}
 
 	public static List<Correspondent> downloadAllOffline(Context context) {
 

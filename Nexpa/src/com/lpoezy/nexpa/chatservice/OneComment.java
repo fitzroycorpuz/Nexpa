@@ -71,7 +71,6 @@ public class OneComment {
 			@JsonProperty("comment")String comment, 
 			@JsonProperty("success")boolean success, 
 			@JsonProperty("date")String date, 
-			@JsonProperty("dateReceived")String dateReceived, 
 			@JsonProperty("isUnread")boolean isUnread, 
 			@JsonProperty("isSyncedOnline")boolean isSyncedOnline) {
 		
@@ -82,7 +81,6 @@ public class OneComment {
 		this.success = success;
 		this.date = date;
 		this.isUnread = isUnread;
-		this.dateReceived = dateReceived;
 		this.isSyncedOnline = isSyncedOnline;
 	}
 
@@ -141,6 +139,19 @@ public class OneComment {
 		db.close();
 
 	}
+	
+	
+	public void saveReceivedMsgOffline(Context context, String sendername) {
+		
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToWrite();
+
+		
+
+		
+		db.close();
+	}	
+	
 	
 	//do not rely on members values while saving local data,
 	//senderId and receiverId can change anytime
@@ -287,12 +298,12 @@ public class OneComment {
 		Map<String, String> map = db.downloadLatestMsgOffline(userId, senderId);
 		
 		if (map.size() > 0) {
-			this.senderId = Long.parseLong(map.get(SQLiteHandler.MSG_USER_ID));
-			this.receiverId = Long.parseLong(map.get(SQLiteHandler.MSG_CORRESPONDENT_ID));
-			this.left = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_LEFT));
+			this.senderId = Long.parseLong(map.get(SQLiteHandler.MSG_SENDER_NAME));
+			this.receiverId = Long.parseLong(map.get(SQLiteHandler.MSG_RECEIVER_NAME));
+			this.left = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_LEFT));
 			this.comment = map.get(SQLiteHandler.MSG_BODY);
 			this.success = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_SUCCESS));
-			this.date = map.get(SQLiteHandler.MSG_CREATED_DATE);
+			this.date = map.get(SQLiteHandler.MSG_DATE);
 			this.isUnread = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_UNREAD));
 			
 		}
@@ -372,7 +383,7 @@ public class OneComment {
 								boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
 								String dateReceived = jObj.getString("date_received");
 								
-								OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, dateReceived, isUnread, true);
+								OneComment message = new OneComment(senderId, receiverId, left, comment, success, date, isUnread, true);
 								
 								
 //								if(!OneComment.isExisting(context, message)){
@@ -520,14 +531,14 @@ public class OneComment {
 
 	public static OneComment getMsg(Cursor cursor) {
 		
-		String senderId 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_USER_ID));
-		String receiverId 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_CORRESPONDENT_ID));
-		int left 				= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_LEFT));
+		String senderId 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_SENDER_NAME));
+		String receiverId 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_RECEIVER_NAME));
+		int left 				= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_LEFT));
 		String msg 				= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_BODY));
 		int success 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_SUCCESS));
-		String date 			= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_CREATED_DATE));
+		String date 			= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE));
 		int isUnread 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_UNREAD));
-		String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
+		//String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
 		int isSyncedOnline 		= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
 		
 		L.error("msg: "+msg+", date "+date+", isSyncedOnline "+isSyncedOnline);
@@ -537,13 +548,15 @@ public class OneComment {
 				msg, 
 				StringFormattingUtils.getBoolean(success), 
 				date, 
-				dateReceived, 
+				
 				StringFormattingUtils.getBoolean(isUnread),
 				StringFormattingUtils.getBoolean(isSyncedOnline)
 				);
 		
 		return comment;
 	}
+
+	
 
 	
 }

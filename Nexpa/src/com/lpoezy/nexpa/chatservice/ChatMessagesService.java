@@ -1,5 +1,7 @@
 package com.lpoezy.nexpa.chatservice;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.packet.DelayInformation;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +30,7 @@ import com.lpoezy.nexpa.activities.TabHostActivity;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
@@ -118,7 +122,6 @@ public class ChatMessagesService extends Service {
 				public void onXMPPConnected(XMPPConnection con) {
 
 					addPacketListener(con);
-
 				}
 
 			});
@@ -129,7 +132,6 @@ public class ChatMessagesService extends Service {
 			addPacketListener(connection);
 
 		}
-
 	}
 
 	// will handle all the received messages,
@@ -142,16 +144,24 @@ public class ChatMessagesService extends Service {
 			@Override
 			public void processPacket(Packet packet) {
 				final Message message = (Message) packet;
-
+				
 				if (message.getBody() != null) {
 
 					final String fromName = StringUtils.parseBareAddress(message.getFrom());
-
-					// final String tag_string_req =
-					// "download_msg_by_user_name_and_correspondent_id";
-
+					
+					String senderName = fromName.split("@")[0];
+					boolean isLeft = true;
+					boolean isSuccessful = true;
+					String body = message.getBody();
+					long date = System.currentTimeMillis();
+					String receiverName = "";
+					boolean isUnread = false;
+					boolean isSyncedOnline = false;
+					NewMessage msg = new NewMessage(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);
+					msg.saveMyReceivedMsgOffline(getApplicationContext());
+/*/
 					new Thread(new Runnable() {
-
+						
 						@Override
 						public void run() {
 							SQLiteHandler db = new SQLiteHandler(getApplicationContext());
@@ -162,7 +172,7 @@ public class ChatMessagesService extends Service {
 							postDataParams.put("username", fromName.split("@")[0]);
 							postDataParams.put("correspondent_id", db.getLoggedInID());
 
-							final String spec = AppConfig.URL_MSG;
+							final String spec = AppConfig.URL_MSG;s
 							String webPage = HttpUtilz.makeRequest(spec, postDataParams);
 							L.debug("ChatMessageService, webPage: " + webPage);
 
@@ -245,7 +255,7 @@ public class ChatMessagesService extends Service {
 
 						}
 					}).start();
-
+//*/
 					// StringRequest strReq = new StringRequest(Method.POST,
 					// AppConfig.URL_MSG,
 					// new Response.Listener<String>() {

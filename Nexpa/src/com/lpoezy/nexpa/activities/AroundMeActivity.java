@@ -724,7 +724,7 @@ public class AroundMeActivity extends AppCompatActivity
 								String imgDir = c.getString("img_dir");
 								String imgFile = c.getString("img_file");
 								String dateCreated = c.getString("date_uploaded");
-
+								
 								// L.debug("getting profile picture of userId:
 								// "+userId+", imgDir
 								// "+imgDir.equalsIgnoreCase("null")+", imgFile
@@ -732,8 +732,8 @@ public class AroundMeActivity extends AppCompatActivity
 								if ((imgDir != null && !imgDir.isEmpty() && !imgDir.equalsIgnoreCase("null"))
 										&& (imgFile != null && !imgFile.isEmpty()
 												&& !imgFile.equalsIgnoreCase("null"))) {
-									L.debug("getting profile picture of userId: " + userId + ", imgDir " + imgDir
-											+ ", imgFile " + imgFile);
+									L.error("getting profile picture of userId: " + userId +", uname: " +uname+", imgDir: " + imgDir
+											+ ", imgFile: " + imgFile);
 									ProfilePicture profilePic = new ProfilePicture(Long.parseLong(userId), imgDir,
 											imgFile, dateCreated, true);
 									profilePic.saveOffline(AroundMeActivity.this);

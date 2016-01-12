@@ -124,7 +124,7 @@ public class Messages {
 						final boolean isUnread = StringFormattingUtils.getBoolean(jObj.getString("is_unread"));
 
 						OneComment message = new OneComment(senderId, receiverId, left, comment, success, date,
-								dateReceived, isUnread, true);
+								 isUnread, true);
 						
 						mMessages.add(message);
 						

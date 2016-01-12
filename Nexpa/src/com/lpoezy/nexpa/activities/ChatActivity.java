@@ -243,8 +243,8 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 					msg.setBody(text);
 
 					connection = XMPPLogic.getInstance().getConnection();
-
 					if ((connection == null) || (!connection.isConnected())) {
+						
 						L.debug("XMPPChatDemoActivity, reconnecting...");
 
 						OneComment comment = new OneComment(true, text, false);
@@ -256,7 +256,6 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 						long now = System.currentTimeMillis();
 						String date = DateUtils.millisToSimpleDate(now, DateFormatz.DATE_FORMAT_5);
 						comment.date = date;
-						
 						
 						mComments.add(comment);
 						mAdapter.notifyDataSetChanged();
@@ -331,12 +330,10 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 									if(pendingMsg.success){
 										L.debug("ChatACtivity, sending msg");
 										 connection.sendPacket(msg);
-										 
 										 mCorrespondent.clearExistingConversation();
 									}
 								}
 							}
-							
 						}
 					}).start();
 				}
@@ -474,16 +471,11 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 					// adapter.add(comment);
 
 					// listview.setAdapter(adapter);
-
 					mCorrespondent.addMessage(comment);
-
 				}
 			});
-
 		}
-
 	};
-
 	/**
 	 * Called by Settings dialog when a connection is establised with the XMPP
 	 * server
