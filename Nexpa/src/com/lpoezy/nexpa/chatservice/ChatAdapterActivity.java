@@ -89,7 +89,7 @@ public class ChatAdapterActivity extends ArrayAdapter<OneComment> implements Cor
 			
 			@Override
 			public void run() {
-				correspondent.downloadProfilePicOnline(getContext());
+				correspondent.downloadProfilePicOnline(getContext(), -1);
 				
 			}
 		}).start();

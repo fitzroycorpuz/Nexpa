@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.lpoezy.nexpa.objects.Messages;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.L;
 
@@ -80,19 +81,23 @@ public class SyncDataService extends Service {
 			public void run() {
 				
 				//check if there is unsync msg
-				List<OneComment> list = OneComment.downloadMyUnsyncReadMsgsOffline(getApplicationContext());
+				//List<OneComment> list = OneComment.downloadMyUnsyncReadMsgsOffline(getApplicationContext());
+				Messages msgs = new Messages();
+				msgs.downloadMyUnsyncedSentMsgsOffline(getApplicationContext());
 				
-				if(list!=null && !list.isEmpty()){
+				if(msgs.size()!=0){
 					
-					try {
-						if(OneComment.markMsgsAsReadOnline(list)){
-							for(OneComment msg : list){
-								msg.markAsSyncedOffline(getApplicationContext());
-							}
-						}
-					} catch (JsonProcessingException e) {
-						L.error(""+e);
-					}
+					msgs.saveMyUnsyncedSentMsgsOnline(getApplicationContext());
+//					try {
+//						if(OneComment.markMsgsAsReadOnline(list)){
+//							for(OneComment msg : list){
+//								msg.markAsSyncedOffline(getApplicationContext());
+//							}
+//						}
+//					} catch (JsonProcessingException e) {
+//						L.error(""+e);
+//					}
+					
 					retry = MINUTE;
 				}else{
 					

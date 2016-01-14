@@ -340,8 +340,9 @@ public class AroundMeActivity extends AppCompatActivity
 					Intent intent = new Intent(AroundMeActivity.this, PeopleProfileActivity.class);
 					Log.e("ccc", arr_about.get(position));
 					// intent.putExtra("TAG_GEO_PID", us.get(position).getId());
-
-					intent.putExtra("TAG_GEO_USER_ID", arr_correspondents.get(position).getId());
+					long correspondentId = arr_correspondents.get(position).getId();
+					
+					intent.putExtra("TAG_GEO_USER_ID", correspondentId);
 					intent.putExtra("TAG_GEO_USER", arr_uname.get(position));
 					intent.putExtra("TAG_GEO_EMAIL", arr_email.get(position));
 					intent.putExtra("TAG_GEO_FNAME", arr_fname.get(position));
@@ -463,17 +464,17 @@ public class AroundMeActivity extends AppCompatActivity
 			// "+us.get(j).getUserName());
 
 			final Correspondent correspondent = new Correspondent();
-
+			
 			correspondent.addListener(this);
-			correspondent.setId(Long.parseLong(Integer.toString(us.get(j).getUserId())));
-
+			final long userId = Long.parseLong(Integer.toString(us.get(j).getUserId()));
+			correspondent.setId(userId);
 			arr_correspondents.add(j, correspondent);
 
 			new Thread(new Runnable() {
 
 				@Override
 				public void run() {
-					correspondent.downloadProfilePicOnline(AroundMeActivity.this);
+					correspondent.downloadProfilePicOnline(AroundMeActivity.this, userId);
 
 				}
 			}).start();

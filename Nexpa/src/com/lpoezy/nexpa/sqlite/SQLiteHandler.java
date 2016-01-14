@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.objects.Announcement;
 import com.lpoezy.nexpa.objects.Users;
@@ -72,10 +73,10 @@ public class SQLiteHandler {
 
 	private static final String TABLE_CORRESPONDENTS = "correspondents";
 	public static final String CORRESPONDENT_ID = "_id";
-	public static final String CORRESPONDENT_USER_ID = "user_id";//logged in id
+	//public static final String CORRESPONDENT_USER_ID = "user_id";//logged in id
 	public static final String CORRESPONDENT_USERNAME = "username";
-	public static final String CORRESPONDENT_EMAIL = "email";
-	public static final String CORRESPONDENT_FNAME = "fname";
+	//public static final String CORRESPONDENT_EMAIL = "email";
+	//public static final String CORRESPONDENT_FNAME = "fname";
 
 	private static final String TABLE_PROFILE_PICTURES = "profile_pictures";
 	public static final String IMG_ID = "_id";// KEY_ID
@@ -181,11 +182,18 @@ public class SQLiteHandler {
 					+ USER_PROFILE_URL1 + " TEXT, " + USER_PROFILE_URL2 +" TEXT, "+ USER_PROFILE_DATE_UPDATED+" TEXT, "+USER_PROFILE_IS_SYNCED_ONLINE+" INTEGER);";
 			db.execSQL(CREATE_TABLE_USER_PROFILE);
 
+//			String CREATE_TABLE_CORRESPONDENTS = "CREATE TABLE " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_ID
+//					+ " INTEGER PRIMARY KEY, " + CORRESPONDENT_USER_ID + " INTEGER, " + CORRESPONDENT_USERNAME
+//					+ " TEXT, " + CORRESPONDENT_EMAIL + " TEXT," + CORRESPONDENT_FNAME + " TEXT);";
+//			Log.e("CREATE_TABLE_CORRESPONDENTS", CREATE_TABLE_CORRESPONDENTS);
+//			db.execSQL(CREATE_TABLE_CORRESPONDENTS);
+			
 			String CREATE_TABLE_CORRESPONDENTS = "CREATE TABLE " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_ID
-					+ " INTEGER PRIMARY KEY, " + CORRESPONDENT_USER_ID + " INTEGER, " + CORRESPONDENT_USERNAME
-					+ " TEXT, " + CORRESPONDENT_EMAIL + " TEXT," + CORRESPONDENT_FNAME + " TEXT);";
+					+ " INTEGER PRIMARY KEY, " + CORRESPONDENT_USERNAME + " TEXT UNIQUE);";
 			Log.e("CREATE_TABLE_CORRESPONDENTS", CREATE_TABLE_CORRESPONDENTS);
 			db.execSQL(CREATE_TABLE_CORRESPONDENTS);
+			
+			
 
 			String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID
 					+ " INTEGER PRIMARY KEY, " + IMG_USER_ID + " INTEGER UNIQUE, " + IMG_DIR + " TEXT, " + IMG_FILE + " TEXT,"
@@ -596,12 +604,12 @@ public class SQLiteHandler {
 
 	}
 
-	public int getUnReadMsgCount(long id) {
-		L.debug("SqliteHandler, getUnReadMsgCount of " + id);
+	public int getUnReadMsgCount(String name) {
+		L.debug("SqliteHandler, getUnReadMsgCount of " + name);
 		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
 				new String[] { MSG_IS_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_IS_UNREAD },
 				MSG_RECEIVER_NAME + "=? AND " + MSG_IS_UNREAD + "=?",
-				new String[] { Long.toString(id), Integer.toString(1) }, null, null, null);
+				new String[] { name, Integer.toString(1) }, null, null, null);
 		int count = 0;
 		if (cursor.moveToFirst()) {
 			do {
@@ -800,6 +808,32 @@ public class SQLiteHandler {
 		return sent;
 	}
 	
+	public List<NewMessage> downloadMyUnsyncedSentMsgs() {
+		
+		L.debug("SqliteHandler, downloadMyUnsyncedSentMsgs");
+		
+		String senderName = getUsername();
+		
+		String table = TABLE_MESSAGES;
+		String[] columns = new String[]{MSG_SENDER_NAME, MSG_RECEIVER_NAME, MSG_IS_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE, MSG_IS_UNREAD, MSG_IS_SYNCED_ONLINE};
+		String selection = MSG_SENDER_NAME +" = ? AND "+ MSG_IS_SYNCED_ONLINE+" = ?";
+		String[] selectionArgs = new String[]{senderName, StringFormattingUtils.getBoolean(false)};
+		Cursor c = sqLiteDatabase.query(table, columns, selection, selectionArgs, null, null, null);
+		
+		if(c.moveToFirst()){
+			
+			List<NewMessage> list = new ArrayList<NewMessage>();
+			do{
+				NewMessage unsyncMsg = NewMessage.getMsg(c);
+				list.add(unsyncMsg);
+			}while(c.moveToNext());
+			
+			return list;
+		}
+		
+		return null;
+	}
+	
 	public List<OneComment> downloadMyUnsyncReadMsgs() {
 		
 		L.debug("SqliteHandler, downloadMyUnsyncMsgsOffline");
@@ -910,12 +944,14 @@ public class SQLiteHandler {
 
 		return map;
 	}
+	
+	
 
 	public List<Correspondent> downloadAllCorrespondents() {
 		L.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		L.error("SQLiteHandler,getting message senders");
 
-		Cursor cursor = sqLiteDatabase.query(TABLE_CORRESPONDENTS, new String[] { CORRESPONDENT_USER_ID, CORRESPONDENT_USERNAME }, null, null, null, null, null);
+		Cursor cursor = sqLiteDatabase.query(TABLE_CORRESPONDENTS, new String[] { CORRESPONDENT_ID, CORRESPONDENT_USERNAME }, null, null, null, null, null);
 		
 //		String myId = getLoggedInID();
 //		Cursor cursor = sqLiteDatabase.query(TABLE_USER_PROFILE, new String[] { USER_PROFILE_USER_ID,
@@ -930,10 +966,10 @@ public class SQLiteHandler {
 			do {
 				
 
-				long id = Long.parseLong(cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USER_ID)));
+				long id = Long.parseLong(cursor.getString(cursor.getColumnIndex(CORRESPONDENT_ID)));
 				String uname  = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
 				L.debug("id: "+id+", uname: "+uname);
-				Correspondent correspondent = new Correspondent(id, uname);
+				Correspondent correspondent = new Correspondent(uname);
 				
 				//UserProfile correspondent = new UserProfile(id, uname, description, profession, url0, url1, url2, dateUpdated);
 				if (ids.indexOf(id) == -1) {
@@ -948,6 +984,33 @@ public class SQLiteHandler {
 		L.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		return correspondents;
 
+	}
+	
+	//SELECT sender_name, receiver_name, left, body, success, date, is_unread, date_received, is_synced_online FROM sent_messages WHERE (sender_name = 'l' AND receiver_name = 'n') OR (sender_name = 'n' AND receiver_name = 'l') ORDER BY date ASC
+	public List<NewMessage> downloadMyConversationWith(String correspondentName) {
+		L.error("SQLiteHandler, downloadMyConversationWith " + correspondentName);
+		String username = getUsername();
+		Cursor cursor = sqLiteDatabase.query(TABLE_MESSAGES,
+				new String[] { MSG_SENDER_NAME, MSG_RECEIVER_NAME, MSG_IS_LEFT, MSG_BODY, MSG_SUCCESS, MSG_DATE,
+						MSG_IS_UNREAD, MSG_IS_SYNCED_ONLINE },
+				"(" + MSG_SENDER_NAME + " = '" + correspondentName + "' AND " + MSG_RECEIVER_NAME + " = '" + username
+						+ "') OR (" + MSG_SENDER_NAME + " = '" + username + "' AND " + MSG_RECEIVER_NAME + " = '"
+						+ correspondentName + "')",
+				null, null, null, MSG_DATE + " ASC");//MSG_DATE + " ASC"
+
+		List<NewMessage> conversation = new ArrayList<NewMessage>();
+		if (cursor.moveToFirst()) {
+
+			do {
+				
+				conversation.add(NewMessage.getMsg(cursor));
+
+			} while (cursor.moveToNext());
+
+		}
+		cursor.close();
+		return conversation;
+		
 	}
 
 	public List<OneComment> downloadMessagesByIds(String userId, String correspondentId) {
@@ -1005,21 +1068,39 @@ public class SQLiteHandler {
 
 	}
 	
-	
-	
-	public Correspondent downloadCorrespondentByUserId(long userId) {
+	public Correspondent downloadCorrespondentByUsername(String name) {
 		Cursor cursor = sqLiteDatabase.query(TABLE_CORRESPONDENTS,
-				new String[] { CORRESPONDENT_USER_ID, CORRESPONDENT_USERNAME},
-				CORRESPONDENT_USER_ID + " = ?", new String[] { Long.toString(userId) }, null, null, null);
+				new String[] { CORRESPONDENT_ID, CORRESPONDENT_USERNAME},
+				CORRESPONDENT_USERNAME + " = ?", new String[] { name }, null, null, null);
 		
 		Correspondent correspondent = null;
 		
 		if (cursor.moveToFirst()) {
 
-			long id = cursor.getInt(cursor.getColumnIndex(CORRESPONDENT_USER_ID));
+			long id = cursor.getInt(cursor.getColumnIndex(CORRESPONDENT_ID));
 			String username = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
 			
-			correspondent = new Correspondent(id, username);
+			correspondent = new Correspondent(username);
+		}
+		
+		cursor.close();
+		return correspondent;
+
+	}
+	
+	public Correspondent downloadCorrespondentByUserId(long userId) {
+		Cursor cursor = sqLiteDatabase.query(TABLE_CORRESPONDENTS,
+				new String[] { CORRESPONDENT_ID, CORRESPONDENT_USERNAME},
+				CORRESPONDENT_ID + " = ?", new String[] { Long.toString(userId) }, null, null, null);
+		
+		Correspondent correspondent = null;
+		
+		if (cursor.moveToFirst()) {
+
+			long id = cursor.getInt(cursor.getColumnIndex(CORRESPONDENT_ID));
+			String username = cursor.getString(cursor.getColumnIndex(CORRESPONDENT_USERNAME));
+			
+			correspondent = new Correspondent(username);
 		}
 		
 		cursor.close();
@@ -1027,32 +1108,29 @@ public class SQLiteHandler {
 
 	}
 
-	public long saveCorrespondent(String userId, String username, String email, String fname) {
+	public long saveCorrespondent(String username) {
 		ContentValues values = new ContentValues();
-		values.put(CORRESPONDENT_USER_ID, userId);
+		
 		values.put(CORRESPONDENT_USERNAME, username);
-		values.put(CORRESPONDENT_EMAIL, email);
-		values.put(CORRESPONDENT_FNAME, fname);
-
-		long id = sqLiteDatabase.insert(TABLE_CORRESPONDENTS, null, values);
-		L.debug(TAG + " new correspondent inserted into sqlite: " + userId + " : " + fname);
+		
+		long id = sqLiteDatabase.insertWithOnConflict(TABLE_CORRESPONDENTS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+		//long id = sqLiteDatabase.insert(TABLE_CORRESPONDENTS, null, values);
+		L.debug(TAG + " new correspondent inserted into sqlite: " + username);
 		return id;
 	}
 	
 	public void saveMultipleCorrespondents(List<Correspondent> correspondentsForBulkInsert) {
 		
 		L.debug("SQLiteHandler, saveMultipleCorrespondents "+correspondentsForBulkInsert.size());
-		long now = System.currentTimeMillis();
-		 
+		
 		String sql = "INSERT  OR IGNORE INTO "+TABLE_CORRESPONDENTS+
-				"("+CORRESPONDENT_USER_ID+", "+CORRESPONDENT_USERNAME+") VALUES(?, ?);";
+				"("+CORRESPONDENT_USERNAME+") VALUES(?);";
 		sqLiteDatabase.beginTransaction();
 		SQLiteStatement statement = sqLiteDatabase.compileStatement(sql);
 		
 		for(int i=0;i<correspondentsForBulkInsert.size();i++){
 			
-			statement.bindLong(1, correspondentsForBulkInsert.get(i).getId());
-			statement.bindString(2, correspondentsForBulkInsert.get(i).getUsername());
+			statement.bindString(1, correspondentsForBulkInsert.get(i).getUsername());
 			
 			statement.execute();
 			statement.clearBindings();
@@ -1064,12 +1142,20 @@ public class SQLiteHandler {
 	
 	public void saveMultipleMsgs(List<OneComment> mMessages) {
 		
-		
-		
-		
 	}
 	
-	
+	public void markMyMsgsAsRead(String sendername) {
+		L.debug("SQLiteHandler, markMyMsgsAsRead "+sendername);
+		String username = getUsername();
+		boolean isUnread 		= false;
+		
+		ContentValues values = new ContentValues();
+		values.put(MSG_IS_UNREAD, isUnread);
+		
+		int row = sqLiteDatabase.update(TABLE_MESSAGES, values, MSG_SENDER_NAME+"=?  AND "+MSG_IS_UNREAD+"=?", new String[]{sendername, StringFormattingUtils.getBoolean(true)});
+		
+		L.debug("Updated "+row+" rows in TABLE_MESSAGES");
+	}
 	
 	public void saveMultipleMsgsAndMarkAsReceived(List<OneComment> msgsForBulkInsert) {
 		L.debug("SQLiteHandler, saveMultipleMsgsAndMarkAsReceived "+msgsForBulkInsert.size());
@@ -1124,8 +1210,6 @@ public class SQLiteHandler {
 		L.error("SqliteHandler, new msg inserted into sqlite: senderName: " + senderName + ",receiverName: " + receiverName
 				+ " left: " + isLeft + ", msg: " + body + ", success: " + isSuccessful + ", isUnread: " + isUnread
 				+ ", date: " + date);
-		
-		
 	}
 
 	public void saveMessage(long senderId, long receiverId, boolean left, String comment, boolean success, String date,
@@ -1155,7 +1239,21 @@ public class SQLiteHandler {
 				+ " left: " + left + ", msg: " + comment + ", success: " + success + ", isUnread: " + isUnread
 				+ ", date: " + date + "dateReceived " + dateReceived);
 	}
-
+	
+	
+	public long downloadCorrespondentId(String username) {
+		
+		L.error("SQLiteHandler,downloadCorrespondentId");
+		
+		Cursor c = sqLiteDatabase.query(DATABASE_TABLE_2, new String[]{PROFILE_USER_ID}, PROFILE_USERNAME+"=?", new String[]{username}, null, null, null);
+		long id = -1;
+		if(c.moveToFirst()){
+			id = c.getLong(c.getColumnIndex(PROFILE_USER_ID));
+		}
+		
+		return id;
+	}
+	
 	public void insertNearbyUser(String userid, String username, int distance, String fname, String lname, String age,
 			String gender, String looking_for, String date_seen, int shown, String about_me, String looking_type,
 			String status, String email, String val) {
@@ -1852,4 +1950,5 @@ public class SQLiteHandler {
 		
 	}
 
+	
 }

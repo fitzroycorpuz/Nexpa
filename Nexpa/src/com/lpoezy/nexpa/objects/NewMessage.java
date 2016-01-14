@@ -1,8 +1,12 @@
 package com.lpoezy.nexpa.objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.StringFormattingUtils;
 
 import android.content.Context;
+import android.database.Cursor;
 
 public class NewMessage {
 
@@ -14,8 +18,17 @@ public class NewMessage {
 	private boolean isUnread;
 	private boolean isSyncedOnline;
 	private long date;
-
-	public NewMessage(String senderName, String receiverName, String body, boolean isLeft, boolean isSuccessful, boolean isUnread, boolean isSyncedOnline, long date) {
+	
+	@JsonCreator
+	public NewMessage(
+			@JsonProperty("senderName")String senderName, 
+			@JsonProperty("receiverName")String receiverName, 
+			@JsonProperty("body")String body, 
+			@JsonProperty("isLeft")boolean isLeft, 
+			@JsonProperty("isSuccessful")boolean isSuccessful, 
+			@JsonProperty("isUnread")boolean isUnread, 
+			@JsonProperty("isSyncedOnline")boolean isSyncedOnline, 
+			@JsonProperty("date")long date) {
 		
 		this.senderName = senderName;
 		this.receiverName = receiverName;
@@ -26,6 +39,10 @@ public class NewMessage {
 		this.isSyncedOnline = isSyncedOnline;
 		this.date = date;
 
+	}
+
+	public NewMessage() {
+		
 	}
 
 	public String getSenderName() {
@@ -100,5 +117,59 @@ public class NewMessage {
 		db.close();
 		
 	}
+	
+	public void saveMySentMsgOffline(Context context) {
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToWrite();
+		senderName = db.getUsername();
+		db.saveMsg(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);
+		db.close();
+		
+	}
+	
+	
+	public static int getUnReadMsgCountOffline(Context context) {
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToRead();
+
+		String username = db.getUsername();
+		int count = db.getUnReadMsgCount(username);
+		db.close();
+
+		return count;
+	}
+
+	
+	
+	public void downloadLatestOfflineMessageOf(Context context, String username) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static NewMessage getMsg(Cursor cursor) {
+		
+		String senderName 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_SENDER_NAME));
+		String receiverName 		= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_RECEIVER_NAME));
+		int isLeft 				= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_LEFT));
+		String body 				= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_BODY));
+		int isSuccessful 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_SUCCESS));
+		long date 			= cursor.getLong(cursor.getColumnIndex(SQLiteHandler.MSG_DATE));
+		int isUnread 			= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_UNREAD));
+		//String dateReceived 	= cursor.getString(cursor.getColumnIndex(SQLiteHandler.MSG_DATE_RECEIVED));
+		int isSyncedOnline 		= cursor.getInt(cursor.getColumnIndex(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
+		
+		
+		
+		NewMessage comment = new NewMessage(senderName, receiverName, body, 
+				StringFormattingUtils.getBoolean(isLeft), 
+				StringFormattingUtils.getBoolean(isSuccessful), 
+				StringFormattingUtils.getBoolean(isUnread), 
+				StringFormattingUtils.getBoolean(isSyncedOnline), 
+				date);
+		
+		return comment;
+	}
+
+	
 
 }

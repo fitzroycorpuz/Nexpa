@@ -1,22 +1,16 @@
 package com.lpoezy.nexpa.chatservice;
 
-import android.content.Context;
-import android.database.Cursor;
-
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,15 +19,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lpoezy.nexpa.activities.ChatActivity;
 import com.lpoezy.nexpa.configuration.AppConfig;
-import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.StringFormattingUtils;
-import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
+
+import android.content.Context;
+import android.database.Cursor;
 
 public class OneComment {
 
@@ -315,11 +308,11 @@ public class OneComment {
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToRead();
 
-		long userId = Long.valueOf(db.getLoggedInID());
-		int count = db.getUnReadMsgCount(userId);
+//		long userId = Long.valueOf(db.getLoggedInID());
+//		int count = db.getUnReadMsgCount(userId);
 		db.close();
 
-		return count;
+		return 0;
 	}
 
 	public static List<OneComment> downloadAllMessagesByUserIdAndCorrespondentIdOnline(final Context context, final long correspondentId) {

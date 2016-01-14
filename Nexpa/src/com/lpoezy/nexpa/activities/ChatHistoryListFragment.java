@@ -12,6 +12,7 @@ import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.Correspondents;
 import com.lpoezy.nexpa.objects.Messages;
+import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.DividerItemDecoration;
 import com.lpoezy.nexpa.utility.L;
@@ -101,7 +102,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection direction) {
 
-            	updateList();
+            	//updateList();
             }
 		});
 
@@ -122,7 +123,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
 			L.debug("=============ChatHistoryList, message received================");
-			updateList();
+			//updateList();
 
 		}
 
@@ -167,7 +168,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		int count = OneComment.getUnReadMsgCountOffline(getActivity());
 		L.debug("count: "+count+", mBuddys.isEmpty: "+mBuddys.isEmpty());
 		if ((mBuddys != null && mBuddys.isEmpty())) {
-			updateList();
+			//updateList();
 
 			mSwipeRefreshLayout.post(new Runnable() {
 				@Override
@@ -178,7 +179,6 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		} else {
 			downloadAllMsgsOffline();
 		}
-
 	}
 
 	private void downloadAllMsgsOffline() {
@@ -191,39 +191,39 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 	}
 
-	private void updateList() {
-		L.debug("ChatHistory, updateList");
-		if (SystemUtilz.isNetworkAvailable(getActivity())) {
-
-			new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-
-					// mCorrespondents =
-					// Correspondent.downloadAllReceivedOnline(getActivity());
-					final List<Correspondent> correspondents = Correspondent.downloadLatestMsgsOnline(getActivity());
-					Messages messages = new Messages();
-					messages.downloadMyMsgsOnline(getActivity());
-					
-					
-					
-					
-					
-					downloadProfilePics(correspondents);
-					
-					mBuddys.clear();
-					mBuddys.addAll(correspondents);
-					onCorrespondentUpdate();
-				}
-			}).start();
-
-		} else {
-
-			downloadAllMsgsOffline();
-		}
-		// onCorrespondentUpdate();
-	}
+//	private void updateList() {
+//		L.debug("ChatHistory, updateList");
+//		if (SystemUtilz.isNetworkAvailable(getActivity())) {
+//
+//			new Thread(new Runnable() {
+//
+//				@Override
+//				public void run() {
+//
+//					// mCorrespondents =
+//					// Correspondent.downloadAllReceivedOnline(getActivity());
+//					final List<Correspondent> correspondents = Correspondent.downloadLatestMsgsOnline(getActivity());
+//					Messages messages = new Messages();
+//					messages.downloadMyMsgsOnline(getActivity());
+//					
+//					
+//					
+//					
+//					
+//					downloadProfilePics(correspondents);
+//					
+//					mBuddys.clear();
+//					mBuddys.addAll(correspondents);
+//					onCorrespondentUpdate();
+//				}
+//			}).start();
+//
+//		} else {
+//
+//			downloadAllMsgsOffline();
+//		}
+//		// onCorrespondentUpdate();
+//	}
 
 	protected void downloadProfilePics(final List<Correspondent> correspondents) {
 		
@@ -248,7 +248,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 						@Override
 						public void run() {
 
-							correspondent.downloadProfilePicOnline(getActivity());
+							//correspondent.downloadProfilePicOnline(getActivity());
 							 
 
 						}
@@ -287,45 +287,45 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 		@Override
 		public void onBindViewHolder(ViewHolder vh, int position) {
-			vh.position = position;
-
-			// only use username if fname has no value
-			String name = mBuddys.get(position).getUsername();
-					
-			vh.tvBuddys.setText(name);
-
-			OneComment msg = mBuddys.get(position).getConversation().get(0);
-
-			// only make the text bold if the msg is from a correpondent
-			boolean isMsgUnread = msg.isUnread;
-
-			SQLiteHandler db = new SQLiteHandler(getActivity());
-			db.openToRead();
-			long userId = Long.parseLong(db.getLoggedInID());
-			db.close();
-
-			if (isMsgUnread && (userId != msg.senderId))
-				vh.tvMsg.setTypeface(null, Typeface.BOLD); // only text //
-															// style(only bold)
-			else
-				vh.tvMsg.setTypeface(null, Typeface.NORMAL);
-
-			// L.debug("update view holder
-			// "+mBuddys.get(position).getProfilePic());
-			 Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
-				        R.drawable.pic_sample_girl);
-			if (mBuddys.get(position).getProfilePic() != null) {
-
-				
-				rawImage = mBuddys.get(position).getProfilePic();
-			}
-			
-			RoundedImageView riv = new RoundedImageView(getActivity());
-			Bitmap circImage = riv.getCroppedBitmap(rawImage, 68);
-
-			vh.imgProfilePic.setImageBitmap(circImage);
-			
-			vh.tvMsg.setText(msg.comment);
+//			vh.position = position;
+//
+//			// only use username if fname has no value
+//			String name = mBuddys.get(position).getUsername();
+//					
+//			vh.tvBuddys.setText(name);
+//
+//			NewMessage msg = mBuddys.get(position).getConversation().get(0);
+//
+//			// only make the text bold if the msg is from a correpondent
+//			boolean isMsgUnread = msg.isUnread();
+//
+//			SQLiteHandler db = new SQLiteHandler(getActivity());
+//			db.openToRead();
+//			long userId = Long.parseLong(db.getLoggedInID());
+//			db.close();
+//
+//			if (isMsgUnread && (userId != msg.senderId))
+//				vh.tvMsg.setTypeface(null, Typeface.BOLD); // only text //
+//															// style(only bold)
+//			else
+//				vh.tvMsg.setTypeface(null, Typeface.NORMAL);
+//
+//			// L.debug("update view holder
+//			// "+mBuddys.get(position).getProfilePic());
+//			 Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
+//				        R.drawable.pic_sample_girl);
+//			if (mBuddys.get(position).getProfilePic() != null) {
+//
+//				
+//				rawImage = mBuddys.get(position).getProfilePic();
+//			}
+//			
+//			RoundedImageView riv = new RoundedImageView(getActivity());
+//			Bitmap circImage = riv.getCroppedBitmap(rawImage, 68);
+//
+//			vh.imgProfilePic.setImageBitmap(circImage);
+//			
+//			vh.tvMsg.setText(msg.comment);
 
 		}
 
@@ -356,9 +356,9 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 				Correspondent buddy = mBuddys.get(position);
 				// will set all the unread flags,
 				// of the messages to read
-				for (OneComment comment : buddy.getConversation()) {
-					if (comment.isUnread) {
-						comment.isUnread = false;
+				for (NewMessage comment : buddy.getConversation()) {
+					if (comment.isUnread()) {
+						comment.setUnread(false);
 					}
 				}
 

@@ -89,6 +89,8 @@ public class PeopleProfileActivity extends Activity implements Correspondent.OnC
 		userId = intent.getLongExtra("TAG_GEO_USER_ID", -1);
 		username = intent.getStringExtra("TAG_GEO_USER");
 		email = intent.getStringExtra("TAG_GEO_EMAIL");
+		
+		L.debug("userId = "+userId);
 
 /*
 		txtFName = (TextView) findViewById(R.id.user_fname);
@@ -203,14 +205,13 @@ public class PeopleProfileActivity extends Activity implements Correspondent.OnC
         imgProfile.setImageBitmap(circImage);
         
         mCorrespondent = new Correspondent();
-		mCorrespondent.setId(userId);
 		mCorrespondent.addListener(PeopleProfileActivity.this);
         
         new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
-				mCorrespondent.downloadProfilePicOnline(PeopleProfileActivity.this);
+				mCorrespondent.downloadProfilePicOnline(PeopleProfileActivity.this, userId);
 				
 			}
 		}).start();

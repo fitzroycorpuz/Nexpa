@@ -1,11 +1,11 @@
 package com.lpoezy.nexpa.activities;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.ChatMessagesService;
-import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.chatservice.SyncDataService;
 import com.lpoezy.nexpa.chatservice.SyncProfilePictureService;
 import com.lpoezy.nexpa.chatservice.SyncUserProfileService;
 import com.lpoezy.nexpa.configuration.AppConfig;
+import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.L;
@@ -182,8 +182,8 @@ public class TabHostActivity extends TabActivity {
 			// if current screen is ChatHistoryActivity or ChatActivity
 			if (ChatHistoryActivity.isRunning || ChatActivity.isRunning)
 				return;
-
-			int count = OneComment.getUnReadMsgCountOffline(TabHostActivity.this);
+			
+			int count = NewMessage.getUnReadMsgCountOffline(TabHostActivity.this);
 			L.debug("TabhostActivity, mUpdateMsgCount " + count);
 			if (count > 0) {
 				if (mViewMsgCount.getVisibility() == View.GONE)

@@ -25,7 +25,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 		
 		if(isLoggegIn){
 			
-			Intent msgService = new Intent(context, ChatMessagesService.class);
+			Intent msgReceivedService = new Intent(context, ChatMessagesService.class);
 			Intent syncDataService = new Intent(context, SyncDataService.class);
 			Intent syncUserProfileService = new Intent(context, SyncUserProfileService.class);
 			Intent syncProfilePictureService = new Intent(context, SyncProfilePictureService.class);
@@ -33,7 +33,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 			if(isNetworkAvailable){
 				
 				if(!isChatServiceRunning){
-	 				context.startService(msgService);
+	 				context.startService(msgReceivedService);
 	 				
 				}
 				
@@ -53,7 +53,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 			}else{
 				if(isChatServiceRunning){
 					
-					context.stopService(msgService);
+					context.stopService(msgReceivedService);
 				}
 				
 				if(isSyncDataRunning){

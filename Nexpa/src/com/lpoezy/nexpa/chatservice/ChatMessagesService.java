@@ -146,19 +146,62 @@ public class ChatMessagesService extends Service {
 				final Message message = (Message) packet;
 				
 				if (message.getBody() != null) {
-
-					final String fromName = StringUtils.parseBareAddress(message.getFrom());
 					
-					String senderName = fromName.split("@")[0];
-					boolean isLeft = true;
-					boolean isSuccessful = true;
-					String body = message.getBody();
-					long date = System.currentTimeMillis();
-					String receiverName = "";
-					boolean isUnread = false;
-					boolean isSyncedOnline = false;
-					NewMessage msg = new NewMessage(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);
-					msg.saveMyReceivedMsgOffline(getApplicationContext());
+					//save correspondent
+					final String fromName = StringUtils.parseBareAddress(message.getFrom());
+					L.debug("received msg from "+fromName);
+					new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							
+							String senderName = fromName.split("@")[0];
+							Correspondent correspondent = new Correspondent(senderName);
+							correspondent.saveOffline(getApplicationContext());
+							correspondent.downloadCorrespondentIdOffline(getApplicationContext());
+							//save msg
+							boolean isLeft = true;
+							boolean isSuccessful = true;
+							String body = message.getBody();
+							long date = System.currentTimeMillis();
+							String receiverName = "";
+							boolean isUnread = ChatActivity.isRunning ? false: true;
+							boolean isSyncedOnline = false;
+							NewMessage msg = new NewMessage(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);
+							msg.saveMyReceivedMsgOffline(getApplicationContext());
+							
+							// check if there is an available activity
+							// to,
+							// receive the brodacast
+							if (!TabHostActivity.isRunning && !ChatHistoryActivity.isRunning
+									&& !ChatActivity.isRunning) {
+								
+								L.debug("sending nottification!");
+
+								// send notification
+								sendNotification(correspondent);
+								
+							} else {
+								
+								// send broadcast
+								Intent broadcast = new Intent(AppConfig.ACTION_RECEIVED_MSG);
+								broadcast.putExtra("userid", correspondent.getId());
+								broadcast.putExtra("username", correspondent.getUsername());
+								broadcast.putExtra("msg", msg.getBody());
+								broadcast.putExtra("date", msg.getDate());
+								L.debug("sending broadcast!");
+								sendBroadcast(broadcast);
+								
+							}
+							
+							
+							
+							
+						}
+					}).start();
+					
+					
+					
 /*/
 					new Thread(new Runnable() {
 						
@@ -426,7 +469,7 @@ public class ChatMessagesService extends Service {
 
 	private void sendNotification(Correspondent correspondent) {
 
-		int msgCount = OneComment.getUnReadMsgCountOffline(getApplicationContext());
+		int msgCount = NewMessage.getUnReadMsgCountOffline(getApplicationContext());
 
 		String title = (msgCount > 1) ? " new messages" : " new message";
 
