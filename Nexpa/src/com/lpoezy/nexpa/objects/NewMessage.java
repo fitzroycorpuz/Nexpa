@@ -1,8 +1,11 @@
 package com.lpoezy.nexpa.objects;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.StringFormattingUtils;
 
 import android.content.Context;
@@ -142,8 +145,21 @@ public class NewMessage {
 	
 	
 	public void downloadLatestOfflineMessageOf(Context context, String username) {
-		// TODO Auto-generated method stub
 		
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToRead();
+		
+		Map<String, String> map = db.downloadLatestMessageOf(username);
+		this.senderName = map.get(SQLiteHandler.MSG_SENDER_NAME);
+		this.receiverName = map.get(SQLiteHandler.MSG_RECEIVER_NAME);
+		this.body = map.get(SQLiteHandler.MSG_BODY);
+		this.isLeft = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_LEFT));
+		this.isSuccessful = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_SUCCESS));
+		this.isUnread = StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_UNREAD));
+		this.date = Long.parseLong(map.get(SQLiteHandler.MSG_DATE));
+		this.isSyncedOnline =StringFormattingUtils.getBoolean(map.get(SQLiteHandler.MSG_IS_SYNCED_ONLINE));
+		
+		db.close();
 	}
 
 	public static NewMessage getMsg(Cursor cursor) {

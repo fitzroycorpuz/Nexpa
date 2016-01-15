@@ -43,7 +43,8 @@ import android.widget.TextView;
 public class ChatHistoryListFragment extends Fragment implements Correspondent.OnCorrespondentUpdateListener {
 
 	private OnShowChatHistoryListener mCallback;
-	private List<Correspondent> mBuddys;
+	//private List<Correspondent> mBuddys;
+	private Correspondents mBuddys;
 	private ChatHistoryAdapter mAdapter;
 	//private SwipeRefreshLayout mSwipeRefreshLayout;
 	private SwipyRefreshLayout mSwipeRefreshLayout;
@@ -86,25 +87,28 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		rvChatHistory.setLayoutManager(new LinearLayoutManager(getActivity()));
 		rvChatHistory.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
-		mBuddys = new ArrayList<Correspondent>();
+		//mBuddys = new ArrayList<Correspondent>();
+		mBuddys = new Correspondents();
 
 		mAdapter = new ChatHistoryAdapter(getActivity(), mCallback);
 		rvChatHistory.setAdapter(mAdapter);
+		
+		updateList();
 
 		//mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
-		mSwipeRefreshLayout = (SwipyRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
-		mSwipeRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
-		mSwipeRefreshLayout.setColorSchemeResources(R.color.niagara, R.color.buttercup, R.color.niagara);
-
-		mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.carrara));
-		
-		mSwipeRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-
-            	//updateList();
-            }
-		});
+//		mSwipeRefreshLayout = (SwipyRefreshLayout) v.findViewById(R.id.swipeRefreshLayout);
+//		mSwipeRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
+//		mSwipeRefreshLayout.setColorSchemeResources(R.color.niagara, R.color.buttercup, R.color.niagara);
+//
+//		mSwipeRefreshLayout.setBackgroundColor(getResources().getColor(R.color.carrara));
+//		
+//		mSwipeRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+//
+//            	//updateList();
+//            }
+//		});
 
 //		mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 //			@Override
@@ -123,7 +127,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
 			L.debug("=============ChatHistoryList, message received================");
-			//updateList();
+			updateList();
 
 		}
 
@@ -151,10 +155,10 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		getActivity().unregisterReceiver(mReceivedMessage);
 		// getActivity().unregisterReceiver(mReceivedCorrespondentUpdate);
 
-		for (int i = 0; i < mBuddys.size(); i++) {
-			Correspondent correspondent = mBuddys.get(i);
-			correspondent.removeListener(this);
-		}
+//		for (int i = 0; i < mBuddys.size(); i++) {
+//			Correspondent correspondent = mBuddys.get(i);
+//			correspondent.removeListener(this);
+//		}
 	}
 
 	@Override
@@ -165,34 +169,38 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		getActivity().registerReceiver(mReceivedMessage, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
 		// getActivity().registerReceiver(mReceivedCorrespondentUpdate, new
 		// IntentFilter(Correspondent.ACTION_UPDATE));
-		int count = OneComment.getUnReadMsgCountOffline(getActivity());
-		L.debug("count: "+count+", mBuddys.isEmpty: "+mBuddys.isEmpty());
-		if ((mBuddys != null && mBuddys.isEmpty())) {
-			//updateList();
-
-			mSwipeRefreshLayout.post(new Runnable() {
-				@Override
-				public void run() {
-					mSwipeRefreshLayout.setRefreshing(true);
-				}
-			});
-		} else {
-			downloadAllMsgsOffline();
-		}
+//		int count = OneComment.getUnReadMsgCountOffline(getActivity());
+//		L.debug("count: "+count+", mBuddys.isEmpty: "+mBuddys.isEmpty());
+//		if ((mBuddys != null && mBuddys.isEmpty())) {
+//			//updateList();
+//
+//			mSwipeRefreshLayout.post(new Runnable() {
+//				@Override
+//				public void run() {
+//					mSwipeRefreshLayout.setRefreshing(true);
+//				}
+//			});
+//		} else {
+//			downloadAllMsgsOffline();
+//		}
 	}
 
-	private void downloadAllMsgsOffline() {
+//	private void downloadAllMsgsOffline() {
+//
+//		List<Correspondent> correspondents = Correspondent.downloadAllOffline(getActivity());
+//		downloadProfilePics(correspondents);
+//		mBuddys.clear();
+//		mBuddys.addAll(correspondents);
+//		onCorrespondentUpdate();
+//
+//	}
 
-		List<Correspondent> correspondents = Correspondent.downloadAllOffline(getActivity());
-		downloadProfilePics(correspondents);
-		mBuddys.clear();
-		mBuddys.addAll(correspondents);
-		onCorrespondentUpdate();
-
-	}
-
-//	private void updateList() {
-//		L.debug("ChatHistory, updateList");
+	private void updateList() {
+		L.debug("ChatHistory, updateList");
+		
+		mBuddys.downloadOffline(getActivity());
+		mBuddys.downloadLatestMsgOffline(getActivity());
+		
 //		if (SystemUtilz.isNetworkAvailable(getActivity())) {
 //
 //			new Thread(new Runnable() {
@@ -202,18 +210,18 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 //
 //					// mCorrespondents =
 //					// Correspondent.downloadAllReceivedOnline(getActivity());
-//					final List<Correspondent> correspondents = Correspondent.downloadLatestMsgsOnline(getActivity());
-//					Messages messages = new Messages();
-//					messages.downloadMyMsgsOnline(getActivity());
-//					
-//					
-//					
-//					
-//					
-//					downloadProfilePics(correspondents);
-//					
-//					mBuddys.clear();
-//					mBuddys.addAll(correspondents);
+////					final List<Correspondent> correspondents = Correspondent.downloadLatestMsgsOnline(getActivity());
+////					Messages messages = new Messages();
+////					messages.downloadMyMsgsOnline(getActivity());
+////					
+////					
+////					
+////					
+////					
+////					downloadProfilePics(correspondents);
+////					
+////					mBuddys.clear();
+////					mBuddys.addAll(correspondents);
 //					onCorrespondentUpdate();
 //				}
 //			}).start();
@@ -222,8 +230,14 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 //
 //			downloadAllMsgsOffline();
 //		}
-//		// onCorrespondentUpdate();
-//	}
+		// onCorrespondentUpdate();
+		
+		//List<Correspondent> correspondents = Correspondent.downloadAllOffline(getActivity());
+//		downloadProfilePics(correspondents);
+//		mBuddys.clear();
+//		mBuddys.addAll(correspondents);
+//		onCorrespondentUpdate();
+	}
 
 	protected void downloadProfilePics(final List<Correspondent> correspondents) {
 		
@@ -287,23 +301,23 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 		@Override
 		public void onBindViewHolder(ViewHolder vh, int position) {
-//			vh.position = position;
-//
-//			// only use username if fname has no value
-//			String name = mBuddys.get(position).getUsername();
-//					
-//			vh.tvBuddys.setText(name);
-//
-//			NewMessage msg = mBuddys.get(position).getConversation().get(0);
-//
-//			// only make the text bold if the msg is from a correpondent
-//			boolean isMsgUnread = msg.isUnread();
+			vh.position = position;
+
+			// only use username if fname has no value
+			String name = mBuddys.get(position).getUsername();
+					
+			vh.tvBuddys.setText(name);
+
+			NewMessage msg = mBuddys.get(position).getConversation().get(0);
+
+			// only make the text bold if the msg is from a correpondent
+			boolean isMsgUnread = msg.isUnread();
 //
 //			SQLiteHandler db = new SQLiteHandler(getActivity());
 //			db.openToRead();
 //			long userId = Long.parseLong(db.getLoggedInID());
 //			db.close();
-//
+
 //			if (isMsgUnread && (userId != msg.senderId))
 //				vh.tvMsg.setTypeface(null, Typeface.BOLD); // only text //
 //															// style(only bold)
@@ -325,7 +339,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 //
 //			vh.imgProfilePic.setImageBitmap(circImage);
 //			
-//			vh.tvMsg.setText(msg.comment);
+			vh.tvMsg.setText(msg.getBody());
 
 		}
 
@@ -378,17 +392,26 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 	@Override
 	public void onCorrespondentUpdate() {
-
-		mSwipeRefreshLayout.post(new Runnable() {
+		
+		getActivity().runOnUiThread(new Runnable() {
+			
 			@Override
 			public void run() {
 				mAdapter.notifyDataSetChanged();
-
-				if (mSwipeRefreshLayout.isRefreshing()) {
-					mSwipeRefreshLayout.setRefreshing(false);
-				}
+				
 			}
 		});
+
+//		mSwipeRefreshLayout.post(new Runnable() {
+//			@Override
+//			public void run() {
+//				mAdapter.notifyDataSetChanged();
+//
+//				if (mSwipeRefreshLayout.isRefreshing()) {
+//					mSwipeRefreshLayout.setRefreshing(false);
+//				}
+//			}
+//		});
 
 		// getActivity().runOnUiThread( new Runnable() {
 		// public void run() {

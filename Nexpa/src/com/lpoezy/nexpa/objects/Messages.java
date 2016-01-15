@@ -163,11 +163,11 @@ public class Messages {
 		db.close();
 	}
 	
-	public void markMyOfflineMsgsAsSynced(Context context, String username) {
+	public void markMyOfflineMsgsAsSynced(Context context) {
 		
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
-		db.markMyMsgsAsRead(username);
+		db.markMyMsgsAsSynced(mMessages);
 		db.close();
 	}
 	
@@ -179,8 +179,6 @@ public class Messages {
 		mMessages.addAll(conversation);
 		db.close();
 		
-		
-		
 	}
 	
 	public void downloadMyUnsyncedSentMsgsOffline(Context context){
@@ -188,6 +186,8 @@ public class Messages {
 		db.openToRead();
 		List<NewMessage> list = db.downloadMyUnsyncedSentMsgs();
 		db.close();
+		
+		
 		mMessages.addAll(list);
 	}
 

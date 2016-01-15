@@ -87,7 +87,11 @@ public class SyncDataService extends Service {
 				
 				if(msgs.size()!=0){
 					
-					msgs.saveMyUnsyncedSentMsgsOnline(getApplicationContext());
+					boolean isSuccessful = msgs.saveMyUnsyncedSentMsgsOnline(getApplicationContext());
+					
+					if(isSuccessful){
+						msgs.markMyOfflineMsgsAsSynced(getApplicationContext());
+					}
 //					try {
 //						if(OneComment.markMsgsAsReadOnline(list)){
 //							for(OneComment msg : list){

@@ -27,6 +27,16 @@ public class Correspondents {
 		return mCorrespondents;
 	}
 	
+	public int size(){
+		return mCorrespondents.size();
+		
+	}
+	
+	public Correspondent get(int position){
+		return mCorrespondents.get(position);
+		
+	}
+	
 	public void add(Correspondent corrspondent){
 		getCorrespondents().add(corrspondent);
 	}
@@ -59,5 +69,21 @@ public class Correspondents {
 		}
 		
 		db.close();
+	}
+
+	public void downloadOffline(Context context) {
+		SQLiteHandler db = new SQLiteHandler(context);
+		db.openToRead();
+		List<Correspondent> list = db.downloadAllCorrespondents();
+		mCorrespondents.addAll(list);
+		db.close();
+		
+	}
+
+	public void downloadLatestMsgOffline(Context context) {
+		
+		for(Correspondent correspondent : mCorrespondents){
+			correspondent.downloadLatestMsgOffline(context);
+		}
 	}
 }

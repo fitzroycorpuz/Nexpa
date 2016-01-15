@@ -202,8 +202,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 				final String to = recipient.getText().toString();
 				final String text = textMessage.getText().toString();
 				
-				final SQLiteHandler db = new SQLiteHandler(getApplicationContext());
-				db.openToWrite();
+				
 				
 				if(!text.isEmpty()){
 					
@@ -222,6 +221,9 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 					boolean isUnread = true;
 					boolean isSyncedOnline = false;
 					long date = System.currentTimeMillis();
+					
+					Correspondent correspondent = new Correspondent(receiverName);
+					correspondent.saveOffline(ChatActivity.this);
 					
 					if ((connection == null) || (!connection.isConnected())) {
 						
@@ -245,7 +247,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 						if (!isReconnecting) {
 							isReconnecting = true;
 							Account ac = new Account();
-							
+							SQLiteHandler db = new SQLiteHandler(getApplicationContext());
 							db.openToWrite();
 
 							ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(),
@@ -259,7 +261,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 								}
 							});
 
-							
+							db.close();
 						}
 
 					}
@@ -277,7 +279,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 						listview.smoothScrollToPosition(mComments.size() - 1);
 						
 					}
-					db.close();
+					
 				}
 				
 			}
