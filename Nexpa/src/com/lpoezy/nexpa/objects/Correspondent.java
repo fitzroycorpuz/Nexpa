@@ -330,24 +330,24 @@ public class Correspondent {
 //	}
 
 	public void downloadProfilePicOnline(final Context context, long userId) {
-
+		
 		if (profilePic != null)
 			return;
-
+		
 		ProfilePicture profilePicture = new ProfilePicture();
 		profilePicture.setUserId(userId);
 
 		// download profile pic info offline
 		profilePicture.downloadOffline(context);
-
+		
 		if ((profilePicture.getImgDir() != null && !profilePicture.getImgDir().isEmpty())
 				&& (profilePicture.getImgFile() != null && !profilePicture.getImgFile().isEmpty())) {
-
+			
 			String spec = AppConfig.URL + "/" + profilePicture.getImgDir() + "/" + profilePicture.getImgFile();
-			L.debug("spec " + spec);
+			//L.debug("spec" + spec);
 			setProfilePic(HttpUtilz.downloadImage(spec));
 			// context.sendBroadcast(new Intent(ACTION_UPDATE));
-
+			
 		}
 	}
 
@@ -365,7 +365,7 @@ public class Correspondent {
 
 	private void notifyListeners() {
 		for (OnCorrespondentUpdateListener listener : listeners) {
-
+			
 			listener.onCorrespondentUpdate();
 		}
 

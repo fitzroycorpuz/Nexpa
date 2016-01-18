@@ -64,18 +64,18 @@ public class Messages {
 		
 	}
 	
-	public void saveMultipleMsgsOffline(Context context){
+	public void saveOffline(Context context){
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		
-//		if(mMessages.size()>0) {
-//			
-//			db.saveMultipleMsgs(mMessages);
-//			
-//		} else {
-//			
-//			throw new ArrayIndexOutOfBoundsException("No messages details to save");
-//		}
+		if(mMessages.size()>0) {
+			
+			db.saveMultipleMsgs(mMessages);
+			
+		} else {
+			
+			throw new ArrayIndexOutOfBoundsException("No messages details to save");
+		}
 		
 		db.close();
 	}

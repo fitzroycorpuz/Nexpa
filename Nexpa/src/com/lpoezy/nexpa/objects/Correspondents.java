@@ -70,6 +70,10 @@ public class Correspondents {
 		
 		db.close();
 	}
+	
+	public void clear(){
+		mCorrespondents.clear();
+	}
 
 	public void downloadOffline(Context context) {
 		SQLiteHandler db = new SQLiteHandler(context);

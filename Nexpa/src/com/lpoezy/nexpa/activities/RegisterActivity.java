@@ -43,7 +43,7 @@ public class RegisterActivity extends Activity {
 		  register.setOnClickListener(new View.OnClickListener() {
 				
 				public void onClick(View v) {
-					
+					/*
 					AccountManager am = new AccountManager(connection);
 					Map<String, String> attributes = new HashMap<String, String>();
 					attributes.put("username", "my_user_name");
@@ -67,7 +67,7 @@ public class RegisterActivity extends Activity {
 					    reg.getPacketID()), new PacketTypeFilter(IQ.class));
 					PacketCollector collector = connection.createPacketCollector(filter);
 					connection.sendPacket(reg);
-		    	
+		    	//*/
 					Toast.makeText(getApplicationContext(),
 		                      "Button Clicked",Toast.LENGTH_SHORT).show();	
 					

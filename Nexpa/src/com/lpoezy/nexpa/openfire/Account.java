@@ -39,7 +39,7 @@ public class Account {
 	public static final String SERVICE = "198.154.106.139";
 	public static final String SERVICE_LOGIN = "@198.154.106.139/Smack";
 	public static final String SERVICE_UNAME = "admin";
-	private static final String SERVICE_PWORD = "pkslpo123";
+	private static final String SERVICE_PWORD = "9db9b6749ffbf61e19aea4358a11d837";
 	
 	SQLiteHandler db;
 	private XMPPConnection connection;
@@ -93,6 +93,7 @@ public class Account {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, SERVICE);
 					XMPPConnection connection = new XMPPConnection(connConfig);
+					
 					connection.connect();
 					Log.e("XMPPChatDemoActivity", email+" Connected to " + connection.getHost());
 					
@@ -131,15 +132,15 @@ public class Account {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, email + SERVICE_LOGIN);
 					XMPPConnection connection = new XMPPConnection(connConfig);
-					Log.e("user", username);
-					Log.e("password", password);
-					Log.e("email", email);
+					L.error("user: " +username);
+					L.error("password: "+ password);
+					L.error("email: "+ email);
 					connection.disconnect();
 					connection.connect();
-					Log.e("XMPP REGISTER", "Connected to " + connection.getHost());
-					
+					L.error("XMPP REGISTER, Connected to " + connection.getHost());
 					
 					try {
+						//XMPP REGISTER, Failed to log in as tet@test.com : SASL authentication failed using mechanism DIGEST-MD5: 
 						
 						connection.login(username, password);
 						Log.e("XMPP REGISTER", "Logged in as " + connection.getUser());
@@ -151,25 +152,25 @@ public class Account {
 						Collection < RosterEntry > entries = roster.getEntries();
 						
 						for (RosterEntry entry: entries) {
-							Log.e("XMPPChatDemoActivity", "--------------------------------------");
-							Log.e("XMPPChatDemoActivity", "RosterEntry " + entry);
-							Log.e("XMPPChatDemoActivity", "User: " + entry.getUser());
+							L.error("XMPPChatDemoActivity, --------------------------------------");
+							L.error("XMPPChatDemoActivity, RosterEntry " + entry);
+							L.error("XMPPChatDemoActivity, User: " + entry.getUser());
 							Presence entryPresence = roster.getPresence(entry.getUser());
-							Log.e("XMPPChatDemoActivity", "Presence Status: " + entryPresence.getStatus());
-							Log.e("XMPPChatDemoActivity", "Presence Type: " + entryPresence.getType());
+							L.error("XMPPChatDemoActivity, Presence Status: " + entryPresence.getStatus());
+							L.error("XMPPChatDemoActivity, Presence Type: " + entryPresence.getType());
 							Presence.Type type = entryPresence.getType();
 							
 							if (type == Presence.Type.available) Log.e("XMPPChatDemoActivity", "Presence AVAILABLE");
-							Log.d("XMPPChatDemoActivity", "Presence : " + entryPresence);
+							L.debug("XMPPChatDemoActivity, Presence : " + entryPresence);
 						}
 						
 					} catch (XMPPException ex) {
-						Log.e("XMPP REGISTER", "Failed to log in as " + email +" : "+ ex.toString());
+						L.error("XMPP REGISTER, Failed to log in as " + email +" : "+ ex.toString());
 						setConnection(null);
 					}
 					
 				} catch (XMPPException ex) {
-					Log.e("XMPP REGISTER", "Chat server failed:" + ex.getLocalizedMessage());
+					L.error("XMPP REGISTER, Chat server failed:" + ex.getLocalizedMessage());
 					setConnection(null);
 				}
 			}

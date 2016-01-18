@@ -1004,70 +1004,32 @@ public class SQLiteHandler {
 	public List<Correspondent> downloadAllCorrespondents() {
 		L.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		L.error("SQLiteHandler,getting message senders");
-		//SELECT profile.user_id, correspondents.username FROM profile INNER JOIN correspondents 0N profile.username=correspondents.username
-//		String sql = "SELECT " + DATABASE_TABLE_2 + "." + PROFILE_USER_ID + ", " + TABLE_CORRESPONDENTS + "."
-//				+ CORRESPONDENT_USERNAME + " FROM " + DATABASE_TABLE_2 + " INNER JOIN " + TABLE_CORRESPONDENTS + " 0N "
-//				+ DATABASE_TABLE_2 + "." + PROFILE_USERNAME + "=" + TABLE_CORRESPONDENTS + "." + CORRESPONDENT_USERNAME;
-		 Cursor cursorLeft = sqLiteDatabase.query(TABLE_CORRESPONDENTS, new
-		 String[] { CORRESPONDENT_USERNAME }, null, null,
-		 null, null, null);
-		 
-		 Cursor cursorRight = sqLiteDatabase.query(DATABASE_TABLE_2, new String[]{PROFILE_USER_ID, PROFILE_USERNAME}, null, null, null, null, null);
-		 
-		CursorJoiner joiner = new CursorJoiner(cursorLeft, new String[]{CORRESPONDENT_USERNAME}, cursorRight, new String[]{PROFILE_USERNAME});
+
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables(DATABASE_TABLE_2 + " INNER JOIN " + TABLE_CORRESPONDENTS + " ON " + DATABASE_TABLE_2 + "."
+				+ PROFILE_USERNAME + "=" + TABLE_CORRESPONDENTS + "." + CORRESPONDENT_USERNAME);
+
+		Cursor c = builder.query(sqLiteDatabase, new String[] { DATABASE_TABLE_2 + "." + PROFILE_USER_ID,
+				TABLE_CORRESPONDENTS + "." + CORRESPONDENT_USERNAME }, null, null, null, null, null);
+
 		List<Correspondent> correspondents = new ArrayList<Correspondent>();
+		if (c.moveToFirst()) {
+			do {
 
-		while(joiner.hasNext()){
-			
-			CursorJoiner.Result result = joiner.next();
-	        switch (result) {
-	            case LEFT:
-	                // don't care about this case
-	                break;
+				long id = Long.parseLong(c.getString(c.getColumnIndex(PROFILE_USER_ID)));
+				String uname = c.getString(c.getColumnIndex(CORRESPONDENT_USERNAME));
 
-	            case RIGHT:
-	                // nor this case
-	                break;
+				Correspondent correspondent = new Correspondent();
+				correspondent.setId(id);
+				correspondent.setUsername(uname);
 
-	            case BOTH:
-	                // here both original Cursors are pointing at rows that have the same user_id, so we can extract values
-	                long id = cursorRight.getLong(cursorRight.getColumnIndex(PROFILE_USER_ID));
-	            
-	                String uname = cursorLeft.getString(cursorLeft.getColumnIndex(CORRESPONDENT_USERNAME));
+				correspondents.add(correspondent);
 
-	                Correspondent correspondent = new Correspondent();
-					correspondent.setId(id);
-					correspondent.setUsername(uname);
-					correspondents.add(correspondent);
-	                break;
-
-	        }
-			
+			} while (c.moveToNext());
 		}
-		//cursorLeft.close();
-		//cursorRight.close();
-		
-//		List<Correspondent> correspondents = new ArrayList<Correspondent>();
-//		List<Long> ids = new ArrayList<Long>();
-//		if (c0.moveToFirst()) {
-//			do {
-//
-//				long id = Long.parseLong(c0.getString(c0.getColumnIndex(PROFILE_USER_ID)));
-//				String uname = c0.getString(c0.getColumnIndex(CORRESPONDENT_USERNAME));
-//				L.debug("id: " + id + ", uname: " + uname);
-//				Correspondent correspondent = new Correspondent();
-//				correspondent.setId(id);
-//				correspondent.setUsername(uname);
-//				// UserProfile correspondent = new UserProfile(id, uname,
-//				// description, profession, url0, url1, url2, dateUpdated);
-//				
-//				correspondents.add(correspondent);
-//				
-//			} while (c0.moveToNext());
-//		}
-//
-//		// Log.e("B STATUS",last + "");
-//		c0.close();
+		//
+		// // Log.e("B STATUS",last + "");
+		// c0.close();
 		L.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		return correspondents;
 
@@ -1210,11 +1172,41 @@ public class SQLiteHandler {
 		return id;
 	}
 
+	public void saveMultipleMsgs(List<NewMessage> messages) {
+		L.debug("SQLiteHandler, saveMultipleCorrespondents " + messages.size());
+
+		String sql = "INSERT INTO " + TABLE_MESSAGES + "(" + MSG_SENDER_NAME + ", " + MSG_RECEIVER_NAME + ","
+				+ MSG_IS_LEFT + "," + MSG_BODY + "," + MSG_SUCCESS + "," + MSG_DATE + "," + MSG_IS_SYNCED_ONLINE + ","
+				+ MSG_IS_UNREAD + ") VALUES(?,?,?,?,?,?,?,?);";
+		//L.debug(sql);
+		sqLiteDatabase.beginTransaction();
+		SQLiteStatement statement = sqLiteDatabase.compileStatement(sql);
+
+		for (int i = 0; i < messages.size(); i++) {
+
+			statement.bindString(1, messages.get(i).getSenderName());
+			statement.bindString(2, messages.get(i).getReceiverName());
+			statement.bindString(3, StringFormattingUtils.getBoolean(messages.get(i).isLeft()));
+			statement.bindString(4, messages.get(i).getBody());
+			statement.bindString(5, StringFormattingUtils.getBoolean(messages.get(i).isSuccessful()));
+			statement.bindLong(6, messages.get(i).getDate());
+			statement.bindString(7, StringFormattingUtils.getBoolean(messages.get(i).isSyncedOnline()));
+			statement.bindString(8, StringFormattingUtils.getBoolean(messages.get(i).isUnread()));
+			statement.execute();
+			statement.clearBindings();
+		}
+
+		sqLiteDatabase.setTransactionSuccessful();
+		sqLiteDatabase.endTransaction();
+
+	}
+
 	public void saveMultipleCorrespondents(List<Correspondent> correspondentsForBulkInsert) {
 
 		L.debug("SQLiteHandler, saveMultipleCorrespondents " + correspondentsForBulkInsert.size());
 
 		String sql = "INSERT  OR IGNORE INTO " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_USERNAME + ") VALUES(?);";
+		//L.debug(sql);
 		sqLiteDatabase.beginTransaction();
 		SQLiteStatement statement = sqLiteDatabase.compileStatement(sql);
 
@@ -1224,6 +1216,7 @@ public class SQLiteHandler {
 
 			statement.execute();
 			statement.clearBindings();
+			
 		}
 
 		sqLiteDatabase.setTransactionSuccessful();

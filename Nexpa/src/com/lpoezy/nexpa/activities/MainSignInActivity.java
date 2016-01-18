@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.XMPPConnection;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +30,10 @@ import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.configuration.AppController;
+import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.Correspondents;
+import com.lpoezy.nexpa.objects.Messages;
+import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.openfire.Account;
@@ -237,6 +242,124 @@ public class MainSignInActivity extends Activity {
 	private void makeNotify(CharSequence con, Style style) {
 		AppMsg.makeText(this, con, style).show();
 	}
+	
+	private void updateChatHistory(){
+		L.debug("MainSignActivity, updateChatHistory");
+		HashMap<String, String> postDataParams = new HashMap<String, String>();
+		postDataParams.put("tag", "download_all_msgs");// download_profile_and_pic_info
+		postDataParams.put("username", server_name);
+		L.debug("server_name: "+server_name);
+		
+		final String spec = AppConfig.URL_MSG;
+		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+		L.debug("webPage"+webPage);
+		
+		JSONObject result;
+		try {
+			result = new JSONObject(webPage);
+			Correspondents correspondents = new Correspondents();
+			Messages comments = new Messages();
+			boolean error = result.getBoolean("error");
+			if(!error){
+				
+				JSONArray msgs = result.getJSONArray("messages");
+				
+				for(int i=0;i<msgs.length();i++){
+					JSONObject msg = msgs.getJSONObject(i);
+					
+					String senderName = msg.getString("sender_name");
+					String receiverName= msg.getString("receiver_name");
+					String body= msg.getString("body");
+					boolean isLeft = !senderName.equals(server_name)?false:true;
+					
+					if(isLeft){//msg is a received msg
+						//save the sender to offline db
+						correspondents.add(new Correspondent(senderName));
+					}
+					
+					boolean isSuccessful = true;
+					boolean isUnread = false;
+					boolean isSyncedOnline = true;
+					long date= Long.parseLong(msg.getString("date"));
+					NewMessage comment = new NewMessage(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);
+					comments.add(comment);
+				}
+				
+				
+				
+			}
+			
+			correspondents.saveOffline(MainSignInActivity.this);
+			
+			comments.saveOffline(MainSignInActivity.this);
+			
+		} catch (JSONException e) {
+			L.error(""+e);
+		}
+		
+	}
+	
+	private void updateUserProfile(){
+		
+		HashMap<String, String> postDataParams = new HashMap<String, String>();
+		postDataParams.put("tag", "download_profile_and_pic_info");// download_profile_and_pic_info
+		postDataParams.put("user_id", server_uid);
+
+		final String spec = AppConfig.URL_PROFILE_PIC;
+		String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+		JSONObject jResult;
+		// reusing userid
+		// and username
+		long uId = Long.parseLong(server_uid);
+		String uname = server_name;
+		String description = "";
+		String profession = "";
+		String url0 = "";
+		String url1 = "";
+		String url2 = "";
+		String dateUpdated = "";
+	
+		try {
+			jResult = new JSONObject(webPage);
+
+			JSONObject profilePictureJson;
+			if (!jResult.getBoolean("error")) {
+
+				profilePictureJson = jResult
+						.getJSONArray("profile_and_pic_info")
+						.getJSONObject(0);
+
+				
+				description = profilePictureJson.getString("description");
+				profession = profilePictureJson.getString("title");
+				url0 = profilePictureJson.getString("url0");
+				url1 = profilePictureJson.getString("url1");
+				url2 = profilePictureJson.getString("url2");
+				dateUpdated = profilePictureJson.getString("date_updated");
+
+				String imgDir = profilePictureJson.getString("img_dir");
+				String imgFile = profilePictureJson.getString("img_file");
+				String dateUploaded = profilePictureJson
+						.getString("date_uploaded");
+
+				ProfilePicture profilePicture = new ProfilePicture(uId,
+						imgDir, imgFile, dateUploaded, true);
+				profilePicture.downloadImageOnline();
+				profilePicture.saveOffline(MainSignInActivity.this);
+			}
+
+		} catch (JSONException e) {
+			L.error("" + e);
+		}
+
+		UserProfile profile = new UserProfile(uId, uname, description,
+					profession, url0, url1, url2, dateUpdated, true);
+		profile.updateOffline(MainSignInActivity.this);
+
+		L.debug("MainSignInActivity, server_uid: " + server_uid
+				+ ", server_name: " + server_name + ", webPage: "
+				+ webPage);
+	}
 
 	private void checkLogin(final String email, final String password) {
 		final String tag_string_req = "login";
@@ -277,64 +400,10 @@ public class MainSignInActivity extends Activity {
 
 										@Override
 										public void run() {
-											HashMap<String, String> postDataParams = new HashMap<String, String>();
-											postDataParams.put("tag", "download_profile_and_pic_info");// download_profile_and_pic_info
-											postDataParams.put("user_id", server_uid);
-
-											final String spec = AppConfig.URL_PROFILE_PIC;
-											String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-											JSONObject jResult;
-											// reusing userid
-											// and username
-											long uId = Long.parseLong(server_uid);
-											String uname = server_name;
-											String description = "";
-											String profession = "";
-											String url0 = "";
-											String url1 = "";
-											String url2 = "";
-											String dateUpdated = "";
-										
-											try {
-												jResult = new JSONObject(webPage);
-
-												JSONObject profilePictureJson;
-												if (!jResult.getBoolean("error")) {
-
-													profilePictureJson = jResult
-															.getJSONArray("profile_and_pic_info")
-															.getJSONObject(0);
-
-													
-													description = profilePictureJson.getString("description");
-													profession = profilePictureJson.getString("title");
-													url0 = profilePictureJson.getString("url0");
-													url1 = profilePictureJson.getString("url1");
-													url2 = profilePictureJson.getString("url2");
-													dateUpdated = profilePictureJson.getString("date_updated");
-
-													String imgDir = profilePictureJson.getString("img_dir");
-													String imgFile = profilePictureJson.getString("img_file");
-													String dateUploaded = profilePictureJson
-															.getString("date_uploaded");
-
-													ProfilePicture profilePicture = new ProfilePicture(uId,
-															imgDir, imgFile, dateUploaded, true);
-													profilePicture.downloadImageOnline();
-													profilePicture.saveOffline(MainSignInActivity.this);
-												}
-
-											} catch (JSONException e) {
-												L.error("" + e);
-											}
-
-											UserProfile profile = new UserProfile(uId, uname, description,
-														profession, url0, url1, url2, dateUpdated, true);
-											profile.updateOffline(MainSignInActivity.this);
-
-											L.debug("MainSignInActivity, server_uid: " + server_uid
-													+ ", server_name: " + server_name + ", webPage: "
-													+ webPage);
+											
+											updateChatHistory();
+											
+											updateUserProfile();
 											
 											
 											btnLogin.post(new Runnable() {
