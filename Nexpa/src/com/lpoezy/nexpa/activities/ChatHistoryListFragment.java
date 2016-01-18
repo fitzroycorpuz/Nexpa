@@ -159,7 +159,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 		mBuddys.clear();
 		mBuddys.downloadOffline(getActivity());
 		mBuddys.downloadLatestMsgOffline(getActivity());
-		
+		onCorrespondentUpdate();
 		downloadProfilePics(mBuddys);
 	}
 
@@ -244,7 +244,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 			String username = db.getUsername();
 			db.close();
 
-			if (isMsgUnread && (username != msg.getSenderName()))
+			if (isMsgUnread && !username.equals( msg.getSenderName()))
 				vh.tvMsg.setTypeface(null, Typeface.BOLD); // only text //
 															// style(only bold)
 			else

@@ -1027,6 +1027,8 @@ public class SQLiteHandler {
 
 			} while (c.moveToNext());
 		}
+
+		L.debug("correspondents " + correspondents.size());
 		//
 		// // Log.e("B STATUS",last + "");
 		// c0.close();
@@ -1178,12 +1180,12 @@ public class SQLiteHandler {
 		String sql = "INSERT INTO " + TABLE_MESSAGES + "(" + MSG_SENDER_NAME + ", " + MSG_RECEIVER_NAME + ","
 				+ MSG_IS_LEFT + "," + MSG_BODY + "," + MSG_SUCCESS + "," + MSG_DATE + "," + MSG_IS_SYNCED_ONLINE + ","
 				+ MSG_IS_UNREAD + ") VALUES(?,?,?,?,?,?,?,?);";
-		//L.debug(sql);
+		// L.debug(sql);
 		sqLiteDatabase.beginTransaction();
 		SQLiteStatement statement = sqLiteDatabase.compileStatement(sql);
 
 		for (int i = 0; i < messages.size(); i++) {
-
+			statement.clearBindings();
 			statement.bindString(1, messages.get(i).getSenderName());
 			statement.bindString(2, messages.get(i).getReceiverName());
 			statement.bindString(3, StringFormattingUtils.getBoolean(messages.get(i).isLeft()));
@@ -1193,34 +1195,37 @@ public class SQLiteHandler {
 			statement.bindString(7, StringFormattingUtils.getBoolean(messages.get(i).isSyncedOnline()));
 			statement.bindString(8, StringFormattingUtils.getBoolean(messages.get(i).isUnread()));
 			statement.execute();
-			statement.clearBindings();
+			
 		}
 
 		sqLiteDatabase.setTransactionSuccessful();
 		sqLiteDatabase.endTransaction();
-
+		
 	}
 
 	public void saveMultipleCorrespondents(List<Correspondent> correspondentsForBulkInsert) {
 
 		L.debug("SQLiteHandler, saveMultipleCorrespondents " + correspondentsForBulkInsert.size());
 
-		String sql = "INSERT  OR IGNORE INTO " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_USERNAME + ") VALUES(?);";
-		//L.debug(sql);
+		String sql = "INSERT OR IGNORE INTO " + TABLE_CORRESPONDENTS + " (" + CORRESPONDENT_USERNAME + ") VALUES(?);";
+		L.debug(sql);
+
+		
+		SQLiteStatement insert = sqLiteDatabase.compileStatement(sql);
 		sqLiteDatabase.beginTransaction();
-		SQLiteStatement statement = sqLiteDatabase.compileStatement(sql);
-
 		for (int i = 0; i < correspondentsForBulkInsert.size(); i++) {
+			insert.clearBindings();
+			insert.bindString(1, correspondentsForBulkInsert.get(i).getUsername());
 
-			statement.bindString(1, correspondentsForBulkInsert.get(i).getUsername());
+			insert.execute();
 
-			statement.execute();
-			statement.clearBindings();
-			
 		}
 
 		sqLiteDatabase.setTransactionSuccessful();
+
 		sqLiteDatabase.endTransaction();
+		
+		
 	}
 
 	public void markMyMsgsAsSynced(List<NewMessage> messages) {

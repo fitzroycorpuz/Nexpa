@@ -270,7 +270,7 @@ public class MainSignInActivity extends Activity {
 					String senderName = msg.getString("sender_name");
 					String receiverName= msg.getString("receiver_name");
 					String body= msg.getString("body");
-					boolean isLeft = !senderName.equals(server_name)?false:true;
+					boolean isLeft = !senderName.equals(server_name)?true:false;
 					
 					if(isLeft){//msg is a received msg
 						//save the sender to offline db
@@ -284,8 +284,6 @@ public class MainSignInActivity extends Activity {
 					NewMessage comment = new NewMessage(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);
 					comments.add(comment);
 				}
-				
-				
 				
 			}
 			
