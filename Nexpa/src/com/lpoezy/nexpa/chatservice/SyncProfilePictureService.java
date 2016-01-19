@@ -94,7 +94,7 @@ public class SyncProfilePictureService extends Service {
 				}else{
 					
 					retry = (2<<n)* MINUTE;
-					n++;
+					if(n<3)n++;
 					
 					L.debug("SyncProfilePictureService, no changes to update online");
 				}

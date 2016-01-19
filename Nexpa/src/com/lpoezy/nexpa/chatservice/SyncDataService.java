@@ -106,7 +106,7 @@ public class SyncDataService extends Service {
 				}else{
 					
 					retry = (2<<n)* MINUTE;
-					n++;
+					if(n<3)n++;
 					
 					L.debug("SyncDAtaService, no msgs to update online");
 				}
