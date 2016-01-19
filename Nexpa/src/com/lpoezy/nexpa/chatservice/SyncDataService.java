@@ -25,7 +25,7 @@ public class SyncDataService extends Service {
 	private volatile Looper mServiceLooper;
 	private volatile Handler mServiceHandler;
 
-	private int retry = 1000 * 60;
+	private int retry = MINUTE;
 	private int n = 0;
 
 	public static boolean isRunning;
@@ -104,12 +104,13 @@ public class SyncDataService extends Service {
 					
 					retry = MINUTE;
 				}else{
-					
+					L.debug("(2<<"+n+") : "+(2<<n));
 					retry = (2<<n)* MINUTE;
-					if(n<3)n++;
+					if(n<2)n++;
 					
 					L.debug("SyncDAtaService, no msgs to update online");
 				}
+				
 				L.debug("SyncDAtaService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
 				mServiceHandler.postDelayed(this, retry);
 			}
