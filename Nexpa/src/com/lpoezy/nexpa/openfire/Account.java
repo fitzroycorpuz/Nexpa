@@ -247,8 +247,8 @@ public class Account {
 			GroupChatHomeActivity.updateStatusText(3);
 		}
 		catch(Exception e){
-			Log.e("XMPP STATUS", "Trying to log-in... "+ e.getLocalizedMessage());
-			L.debug("XMPP STATUS, Trying to log-in... "+ e.getLocalizedMessage());
+			Log.e("XMPP STATUS", "Trying to log-in... "+ e);
+			L.debug("XMPP STATUS, Trying to log-in... "+ e);
 		}
 		Log.e("XMPP STATUS", "Trying to log-in...");
 		L.debug("XMPP STATUS, Trying to log-in...");

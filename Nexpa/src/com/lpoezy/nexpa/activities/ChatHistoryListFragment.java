@@ -48,6 +48,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 	private ChatHistoryAdapter mAdapter;
 	//private SwipeRefreshLayout mSwipeRefreshLayout;
 	private SwipyRefreshLayout mSwipeRefreshLayout;
+	private RecyclerView rvChatHistory;
 
 	public static ChatHistoryListFragment newInstance() {
 		ChatHistoryListFragment fragment = new ChatHistoryListFragment();
@@ -83,7 +84,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_chat_history_list, container, false);
 
-		RecyclerView rvChatHistory = (RecyclerView) v.findViewById(R.id.rv_chat_history);
+		rvChatHistory = (RecyclerView) v.findViewById(R.id.rv_chat_history);
 		rvChatHistory.setLayoutManager(new LinearLayoutManager(getActivity()));
 		rvChatHistory.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
@@ -319,7 +320,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 	@Override
 	public void onCorrespondentUpdate() {
 		
-		getActivity().runOnUiThread(new Runnable() {
+		rvChatHistory.post(new Runnable() {
 			
 			@Override
 			public void run() {
@@ -328,6 +329,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 				
 			}
 		});
+		
 	}
 
 }

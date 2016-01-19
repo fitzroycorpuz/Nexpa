@@ -56,6 +56,7 @@ public class Correspondents {
 	}
 	
 	public void saveOffline(Context context){
+		L.debug("Correspondents, saveOffline "+mCorrespondents.size());
 		SQLiteHandler db = new SQLiteHandler(context);
 		db.openToWrite();
 		

@@ -271,11 +271,10 @@ public class MainSignInActivity extends Activity {
 					String receiverName= msg.getString("receiver_name");
 					String body= msg.getString("body");
 					boolean isLeft = !senderName.equals(server_name)?true:false;
+					String correspondentName = isLeft?senderName:receiverName;
 					
-					if(isLeft){//msg is a received msg
-						//save the sender to offline db
-						correspondents.add(new Correspondent(senderName));
-					}
+					correspondents.add(new Correspondent(correspondentName));
+					
 					
 					boolean isSuccessful = true;
 					boolean isUnread = false;
@@ -298,7 +297,7 @@ public class MainSignInActivity extends Activity {
 	}
 	
 	private void updateUserProfile(){
-		
+		L.debug("MainSignActivity, updateUserProfile");
 		HashMap<String, String> postDataParams = new HashMap<String, String>();
 		postDataParams.put("tag", "download_profile_and_pic_info");// download_profile_and_pic_info
 		postDataParams.put("user_id", server_uid);
@@ -387,10 +386,11 @@ public class MainSignInActivity extends Activity {
 							db.addUser(server_name, server_email, server_uid, server_created_at, password);
 							session.setLogin(true);
 							Account ac = new Account();
+							
 							ac.LogInChatAccount(server_name, password, server_email, new OnXMPPConnectedListener() {
 
 								@Override
-								public void onXMPPConnected(XMPPConnection connection) {
+								public void onXMPPConnected(final XMPPConnection connection) {
 
 									// download user profile pic info
 									ExecutorService exec = Executors.newCachedThreadPool();
