@@ -165,7 +165,7 @@ public class ChatMessagesService extends Service {
 							String body = message.getBody();
 							long date = System.currentTimeMillis();
 							String receiverName = "";
-							boolean isUnread = ChatActivity.isRunning ? false: true;
+							boolean isUnread = true;//ChatActivity.isRunning ? false: true;
 							boolean isSyncedOnline = false;
 							NewMessage msg = new NewMessage(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);
 							msg.saveMyReceivedMsgOffline(getApplicationContext());

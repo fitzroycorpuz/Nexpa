@@ -325,7 +325,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 					
 
 					//final long userId = intent.getLongExtra("userid", -1);
-					String senderName = intentMes.getStringExtra("username");
+					String senderName = intent.getStringExtra("username");
 					String receiverName = "";
 					String body = intent.getStringExtra("msg");
 					boolean isLeft = true;
@@ -336,7 +336,8 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 					//don't reveal msg,
 					//if the sender is not the current correspondent,
 					//of the user
-					if(!senderName.equalsIgnoreCase(mCorrespondentName))return;
+					L.debug("senderName: "+senderName+", mCorrespondentName: "+mCorrespondentName);
+					if(!senderName.equals(mCorrespondentName))return;
 					
 					
 					// mCorrespondentId = userId;

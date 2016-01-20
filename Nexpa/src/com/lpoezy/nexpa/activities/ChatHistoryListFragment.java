@@ -326,10 +326,8 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 			public void run() {
 				L.debug("ChatHistoryList, onCorrespondentUpdate");
 				mAdapter.notifyDataSetChanged();
-				
 			}
 		});
-		
 	}
 
 }
