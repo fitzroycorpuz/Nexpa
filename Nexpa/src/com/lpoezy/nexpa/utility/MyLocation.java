@@ -60,8 +60,11 @@ public class MyLocation {
 		public void onProviderEnabled(String provider) {}
 		public void onStatusChanged(String provider, int status, Bundle extras) {}
 	};
+	
 	class GetLastLocation extends TimerTask {@Override
 		public void run() {
+		
+			L.error("=================GetLastLocation=====================");
 			lm.removeUpdates(locationListenerGps);
 			lm.removeUpdates(locationListenerNetwork);
 			Location net_loc = null, gps_loc = null;

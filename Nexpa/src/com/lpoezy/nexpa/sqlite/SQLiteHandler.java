@@ -1005,29 +1005,29 @@ public class SQLiteHandler {
 		L.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		L.error("SQLiteHandler,getting message senders");
 
-		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-		builder.setTables(DATABASE_TABLE_2 + " INNER JOIN " + TABLE_CORRESPONDENTS + " ON " + DATABASE_TABLE_2 + "."
-				+ PROFILE_USERNAME + "=" + TABLE_CORRESPONDENTS + "." + CORRESPONDENT_USERNAME);
-
-		Cursor c = builder.query(sqLiteDatabase, new String[] { DATABASE_TABLE_2 + "." + PROFILE_USER_ID,
-				TABLE_CORRESPONDENTS + "." + CORRESPONDENT_USERNAME }, null, null, null, null, null);
-
+//		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+//		builder.setTables(DATABASE_TABLE_2 + " INNER JOIN " + TABLE_CORRESPONDENTS + " ON " + DATABASE_TABLE_2 + "."
+//				+ PROFILE_USERNAME + "=" + TABLE_CORRESPONDENTS + "." + CORRESPONDENT_USERNAME);
+//
+//		Cursor c = builder.query(sqLiteDatabase, new String[] { DATABASE_TABLE_2 + "." + PROFILE_USER_ID,
+//				TABLE_CORRESPONDENTS + "." + CORRESPONDENT_USERNAME }, null, null, null, null, null);
+		Cursor c = sqLiteDatabase.query(TABLE_CORRESPONDENTS, new String[]{CORRESPONDENT_USERNAME}, null, null, null, null, null);
 		List<Correspondent> correspondents = new ArrayList<Correspondent>();
 		if (c.moveToFirst()) {
 			do {
 
-				long id = Long.parseLong(c.getString(c.getColumnIndex(PROFILE_USER_ID)));
+				//long id = Long.parseLong(c.getString(c.getColumnIndex(PROFILE_USER_ID)));
 				String uname = c.getString(c.getColumnIndex(CORRESPONDENT_USERNAME));
 
 				Correspondent correspondent = new Correspondent();
-				correspondent.setId(id);
+				//correspondent.setId(id);
 				correspondent.setUsername(uname);
 
 				correspondents.add(correspondent);
 
 			} while (c.moveToNext());
 		}
-
+		c.close();
 		L.debug("correspondents " + correspondents.size());
 		//
 		// // Log.e("B STATUS",last + "");
@@ -1216,7 +1216,7 @@ public class SQLiteHandler {
 		for (int i = 0; i < correspondentsForBulkInsert.size(); i++) {
 			insert.clearBindings();
 			insert.bindString(1, correspondentsForBulkInsert.get(i).getUsername());
-
+			L.debug("saving username "+correspondentsForBulkInsert.get(i).getUsername());
 			insert.execute();
 
 		}
@@ -1225,6 +1225,17 @@ public class SQLiteHandler {
 
 		sqLiteDatabase.endTransaction();
 		
+		Cursor c = sqLiteDatabase.query(TABLE_CORRESPONDENTS, new String[]{CORRESPONDENT_USERNAME}, null, null, null, null, null);
+		if(c.moveToFirst()){
+			
+			do{
+				
+				L.debug("CORRESPONDENT_USERNAME "+c.getString(c.getColumnIndex(CORRESPONDENT_USERNAME)));
+				
+			}while(c.moveToNext());
+		}
+		
+		c.close();
 		
 	}
 
@@ -1999,6 +2010,7 @@ public class SQLiteHandler {
 		// SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = sqLiteDatabase.rawQuery(selectQuery, null);
 		cursor.moveToFirst();
+		
 		if (cursor.getCount() > 0) {
 			user.put("name", cursor.getString(cursor.getColumnIndex(KEY_NAME)));
 			user.put("email", cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));

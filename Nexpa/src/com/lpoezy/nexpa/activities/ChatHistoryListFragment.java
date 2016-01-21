@@ -187,6 +187,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 
 						@Override
 						public void run() {
+							correspondent.downloadCorrespondentIdOffline(getActivity());
 							long userId = correspondent.getId();
 							correspondent.downloadProfilePicOnline(getActivity(), userId);
 							 

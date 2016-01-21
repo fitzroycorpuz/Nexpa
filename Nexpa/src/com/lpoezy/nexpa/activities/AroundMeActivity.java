@@ -365,12 +365,18 @@ public class AroundMeActivity extends AppCompatActivity
 	}
 
 	private void getNewLoc() {
+		
 		String dtUpdate = db.getLocationDateUpdate();
+		L.error("AroundMeActivity, getNewLoc dtUpdate: "+dtUpdate);
 		if ((dtUpdate == "") || (du.hoursAgo(dtUpdate))) {
+			
 			Log.e("LOCATION INTELLIGENCE", "Update needed...");
+			
 			LocationResult locationResult = new LocationResult() {
+				
 				@Override
 				public void gotLocation(Location location) {
+					
 					if (location != null) {
 						ftLatitude = (float) location.getLatitude();
 						ftLongitude = (float) location.getLongitude();
@@ -843,6 +849,7 @@ public class AroundMeActivity extends AppCompatActivity
 				mSwipeRefreshLayout.setRefreshing(true);
 			}
 		});
+		
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {

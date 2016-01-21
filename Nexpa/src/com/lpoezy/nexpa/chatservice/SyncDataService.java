@@ -92,6 +92,7 @@ public class SyncDataService extends Service {
 					if(isSuccessful){
 						msgs.markMyOfflineMsgsAsSynced(getApplicationContext());
 					}
+					
 //					try {
 //						if(OneComment.markMsgsAsReadOnline(list)){
 //							for(OneComment msg : list){
@@ -113,6 +114,7 @@ public class SyncDataService extends Service {
 				
 				L.debug("SyncDAtaService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
 				mServiceHandler.postDelayed(this, retry);
+				
 			}
 		}, retry);
 		
