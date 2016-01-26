@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Presence;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +39,7 @@ import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
+import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.HttpUtilz;
@@ -385,6 +387,8 @@ public class MainSignInActivity extends Activity {
 
 							db.addUser(server_name, server_email, server_uid, server_created_at, password);
 							session.setLogin(true);
+							
+							
 							Account ac = new Account();
 							
 							ac.LogInChatAccount(server_name, password, server_email, new OnXMPPConnectedListener() {
@@ -408,6 +412,11 @@ public class MainSignInActivity extends Activity {
 
 												@Override
 												public void run() {
+													
+													
+													
+													
+													
 
 													Intent intent = new Intent(MainSignInActivity.this,
 															TabHostActivity.class);

@@ -1,12 +1,19 @@
 package com.lpoezy.nexpa.activities;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.RosterListener;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +35,7 @@ import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.objects.Users;
+import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
 import com.lpoezy.nexpa.utility.DateUtils;
@@ -341,7 +349,7 @@ public class AroundMeActivity extends AppCompatActivity
 					Log.e("ccc", arr_about.get(position));
 					// intent.putExtra("TAG_GEO_PID", us.get(position).getId());
 					long correspondentId = arr_correspondents.get(position).getId();
-					
+
 					intent.putExtra("TAG_GEO_USER_ID", correspondentId);
 					intent.putExtra("TAG_GEO_USER", arr_uname.get(position));
 					intent.putExtra("TAG_GEO_EMAIL", arr_email.get(position));
@@ -365,18 +373,18 @@ public class AroundMeActivity extends AppCompatActivity
 	}
 
 	private void getNewLoc() {
-		
+
 		String dtUpdate = db.getLocationDateUpdate();
-		L.error("AroundMeActivity, getNewLoc dtUpdate: "+dtUpdate);
+		L.error("AroundMeActivity, getNewLoc dtUpdate: " + dtUpdate);
 		if ((dtUpdate == "") || (du.hoursAgo(dtUpdate))) {
-			
+
 			Log.e("LOCATION INTELLIGENCE", "Update needed...");
-			
+
 			LocationResult locationResult = new LocationResult() {
-				
+
 				@Override
 				public void gotLocation(Location location) {
-					
+
 					if (location != null) {
 						ftLatitude = (float) location.getLatitude();
 						ftLongitude = (float) location.getLongitude();
@@ -456,6 +464,9 @@ public class AroundMeActivity extends AppCompatActivity
 		int userSize = us.size();
 		int disSize = distance.size();
 
+		//
+		
+
 		/*
 		 * try { if (userSize < disSize) { for (int i = disSize; i > userSize;
 		 * i--) { adapter.removeItem(i - 1); } } if (sentType.equals("1")) { if
@@ -465,12 +476,19 @@ public class AroundMeActivity extends AppCompatActivity
 		 * (Exception e) {}
 		 */
 
+
+		XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+
+		final Roster roster = connection.getRoster();
+		
+		// L.debug("isAvailable"+roster.getPresence("momo@vps.gigapros.com/Smack").isAvailable());
+		
 		for (int j = 0; j < us.size(); j++) {
 			// L.debug("userID: "+us.get(j).getUserId()+", username:
 			// "+us.get(j).getUserName());
 
 			final Correspondent correspondent = new Correspondent();
-			
+
 			correspondent.addListener(this);
 			final long userId = Long.parseLong(Integer.toString(us.get(j).getUserId()));
 			correspondent.setId(userId);
@@ -487,6 +505,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			if (sentType.equals("1")) {// user is already added
 				// if (us.get(j).getShown().equals("0")) {
+				
 				imageId.add(j, R.drawable.pic_sample_girl);
 				availabilty.add(j, "INSERTED");
 				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", "
@@ -501,6 +520,7 @@ public class AroundMeActivity extends AppCompatActivity
 				arr_about.add(j, us.get(j).getAboutMe());
 				arr_email.add(j, us.get(j).getEmail());
 				arr_status.add(j, us.get(j).getStatus());
+
 				// }
 
 				// }
@@ -679,11 +699,13 @@ public class AroundMeActivity extends AppCompatActivity
 								String id = c.getString(TAG_GEO_PID);
 
 								String lname = ""/*
-													 * c.getString(TAG_GEO_LNAME)
+													 * c.getString(
+													 * TAG_GEO_LNAME)
 													 */;
 
 								String status = ""/*
-													 * c.getString(TAG_GEO_STATUS)
+													 * c.getString(
+													 * TAG_GEO_STATUS)
 													 */;
 								String about_me = ""/*
 													 * c.getString(
@@ -731,7 +753,7 @@ public class AroundMeActivity extends AppCompatActivity
 								String imgDir = c.getString("img_dir");
 								String imgFile = c.getString("img_file");
 								String dateCreated = c.getString("date_uploaded");
-								
+
 								// L.debug("getting profile picture of userId:
 								// "+userId+", imgDir
 								// "+imgDir.equalsIgnoreCase("null")+", imgFile
@@ -739,8 +761,8 @@ public class AroundMeActivity extends AppCompatActivity
 								if ((imgDir != null && !imgDir.isEmpty() && !imgDir.equalsIgnoreCase("null"))
 										&& (imgFile != null && !imgFile.isEmpty()
 												&& !imgFile.equalsIgnoreCase("null"))) {
-									L.error("getting profile picture of userId: " + userId +", uname: " +uname+", imgDir: " + imgDir
-											+ ", imgFile: " + imgFile);
+									L.error("getting profile picture of userId: " + userId + ", uname: " + uname
+											+ ", imgDir: " + imgDir + ", imgFile: " + imgFile);
 									ProfilePicture profilePic = new ProfilePicture(Long.parseLong(userId), imgDir,
 											imgFile, dateCreated, true);
 									profilePic.saveOffline(AroundMeActivity.this);
@@ -849,7 +871,7 @@ public class AroundMeActivity extends AppCompatActivity
 				mSwipeRefreshLayout.setRefreshing(true);
 			}
 		});
-		
+
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {

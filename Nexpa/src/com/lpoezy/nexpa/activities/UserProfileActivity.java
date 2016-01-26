@@ -1,5 +1,6 @@
 package com.lpoezy.nexpa.activities;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Presence;
 
 import com.appyvet.rangebar.RangeBar;
 import com.devspark.appmsg.AppMsg;
@@ -197,7 +198,13 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
        
         if(connection != null && connection.isConnected()) 
         {
-        	connection.disconnect();
+        	
+        	// Create a new presence. Pass in false to indicate we're unavailable.
+//			Presence presence = new Presence(Presence.Type.unavailable);
+//			presence.setStatus("I’m unavailable");
+//			connection.sendPacket(presence);
+//        	
+//        	connection.disconnect();
         }
         
         if(ChatMessagesService.isRunning){

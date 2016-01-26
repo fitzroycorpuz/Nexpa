@@ -265,14 +265,20 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 	}
 	
 	private void createPacketListener() {
+		
 		if (packetListener == null) {
+			
 			packetListener = new PacketListener() {
 				@Override
 				public void processPacket(Packet packet) {
+					
 					final Message message = (Message) packet;
+					
 					if (message.getBody() != null) {
+						
 						String fromName = StringUtils.parseBareAddress(message.getFrom());
 						Log.e("XMPPChatDemoActivity", "Text Recieved: " + message.getBody() + " from " + fromName);
+						
 						String senderRaw = message.getFrom();
 						String[] arr = senderRaw.split("@");
 						String senderEdited = arr[0];
@@ -281,9 +287,11 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 						String formattedLoc = StringFormattingUtils.getBroadcastChatEquivalentLocation(messageToSend);
 						db.insertBroadcast(2, senderEdited + "", formattedMsg , longitude, latitude, formattedLoc, 0);
 						mNotifier.sendEmptyMessage(2);
+						
 					}
 				}
 			};
+			
 			Log.e("XMPP STATUS", "Adding packet listener...");
 			PacketFilter filter = new MessageTypeFilter(Message.Type.normal);
 			db.updateBroadcasting(1);
@@ -356,6 +364,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 	            		else{
 	            			txtCharLeft.setTextColor(getResources().getColor(R.color.toucan_deep_red));
 	            		}
+	            		
 	            		btnStartChat.setEnabled(false);
 	            		btnStartChat.setBackgroundColor((getResources().getColor(R.color.white_smoke)));
 	            	}
@@ -1071,7 +1080,9 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 						Log.e("LOG", "*****JARRAY*****" + nearby_users.length());
 						if (nearby_users.length() == 0) {
 							isSuccess = 1;
+							
 						} else {
+							
 							for (int i = 0; i < nearby_users.length(); i++) {
 								JSONObject c = nearby_users.getJSONObject(i);
 								String uname = c.getString(TAG_GEO_USER);
@@ -1089,22 +1100,29 @@ public class GroupChatHomeActivity extends AppCompatActivity implements OnItemCl
 										Log.e("ERR", "ds"+ xmp.getLocalizedMessage());
 									}
 								}
+								
 								Log.e("XMPPChatDemoActivity", "Sending broadcast to: " + uname);
+								
 								if (i + 1 == nearby_users.length()) {
 									db.insertBroadcast(1, db.getLoggedInID() + "" + 0, edBroad.getText().toString(), longitude, latitude, locationName, exactBroadCount);
 									dialogBroadcast.dismiss();
+									
 									makeNotify("Message Successfully Broadcasted", AppMsg.STYLE_INFO);
 									mNotifier.sendEmptyMessage(2);
 								}
+								
 								if (i == nearby_users.length() - 1) {
 									isSuccess = 2;
 								}
+								
 							}
 						}
 					} else {
+						
 						isSuccess = 3;
 						failedToBroadcast(isSuccess);
 					}
+					
 				} catch (JSONException e) {
 					e.printStackTrace();
 					isSuccess = 4;

@@ -286,16 +286,17 @@ public class Account {
 //						L.debug("XMPPChatDemoActivity, entries: " + entries.size());
 //						
 //						for (RosterEntry entry: entries) {
-//							Log.e("XMPPChatDemoActivity", "--------------------------------------");
-//							Log.e("XMPPChatDemoActivity", "RosterEntry " + entry);
-//							Log.e("XMPPChatDemoActivity", "User: " + entry.getUser());
+//							L.error("XMPPChatDemoActivity, --------------------------------------");
+//							L.error("XMPPChatDemoActivity, RosterEntry " + entry);
+//							L.error("XMPPChatDemoActivity, User: " + entry.getUser());
 //							
 //							L.debug("XMPPChatDemoActivity, User: " + entry.getUser());
 //							Presence entryPresence = roster.getPresence(entry.getUser());
 //							Log.e("XMPPChatDemoActivity", "Presence Status: " + entryPresence.getStatus());
 //							Log.e("XMPPChatDemoActivity", "Presence Type: " + entryPresence.getType());
 //							Presence.Type type = entryPresence.getType();
-//							if (type == Presence.Type.available) Log.e("XMPPChatDemoActivity", "Presence AVIALABLE");
+//							if (type == Presence.Type.available) 
+//								L.error("XMPPChatDemoActivity, Presence AVIALABLE");
 //							Log.d("XMPPChatDemoActivity", "Presence : " + entryPresence);
 //						}
 						

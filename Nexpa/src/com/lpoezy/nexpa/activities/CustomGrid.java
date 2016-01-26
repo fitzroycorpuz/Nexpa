@@ -2,6 +2,10 @@ package com.lpoezy.nexpa.activities;
 
 import java.util.ArrayList;
 
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.pubsub.PresenceState;
+
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
@@ -92,7 +96,10 @@ public class CustomGrid extends BaseAdapter {
            //TextView txtAvailView = (TextView) grid.findViewById(R.id.txtAvail);
            
            
-
+           //Roster roster = Roster.
+           
+          // Presence presence = 
+          
            textView.setText(web.get(position)+ " | " + distance.get(position) +"m");
            //imageView.setImageResource(Imageid.get(position));
           
