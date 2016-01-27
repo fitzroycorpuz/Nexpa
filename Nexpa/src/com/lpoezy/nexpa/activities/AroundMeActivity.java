@@ -362,7 +362,7 @@ public class AroundMeActivity extends AppCompatActivity
 					intent.putExtra("TAG_GEO_FNAME", arr_fname.get(position));
 					intent.putExtra("TAG_GEO_AGE", arr_age.get(position));
 					intent.putExtra("TAG_GEO_GENDER", arr_gender.get(position));
-					intent.putExtra("TAG_GEO_DISTANCE", "25");
+					intent.putExtra("TAG_GEO_DISTANCE", distance.get(position));
 					intent.putExtra("TAG_GEO_ABOUTME", arr_about.get(position));
 					intent.putExtra("TAG_GEO_LOOKING_TYPE", arr_looking_type.get(position));
 					intent.putExtra("TAG_GEO_STATUS", arr_status.get(position));

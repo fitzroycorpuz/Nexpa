@@ -89,7 +89,7 @@ public class PeopleProfileActivity extends Activity implements Correspondent.OnC
 		userId = intent.getLongExtra("TAG_GEO_USER_ID", -1);
 		username = intent.getStringExtra("TAG_GEO_USER");
 		email = intent.getStringExtra("TAG_GEO_EMAIL");
-		
+		distance = intent.getIntExtra("TAG_GEO_DISTANCE", 0)+"m";
 		L.debug("userId = "+userId);
 
 /*
@@ -239,7 +239,7 @@ public class PeopleProfileActivity extends Activity implements Correspondent.OnC
 		
 		if(profile.getUsername()!=null &&!profile.getUsername().equalsIgnoreCase("null") && !profile.getUsername().equals("")){
 			mTvUname.setVisibility(View.VISIBLE);
-			mTvUname.setText(profile.getUsername());
+			mTvUname.setText(profile.getUsername()+" | "+distance);
 		}
 		
 		if(profile.getUrl0()!=null &&!profile.getUrl0().equalsIgnoreCase("null") && !profile.getUrl0().equals("")){
