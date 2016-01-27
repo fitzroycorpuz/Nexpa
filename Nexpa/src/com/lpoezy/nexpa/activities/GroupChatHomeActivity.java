@@ -645,7 +645,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			});
 
 			// *
-			btnFave = (LinearLayout) arg1.findViewById(R.id.btnFavorite);
+			/*btnFave = (LinearLayout) arg1.findViewById(R.id.btnFavorite);
 			btnFave.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
@@ -663,7 +663,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					
 					
 				};
-			});
+			});*/
 			// */
 			// btnStarred = (LinearLayout) arg1.findViewById(R.id.btnReply);
 
@@ -825,7 +825,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						return true;
 					}
 					
-					if (view.getId() == R.id.txtFave) {
+					/*if (view.getId() == R.id.txtFave) {
 
 						TextView txtFave = (TextView) view;
 						String strFave = txtFave.getText().toString();
@@ -838,7 +838,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 							txtFave.setText("1");
 						}
 						return true;
-					}
+					}*/
 
 					if (view.getId() == R.id.txtDel) {
 
