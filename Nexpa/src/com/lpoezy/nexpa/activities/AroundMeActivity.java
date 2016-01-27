@@ -8,10 +8,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.util.StringUtils;
@@ -477,18 +483,58 @@ public class AroundMeActivity extends AppCompatActivity
 		 */
 
 
-		XMPPConnection connection = XMPPLogic.getInstance().getConnection();
-
-		final Roster roster = connection.getRoster();
+		//roy@vps.gigapros.com/Smack
+		//L.debug("xxxxxxxxxxxxxxxxxx isAvailable, "+roster.getPresence("leki@vps.gigapros.com/Smack"));
 		
-		// L.debug("isAvailable"+roster.getPresence("momo@vps.gigapros.com/Smack").isAvailable());
+		
+		//Roster roster = xmppManager.connection.getRoster();
+		//roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+        //Presence subscribed = new Presence(Presence.Type.subscribed);
+ 
+//        Presence response = new Presence(Presence.Type.subscribed);
+//        response.setTo("leki");
+//        connection.sendPacket(response);
+//		
+//		try {
+//			roster.createEntry("leki", "leki@tes.com", null);
+//		} catch (XMPPException e) {
+//			L.error(""+e);
+//		}
+//
+//		Collection<RosterEntry> entries = roster.getEntries();
+//		for (RosterEntry entry : entries) {
+//
+//
+//		    Presence presence = roster.getPresence(entry.getUser());
+//
+//		    // User A always not available even I set User A to available
+//		    L.error("presence.isAvailable() = " + presence.isAvailable());
+//
+//		    // User A's status always empty
+//		    L.error("presence.getStatus() = " + presence.getStatus());
+//		    L.error("presence.getType() = " + presence.getType());
+//		    L.debug("entry.getUser() "+entry.getUser()); 
+//		    // User A's getName() always null
+////		    if (entry.getName() != null)
+////		    {
+////		        L.debug(entry.getName());
+////		    } 
+////		    else
+////		    	L.debug("GetName is null"); 
+//		    
+//		    if (presence.getType() == Presence.Type.subscribe){
+//		    	L.debug(entry.getUser()+", subscribe"); 
+//		    }else if(presence.getType() == Presence.Type.unsubscribe){
+//		    	L.debug(entry.getUser()+", unsubscribe"); 
+//		    }
+//
+//		}
 		
 		for (int j = 0; j < us.size(); j++) {
-			// L.debug("userID: "+us.get(j).getUserId()+", username:
-			// "+us.get(j).getUserName());
+			 //L.debug("ccccccccccc userID: "+us.get(j).getUserId()+", username:"+us.get(j).getUserName());
 
 			final Correspondent correspondent = new Correspondent();
-
+			correspondent.setUsername(us.get(j).getUserName());
 			correspondent.addListener(this);
 			final long userId = Long.parseLong(Integer.toString(us.get(j).getUserId()));
 			correspondent.setId(userId);
@@ -498,6 +544,9 @@ public class AroundMeActivity extends AppCompatActivity
 
 				@Override
 				public void run() {
+					
+					correspondent.checkIfOnline();
+					
 					correspondent.downloadProfilePicOnline(AroundMeActivity.this, userId);
 
 				}

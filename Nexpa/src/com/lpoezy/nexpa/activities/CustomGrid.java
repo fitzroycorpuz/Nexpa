@@ -99,8 +99,8 @@ public class CustomGrid extends BaseAdapter {
            //Roster roster = Roster.
            
           // Presence presence = 
-          
-           textView.setText(web.get(position)+ " | " + distance.get(position) +"m");
+          String avalability = mCorrespondents.get(position).isAvailable()?"Online":"Offline";
+           textView.setText(web.get(position)+ "|"  /*+ distance.get(position) +"m"*/+avalability);
            //imageView.setImageResource(Imageid.get(position));
           
            

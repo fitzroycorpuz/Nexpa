@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.XMPPConnection;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +18,7 @@ import org.json.JSONObject;
 import com.lpoezy.nexpa.activities.ChatActivity;
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
+import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
@@ -33,6 +36,7 @@ public class Correspondent {
 
 	private long id = -1;
 	private String username = "";
+	private boolean isAvailable = false;
 
 	private Bitmap profilePic;
 
@@ -78,6 +82,18 @@ public class Correspondent {
 
 		if (this.profilePic != null)
 			notifyListeners();
+	}
+	
+	
+
+	public boolean isAvailable() {
+		return isAvailable;
+	}
+
+	public void setAvailable(boolean isAvailable) {
+		this.isAvailable = isAvailable;
+		
+		notifyListeners();
 	}
 
 	public void addMessage(NewMessage msg) {
@@ -166,6 +182,19 @@ public class Correspondent {
 		}
 
 	}
+	
+	public void checkIfOnline() {
+		
+		XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+		
+		if(connection != null && connection.isConnected()){
+			final Roster roster = connection.getRoster();
+			 boolean isAvailable = roster.getPresence(this.username+"@vps.gigapros.com/Smack").isAvailable();
+			
+			 setAvailable(isAvailable);
+		}
+	
+	}
 
 	public static List<Correspondent> downloadAllOffline(Context context) {
 
@@ -187,5 +216,4 @@ public class Correspondent {
 
 		public void onCorrespondentUpdate();
 	}
-
 }
