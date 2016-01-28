@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="btn_fave_res_id" type="id">0</item>
+    <item name="broadcast_from" type="id">0</item>
+    <item name="broadcast_id" type="id">0</item>
+    <item name="curr_broadcast_id" type="id">0</item>
+</resources>

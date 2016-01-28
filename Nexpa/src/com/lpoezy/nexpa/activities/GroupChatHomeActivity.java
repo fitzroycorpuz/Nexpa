@@ -46,7 +46,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.gesture.GestureOverlayView;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Drawable.ConstantState;
 import android.graphics.drawable.TransitionDrawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -72,6 +74,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -102,7 +105,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 	LinearLayout lnEmpty;
 	LinearLayout lnBroadcastExist;
 	LinearLayout btnReply;
-	LinearLayout btnFave;
+	LinearLayout btnFavorite;
 	LinearLayout btnDel;
 	TextView txBroad;
 	Dialog dialogBroadcast;
@@ -263,6 +266,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					connection.removePacketListener(packetListener);
 					packetListener = null;
 				} catch (Exception e) {
+					L.error(""+e);
 				}
 			} else {
 				updateStatusText(2);
@@ -612,6 +616,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 
 	TextView txtBroadId;
 	String br_id;
+	private int BTN_FAVE_DRAWABLE = 0;
+	protected int BRODCAST_ID = 1;
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 
 		@Override
@@ -645,25 +651,23 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			});
 
 			// *
-			/*btnFave = (LinearLayout) arg1.findViewById(R.id.btnFavorite);
-			btnFave.setOnClickListener(new OnClickListener() {
+			btnFavorite = (LinearLayout) arg1.findViewById(R.id.btnFavorite);
+			btnFavorite.setOnClickListener(new OnClickListener() {
+				
+
 				@Override
 				public void onClick(View arg0) {
+					
+					ImageButton btnFave = (ImageButton)btnFavorite.findViewById(R.id.btnFave);
+					//Integer broadcastId = (Integer)btnFavorite.getTag(R.id.broad_id);
+					//btnFavorite.setTag(R.id.curr_broadcast_id, broadcastId);
+					clickedBroadcastId = (Integer)btnFavorite.getTag(R.id.broad_id);
+					
+					
+					
 					mNotifier.sendEmptyMessage(2);
-					TextView txtFave = (TextView) arg1
-							.findViewById(R.id.txtFave);
-					String strFave = txtFave.getText().toString();
-
-					L.debug("strFave: " + strFave);
-					if (strFave.equals("1")) {
-						L.debug("fave on");
-					} else {
-						L.debug("fave off");
-					}
-					
-					
 				};
-			});*/
+			});
 			// */
 			// btnStarred = (LinearLayout) arg1.findViewById(R.id.btnReply);
 
@@ -708,6 +712,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 	String strReach;
 	boolean setType;
 	int incr = 0;
+	protected int clickedBroadcastId = -1;
+	
 
 	private void showList() {
 
@@ -736,13 +742,15 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 							SQLiteHandler.BROADCAST_FROM,
 							SQLiteHandler.BROADCAST_TYPE,
 							SQLiteHandler.BROADCAST_TYPE,
+							SQLiteHandler.BROADCAST_TYPE,
 							SQLiteHandler.BROADCAST_TYPE }, new int[] {
 							R.id.broad_id, R.id.broad_from, R.id.date_broad,
 							R.id.location_local, R.id.broad_message,
 							R.id.reach, R.id.txtReply, R.id.imgReply,
-							R.id.btnReply, R.id.broad_from_raw, R.id.btnTrash,
+							R.id.btnReply, R.id.broad_from_raw, R.id.btnFave, R.id.btnTrash,
 							R.id.txtFave, R.id.txtDel }, 0);
 			mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+				
 				@Override
 				public boolean setViewValue(View view, Cursor cursor, int column) {
 					
@@ -750,19 +758,20 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					String statVal = "";
 					broadType = cursor.getString(cursor
 							.getColumnIndex("broad_type_of"));
-
+					int broadcastId = cursor.getInt(cursor.getColumnIndex(SQLiteHandler.BROAD_ID));
+					((View)view.getParent()).setTag(R.id.broad_id, broadcastId);
 					if (view.getId() == R.id.broad_from) {
 						TextView tv = (TextView) view;
 						if (broadType.equals("1")) {
 							statVal = displayName(db.getFName() + "",
 									db.getUsername());
 							tv.setText(statVal);
-
+							
 							// if (setType == true){
 							broad_user_type = 1;
 							// setType = false;
 							// }
-							return true;
+							//return true;
 						} else {
 							// if (setType == true){
 							broad_user_type = 0;
@@ -774,8 +783,10 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 											+ "", cursor.getString(cursor
 											.getColumnIndex("broad_from")));
 							tv.setText(statVal);
-							return true;
+							//return true;
 						}
+						
+						return true;
 					}
 
 					if (view.getId() == R.id.broad_message) {
@@ -825,20 +836,17 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						return true;
 					}
 					
-					/*if (view.getId() == R.id.txtFave) {
+					//*
+					 if (view.getId() == R.id.txtFave) {
 
 						TextView txtFave = (TextView) view;
 						String strFave = txtFave.getText().toString();
-						if (strFave.equals("1")) {
-							txtFave.setText("0");
-						} else if(strFave.equals("0")){
-							txtFave.setText("1");
-							// setType = true;
-						} else if(strFave.equals("")){
-							txtFave.setText("1");
+						if (broad_user_type == 1) {
+							
 						}
 						return true;
-					}*/
+					}
+					 //*/
 
 					if (view.getId() == R.id.txtDel) {
 
@@ -910,6 +918,28 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 							noteTypeIcon
 									.setBackgroundResource(R.drawable.btn_block_user);
 						}
+						return true;
+					}
+					
+					if (view.getId() == R.id.btnFave) {
+						//L.debug("cursor.getColumnIndex(SQLiteHandler.BROAD_ID: "+cursor.getLong(cursor.getColumnIndex(SQLiteHandler.BROAD_ID)));
+						//Integer btnFaveResId = (Integer) ((View)view.getParent()).getTag(R.id.btn_fave_res_id);
+						//Integer clickedBroadcastId = (Integer) ((View)view.getParent()).getTag(R.id.curr_broadcast_id);
+						//L.debug(", broadcastId: "+broadcastId+", clickedBroadcastId: "+clickedBroadcastId);
+						if(clickedBroadcastId == broadcastId){
+							
+							
+//							if(view.getBackground().getConstantState() == getResources().getDrawable(R.drawable.btn_star).getConstantState()){
+//								
+//								//btnFavorite.setTag(R.id.btn_fave_res_id, R.drawable.btn_star_yellow);
+//								view.setBackgroundResource(R.drawable.btn_star_yellow);
+//							}else{
+//								
+//								view.setBackgroundResource(R.drawable.btn_star);
+//								//btnFavorite.setTag(R.id.btn_fave_res_id, R.drawable.btn_star);
+//							}
+						}
+						//((View)view.getParent()).setTag(BRODCAST_ID,""+cursor.getLong(cursor.getColumnIndex(SQLiteHandler.BROAD_ID)));
 						return true;
 					}
 
