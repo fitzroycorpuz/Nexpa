@@ -384,7 +384,7 @@ public class AroundMeActivity extends AppCompatActivity
 		L.error("AroundMeActivity, getNewLoc dtUpdate: " + dtUpdate);
 		if ((dtUpdate == "") || (du.hoursAgo(dtUpdate))) {
 
-			Log.e("LOCATION INTELLIGENCE", "Update needed...");
+			L.error("LOCATION INTELLIGENCE, Update needed...");
 
 			LocationResult locationResult = new LocationResult() {
 
@@ -392,8 +392,9 @@ public class AroundMeActivity extends AppCompatActivity
 				public void gotLocation(Location location) {
 
 					if (location != null) {
-						ftLatitude = (float) location.getLatitude();
-						ftLongitude = (float) location.getLongitude();
+						
+						ftLatitude = (float) location.getLatitude()/*-33.8788025f*/;
+						ftLongitude = (float) location.getLongitude()/*151.2120050f*/;
 						latitude = ftLatitude;
 						longitude = ftLongitude;
 						db.insertLocation(longitude, latitude);
@@ -425,9 +426,9 @@ public class AroundMeActivity extends AppCompatActivity
 				mSwipeRefreshLayout.setRefreshing(false);
 			}
 		} else {
-			Log.e("LOCATION INTELLIGENCE", "Getting db location...");
-			ftLatitude = Float.parseFloat(db.getLocationLatitude());
-			ftLongitude = Float.parseFloat(db.getLocationLongitude());
+			L.error("LOCATION INTELLIGENCE, Getting db location...");
+			ftLatitude = Float.parseFloat(db.getLocationLatitude())/*-33.8788025f*/;
+			ftLongitude = Float.parseFloat(db.getLocationLongitude())/*151.2120050f*/;
 			latitude = ftLatitude;
 			longitude = ftLongitude;
 			SendLocToServer();
@@ -637,7 +638,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			@Override
 			public void onResponse(String response) {
-				Log.e(TAG, "SAVE GEO Response: " + response.toString());
+				L.error(TAG+" SAVE GEO Response: " + response.toString());
 
 				try {
 					JSONObject jObj = new JSONObject(response);
@@ -646,13 +647,13 @@ public class AroundMeActivity extends AppCompatActivity
 						// User successfully stored in MySQL
 						// Now store the user in sqlite
 						GetNearbyUsers();
-						Log.e("JSON", "User geo stored on mySql");
+						L.error("JSON, User geo stored on mySql");
 						// finish();
 					} else {
 
 						// Error occurred in registration. Get the error
 						// message
-						Log.e("JSON", "Error occurred in registration");
+						L.error("JSON, Error occurred in registration");
 						String errorMsg = jObj.getString("error_msg");
 
 					}
@@ -664,7 +665,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Log.e(TAG, "Error: " + error.getMessage());
+				L.error(TAG+" Error: " + error.getMessage());
 				makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
 				// Toast.makeText(getApplicationContext(),error.getMessage(),
 				// Toast.LENGTH_LONG).show();
@@ -706,6 +707,8 @@ public class AroundMeActivity extends AppCompatActivity
 	}
 
 	private void GetNearbyUsers() {
+		
+		L.error(TAG+" GetNearbyUsers");
 		// Tag used to cancel the request
 		String tag_string_req = "collect";
 		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_NEARBY, new Response.Listener<String>() {
@@ -865,7 +868,7 @@ public class AroundMeActivity extends AppCompatActivity
 			protected Map<String, String> getParams() {
 				// Posting params to register url
 				Map<String, String> params = new HashMap<String, String>();
-
+				
 				ins_latitude = latitude;
 				ins_longitude = longitude;
 
@@ -874,8 +877,7 @@ public class AroundMeActivity extends AppCompatActivity
 				params.put("longitude", ins_longitude + "");
 				params.put("latitude", +ins_latitude + "");
 
-				// Log.e("MAP", ins_user + " + "+ins_longitude+" :
-				// "+ins_latitude);
+				 L.error("MAP, "+ ins_user + " + "+ins_longitude+" :"+ins_latitude);
 				// params.put("latitude", latitude +"");
 
 				return params;

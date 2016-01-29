@@ -481,8 +481,6 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					}
 				});
 				
-				
-				
 				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 				lp.copyFrom(dialogPref.getWindow().getAttributes());
 				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -580,8 +578,10 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 							dst = 100;
 						}
 						Log.e("dst", dst + " c");
-						db.updateBroadcastDist(distTick);
-						showList();
+						
+						//db.updateBroadcastDist(distTick);
+						//dst = Integer.parseInt(distTick);
+						//showList();
 						dialogPref.dismiss();
 					}
 				});
