@@ -4,4 +4,5 @@
     <item name="broadcast_from" type="id">0</item>
     <item name="broadcast_id" type="id">0</item>
     <item name="curr_broadcast_id" type="id">0</item>
+    <item name="btn_star_click_count" type="id">0</item>
 </resources>

@@ -26,6 +26,7 @@ android:orientation="vertical">
 		    android:layout_height="wrap_content"
 		    android:minHeight="30dp"
 		    android:minWidth="30dp"
+		    android:visibility="invisible"
 		     android:maxHeight="30dp"
 		    android:maxWidth="30dp" >
 

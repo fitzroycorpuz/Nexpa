@@ -152,6 +152,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 	private PacketListener packetListener;
 	private ImageView btnDistanceTest;
 	protected EditText rbDistance1;
+	private ImageView btnGender;
 
 	public static String displayName(String fname, String user) {
 		if ((fname.equals("")) || (fname == null) || (fname.equals("null"))) {
@@ -434,6 +435,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 		// mListView.setOnItemClickListener(this);
 		mListView.setOnItemClickListener(onItemClickListener);
 		btnSearch = (ImageView) findViewById(R.id.img_search);
+		btnGender = (ImageView) findViewById(R.id.img_gender);
 		btnPost = (ImageView) findViewById(R.id.img_megaphone);
 		btnDistance = (ImageView) findViewById(R.id.img_here);
 		btnDistanceTest = (ImageView) findViewById(R.id.img_here_test);
@@ -459,6 +461,36 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 		lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 		lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 		dialogBroadcast.getWindow().setAttributes(lp);
+		
+		btnGender.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialogPref = new Dialog(GroupChatHomeActivity.this);
+				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				dialogPref
+						.setContentView(R.layout.activity_gender);
+				
+				
+				Button dialogButton = (Button) dialogPref
+						.findViewById(R.id.dialogButtonOK);
+				dialogButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						dialogPref.dismiss();
+					}
+				});
+				
+				
+				
+				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+				lp.copyFrom(dialogPref.getWindow().getAttributes());
+				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+				dialogPref.show();
+				dialogPref.getWindow().setAttributes(lp);
+			}
+		});
 
 		btnDistance.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -926,9 +958,38 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						//Integer btnFaveResId = (Integer) ((View)view.getParent()).getTag(R.id.btn_fave_res_id);
 						//Integer clickedBroadcastId = (Integer) ((View)view.getParent()).getTag(R.id.curr_broadcast_id);
 						//L.debug(", broadcastId: "+broadcastId+", clickedBroadcastId: "+clickedBroadcastId);
+						Integer clickCount = (Integer)((View)view.getParent()).getTag(R.id.btn_star_click_count);
 						if(clickedBroadcastId == broadcastId){
 							
 							
+							try{
+								
+								clickCount++;	
+							}catch(NullPointerException e){
+								//L.error(""+e);
+								clickCount = 1;
+							}
+							if(clickCount>=10)clickCount = 0;
+							
+							
+//							if (clickCount%2!=0) {
+//
+//								// btnFavorite.setTag(R.id.btn_fave_res_id,
+//								// R.drawable.btn_star_yellow);
+//								view.setBackgroundResource(R.drawable.btn_star_yellow);
+//							} else {
+//
+//								view.setBackgroundResource(R.drawable.btn_star);
+//								// btnFavorite.setTag(R.id.btn_fave_res_id,
+//								// R.drawable.btn_star);
+//							}
+							
+							clickedBroadcastId = -1;
+							
+							
+							
+							
+							((View)view.getParent()).setTag(R.id.btn_star_click_count, clickCount);
 //							if(view.getBackground().getConstantState() == getResources().getDrawable(R.drawable.btn_star).getConstantState()){
 //								
 //								//btnFavorite.setTag(R.id.btn_fave_res_id, R.drawable.btn_star_yellow);
@@ -939,6 +1000,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 //								//btnFavorite.setTag(R.id.btn_fave_res_id, R.drawable.btn_star);
 //							}
 						}
+						
+						L.debug(broadcastId+"clickCount: "+clickCount);
 						//((View)view.getParent()).setTag(BRODCAST_ID,""+cursor.getLong(cursor.getColumnIndex(SQLiteHandler.BROAD_ID)));
 						return true;
 					}
