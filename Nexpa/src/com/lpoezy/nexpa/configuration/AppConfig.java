@@ -20,5 +20,4 @@ public class AppConfig {
     public static final String ACTION_RECEIVED_MSG = "com.lpoezy.nexpa.actions.ACTION_RECEIVED_MSG";
     public static final String ACTION_USER_PROFILE_UPDATED = "com.lpoezy.nexpa.actions.ACTION_USER_PROFILE_UPDATED";
 
-    
 }

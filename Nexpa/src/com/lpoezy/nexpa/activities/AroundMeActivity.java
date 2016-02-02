@@ -201,7 +201,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
 			rbDistance.setRangeBarEnabled(false);
-			dst = 100;
+			
 			try {
 				dst = Integer.parseInt(db.getBroadcastDist());
 			} catch (Exception e) {
@@ -227,8 +227,15 @@ public class AroundMeActivity extends AppCompatActivity
 				public void onClick(View v) {
 
 					db.updateBroadcastDist(distTick);
-					dst = Integer.parseInt(distTick);
-					tryGridToUpdate();
+
+					try {
+						dst = Integer.parseInt(distTick);
+						tryGridToUpdate();
+
+					} catch (NumberFormatException e) {
+						dst = 100;
+					}
+
 					dialogPref.dismiss();
 				}
 			});
@@ -392,9 +399,9 @@ public class AroundMeActivity extends AppCompatActivity
 				public void gotLocation(Location location) {
 
 					if (location != null) {
-						
-						ftLatitude = (float) location.getLatitude()/*-33.8788025f*/;
-						ftLongitude = (float) location.getLongitude()/*151.2120050f*/;
+
+						ftLatitude = /* (float) location.getLatitude() */-33.8788025f;
+						ftLongitude = /* (float) location.getLongitude() */151.2120050f;
 						latitude = ftLatitude;
 						longitude = ftLongitude;
 						db.insertLocation(longitude, latitude);
@@ -427,8 +434,8 @@ public class AroundMeActivity extends AppCompatActivity
 			}
 		} else {
 			L.error("LOCATION INTELLIGENCE, Getting db location...");
-			ftLatitude = Float.parseFloat(db.getLocationLatitude())/*-33.8788025f*/;
-			ftLongitude = Float.parseFloat(db.getLocationLongitude())/*151.2120050f*/;
+			ftLatitude = /* Float.parseFloat(db.getLocationLatitude()) */-33.8788025f;
+			ftLongitude = /* Float.parseFloat(db.getLocationLongitude()) */151.2120050f;
 			latitude = ftLatitude;
 			longitude = ftLongitude;
 			SendLocToServer();
@@ -472,7 +479,6 @@ public class AroundMeActivity extends AppCompatActivity
 		int disSize = distance.size();
 
 		//
-		
 
 		/*
 		 * try { if (userSize < disSize) { for (int i = disSize; i > userSize;
@@ -483,56 +489,56 @@ public class AroundMeActivity extends AppCompatActivity
 		 * (Exception e) {}
 		 */
 
+		// roy@vps.gigapros.com/Smack
+		// L.debug("xxxxxxxxxxxxxxxxxx isAvailable,
+		// "+roster.getPresence("leki@vps.gigapros.com/Smack"));
 
-		//roy@vps.gigapros.com/Smack
-		//L.debug("xxxxxxxxxxxxxxxxxx isAvailable, "+roster.getPresence("leki@vps.gigapros.com/Smack"));
-		
-		
-		//Roster roster = xmppManager.connection.getRoster();
-		//roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
-        //Presence subscribed = new Presence(Presence.Type.subscribed);
- 
-//        Presence response = new Presence(Presence.Type.subscribed);
-//        response.setTo("leki");
-//        connection.sendPacket(response);
-//		
-//		try {
-//			roster.createEntry("leki", "leki@tes.com", null);
-//		} catch (XMPPException e) {
-//			L.error(""+e);
-//		}
-//
-//		Collection<RosterEntry> entries = roster.getEntries();
-//		for (RosterEntry entry : entries) {
-//
-//
-//		    Presence presence = roster.getPresence(entry.getUser());
-//
-//		    // User A always not available even I set User A to available
-//		    L.error("presence.isAvailable() = " + presence.isAvailable());
-//
-//		    // User A's status always empty
-//		    L.error("presence.getStatus() = " + presence.getStatus());
-//		    L.error("presence.getType() = " + presence.getType());
-//		    L.debug("entry.getUser() "+entry.getUser()); 
-//		    // User A's getName() always null
-////		    if (entry.getName() != null)
-////		    {
-////		        L.debug(entry.getName());
-////		    } 
-////		    else
-////		    	L.debug("GetName is null"); 
-//		    
-//		    if (presence.getType() == Presence.Type.subscribe){
-//		    	L.debug(entry.getUser()+", subscribe"); 
-//		    }else if(presence.getType() == Presence.Type.unsubscribe){
-//		    	L.debug(entry.getUser()+", unsubscribe"); 
-//		    }
-//
-//		}
-		
+		// Roster roster = xmppManager.connection.getRoster();
+		// roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+		// Presence subscribed = new Presence(Presence.Type.subscribed);
+
+		// Presence response = new Presence(Presence.Type.subscribed);
+		// response.setTo("leki");
+		// connection.sendPacket(response);
+		//
+		// try {
+		// roster.createEntry("leki", "leki@tes.com", null);
+		// } catch (XMPPException e) {
+		// L.error(""+e);
+		// }
+		//
+		// Collection<RosterEntry> entries = roster.getEntries();
+		// for (RosterEntry entry : entries) {
+		//
+		//
+		// Presence presence = roster.getPresence(entry.getUser());
+		//
+		// // User A always not available even I set User A to available
+		// L.error("presence.isAvailable() = " + presence.isAvailable());
+		//
+		// // User A's status always empty
+		// L.error("presence.getStatus() = " + presence.getStatus());
+		// L.error("presence.getType() = " + presence.getType());
+		// L.debug("entry.getUser() "+entry.getUser());
+		// // User A's getName() always null
+		//// if (entry.getName() != null)
+		//// {
+		//// L.debug(entry.getName());
+		//// }
+		//// else
+		//// L.debug("GetName is null");
+		//
+		// if (presence.getType() == Presence.Type.subscribe){
+		// L.debug(entry.getUser()+", subscribe");
+		// }else if(presence.getType() == Presence.Type.unsubscribe){
+		// L.debug(entry.getUser()+", unsubscribe");
+		// }
+		//
+		// }
+
 		for (int j = 0; j < us.size(); j++) {
-			 //L.debug("ccccccccccc userID: "+us.get(j).getUserId()+", username:"+us.get(j).getUserName());
+			// L.debug("ccccccccccc userID: "+us.get(j).getUserId()+",
+			// username:"+us.get(j).getUserName());
 
 			final Correspondent correspondent = new Correspondent();
 			correspondent.setUsername(us.get(j).getUserName());
@@ -545,9 +551,9 @@ public class AroundMeActivity extends AppCompatActivity
 
 				@Override
 				public void run() {
-					
+
 					correspondent.checkIfOnline();
-					
+
 					correspondent.downloadProfilePicOnline(AroundMeActivity.this, userId);
 
 				}
@@ -555,7 +561,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			if (sentType.equals("1")) {// user is already added
 				// if (us.get(j).getShown().equals("0")) {
-				
+
 				imageId.add(j, R.drawable.pic_sample_girl);
 				availabilty.add(j, "INSERTED");
 				web.add(j, displayGridCellName(us.get(j).getFName(), us.get(j).getUserName()) + ", "
@@ -638,7 +644,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			@Override
 			public void onResponse(String response) {
-				L.error(TAG+" SAVE GEO Response: " + response.toString());
+				L.error(TAG + " SAVE GEO Response: " + response.toString());
 
 				try {
 					JSONObject jObj = new JSONObject(response);
@@ -665,7 +671,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				L.error(TAG+" Error: " + error.getMessage());
+				L.error(TAG + " Error: " + error.getMessage());
 				makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
 				// Toast.makeText(getApplicationContext(),error.getMessage(),
 				// Toast.LENGTH_LONG).show();
@@ -707,8 +713,8 @@ public class AroundMeActivity extends AppCompatActivity
 	}
 
 	private void GetNearbyUsers() {
-		
-		L.error(TAG+" GetNearbyUsers");
+
+		L.error(TAG + " GetNearbyUsers");
 		// Tag used to cancel the request
 		String tag_string_req = "collect";
 		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_NEARBY, new Response.Listener<String>() {
@@ -716,6 +722,9 @@ public class AroundMeActivity extends AppCompatActivity
 			@Override
 			public void onResponse(String response) {
 				Log.e(TAG, "GET GEO Response: " + response.toString());
+				
+				
+				
 				try {
 					JSONObject jObj = new JSONObject(response);
 					boolean error = jObj.getBoolean("error");
@@ -853,8 +862,13 @@ public class AroundMeActivity extends AppCompatActivity
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				
+				
 			}
-		}, new Response.ErrorListener() {
+			
+			
+		}
+		, new Response.ErrorListener() {
 
 			@Override
 			public void onErrorResponse(VolleyError error) {
@@ -868,16 +882,18 @@ public class AroundMeActivity extends AppCompatActivity
 			protected Map<String, String> getParams() {
 				// Posting params to register url
 				Map<String, String> params = new HashMap<String, String>();
-				
+
 				ins_latitude = latitude;
 				ins_longitude = longitude;
 
 				params.put("tag", "collect");
 				params.put("pid", ins_user);
 				params.put("longitude", ins_longitude + "");
-				params.put("latitude", +ins_latitude + "");
+				params.put("latitude", ins_latitude + "");
+				params.put("p_distance_pref", dst + "");
+				params.put("unit", "k");
 
-				 L.error("MAP, "+ ins_user + " + "+ins_longitude+" :"+ins_latitude);
+				//L.error("MAP, " + ins_user + " + " + ins_longitude + " :" + ins_latitude + ": " + dst);
 				// params.put("latitude", latitude +"");
 
 				return params;
@@ -899,7 +915,6 @@ public class AroundMeActivity extends AppCompatActivity
 		super.onResume();
 		isRunning = true;
 
-		dst = 100;
 		try {
 			dst = Integer.parseInt(db.getBroadcastDist());
 		} catch (Exception e) {

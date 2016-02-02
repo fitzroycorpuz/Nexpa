@@ -1374,9 +1374,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 											}
 										}
 
-										Log.e("XMPPChatDemoActivity",
-												"Sending broadcast to: "
-														+ uname);
+										L.error("XMPPChatDemoActivity, Sending broadcast to: "+ uname);
 
 										if (i + 1 == nearby_users.length()) {
 											db.insertBroadcast(
@@ -1421,6 +1419,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						failedToBroadcast(isSuccess);
 					}
 				}) {
+			
 			@Override
 			protected Map<String, String> getParams() {
 				Map<String, String> params = new HashMap<String, String>();

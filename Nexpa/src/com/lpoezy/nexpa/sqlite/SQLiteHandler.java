@@ -1410,7 +1410,7 @@ public class SQLiteHandler {
 		values.put(LOC_DATE, dateNow);
 		long id = sqLiteDatabase.insert(DATABASE_TABLE_4, null, values);
 		// db.close();
-		Log.e(TAG, "Broadcast inserted to sqlite: message " + id);
+		L.error(TAG+ " Broadcast inserted to sqlite: message " + id);
 	}
 
 	public List<Announcement> downloadPersonalBroadcasts() {
