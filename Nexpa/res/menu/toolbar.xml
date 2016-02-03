@@ -2,20 +2,20 @@
 xmlns:tools="schemas.android.com/tools"
 tools:context="com.lpoezy.nexpa.activities.AroundMeActivity"
 xmlns:yourapp="http://schemas.android.com/apk/res-auto">
-  
-     <item
+
+    
+      <item
     android:id="@+id/action_distance"
     android:orderInCategory="100"
     android:title="Distance Settings"
     android:icon="@drawable/icon_target"
-    yourapp:showAsAction="ifRoom" />
+    yourapp:showAsAction="always" /> 
      
-       <item
+      <!--  <item
     android:id="@+id/action_distance_test"
     android:orderInCategory="100"
     android:title="Distance Settings (Tester)"
     android:icon="@drawable/icon_target"
-    yourapp:showAsAction="ifRoom" />
-
-
+    yourapp:showAsAction="ifRoom" /> -->
+    
 </menu>
