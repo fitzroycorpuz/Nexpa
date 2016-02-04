@@ -19,5 +19,8 @@ public class AppConfig {
     public static int MSG_NOTIFICATION_ID = 1000;
     public static final String ACTION_RECEIVED_MSG = "com.lpoezy.nexpa.actions.ACTION_RECEIVED_MSG";
     public static final String ACTION_USER_PROFILE_UPDATED = "com.lpoezy.nexpa.actions.ACTION_USER_PROFILE_UPDATED";
+	public static final int SUPERUSER_MIN_DISTANCE_KM = 1;
+    
+    public static int SUPERUSER_MAX_DISTANCE_KM= 7000;
 
 }

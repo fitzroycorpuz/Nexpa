@@ -77,6 +77,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
@@ -159,6 +160,7 @@ public class AroundMeActivity extends AppCompatActivity
 	private static final String TAG_GEO_STATUS = "status";
 
 	private static final String TAG_GEO_EMAIL = "email_address";
+	//private static final int DEFAULT_TICK_START = 1;
 
 	public static boolean isRunning = false;
 	private int dst;
@@ -189,6 +191,7 @@ public class AroundMeActivity extends AppCompatActivity
 	RangeBar rbDistance;
 	EditText rbDistance1;
 	String distTick = "";
+	private boolean mIsSuperuser;
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -201,12 +204,15 @@ public class AroundMeActivity extends AppCompatActivity
 
 			rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
 			rbDistance.setRangeBarEnabled(false);
-			
+
 			try {
 				dst = Integer.parseInt(db.getBroadcastDist());
 			} catch (Exception e) {
-				dst = 100;
+				dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 			}
+			
+			
+			L.debug("db.getBroadcastDist()"+db.getBroadcastDist());
 			rbDistance.setSeekPinByValue(dst);
 
 			rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
@@ -233,12 +239,43 @@ public class AroundMeActivity extends AppCompatActivity
 						tryGridToUpdate();
 
 					} catch (NumberFormatException e) {
-						dst = 100;
+						dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 					}
 
 					dialogPref.dismiss();
 				}
 			});
+			
+			
+			
+			
+
+			CheckBox cbxSuperUser = (CheckBox) dialogPref.findViewById(R.id.cbx_superuser);
+			SessionManager sm = new SessionManager(AroundMeActivity.this);
+			cbxSuperUser.setChecked(sm.isSuperuser());
+			
+			cbxSuperUser.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					SessionManager sm = new SessionManager(AroundMeActivity.this);
+					if (((CheckBox) v).isChecked()) {
+						rbDistance.setEnabled(false);
+						sm.setSuperuser(true);
+					} else {
+						sm.setSuperuser(false);
+						rbDistance.setEnabled(true);
+					}
+
+				}
+			});
+			
+			if (cbxSuperUser.isChecked()) {
+				rbDistance.setEnabled(false);
+			} else {
+				rbDistance.setEnabled(true);
+			}
+
 			WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 			lp.copyFrom(dialogPref.getWindow().getAttributes());
 			lp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -246,46 +283,34 @@ public class AroundMeActivity extends AppCompatActivity
 			dialogPref.show();
 			dialogPref.getWindow().setAttributes(lp);
 			return true;
-		
-			/*/
-		case R.id.action_distance_test:
-			dialogPref = new Dialog(AroundMeActivity.this);
-			dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			dialogPref.setContentView(R.layout.android_profile_distance_tester);
 
-			rbDistance1 = (EditText) dialogPref.findViewById(R.id.rbDistance);
-			dst = 100;
-			try {
-				dst = Integer.parseInt(db.getBroadcastDist());
-			} catch (Exception e) {
-				dst = 100;
-			}
-
-			Button dialogButton1 = (Button) dialogPref.findViewById(R.id.dialogButtonOK);
-			dialogButton1.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-
-					try {
-						dst = Integer.parseInt(rbDistance1.getText().toString());
-					} catch (Exception e) {
-						dst = 100;
-					}
-					Log.e("dst", dst + " c");
-					db.updateBroadcastDist(distTick);
-					tryGridToUpdate();
-					dialogPref.dismiss();
-				}
-			});
-
-			WindowManager.LayoutParams lp1 = new WindowManager.LayoutParams();
-			lp1.copyFrom(dialogPref.getWindow().getAttributes());
-			lp1.width = WindowManager.LayoutParams.MATCH_PARENT;
-			lp1.height = WindowManager.LayoutParams.WRAP_CONTENT;
-			dialogPref.show();
-			dialogPref.getWindow().setAttributes(lp1);
-			return true;
-			//*/
+		/*
+		 * / case R.id.action_distance_test: dialogPref = new
+		 * Dialog(AroundMeActivity.this);
+		 * dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		 * dialogPref.setContentView(R.layout.android_profile_distance_tester);
+		 * 
+		 * rbDistance1 = (EditText) dialogPref.findViewById(R.id.rbDistance);
+		 * dst = 100; try { dst = Integer.parseInt(db.getBroadcastDist()); }
+		 * catch (Exception e) { dst = 100; }
+		 * 
+		 * Button dialogButton1 = (Button)
+		 * dialogPref.findViewById(R.id.dialogButtonOK);
+		 * dialogButton1.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) {
+		 * 
+		 * try { dst = Integer.parseInt(rbDistance1.getText().toString()); }
+		 * catch (Exception e) { dst = 100; } Log.e("dst", dst + " c");
+		 * db.updateBroadcastDist(distTick); tryGridToUpdate();
+		 * dialogPref.dismiss(); } });
+		 * 
+		 * WindowManager.LayoutParams lp1 = new WindowManager.LayoutParams();
+		 * lp1.copyFrom(dialogPref.getWindow().getAttributes()); lp1.width =
+		 * WindowManager.LayoutParams.MATCH_PARENT; lp1.height =
+		 * WindowManager.LayoutParams.WRAP_CONTENT; dialogPref.show();
+		 * dialogPref.getWindow().setAttributes(lp1); return true; //
+		 */
 		default:
 			// If we got here, the user's action was not recognized.
 			// Invoke the superclass to handle it.
@@ -401,8 +426,8 @@ public class AroundMeActivity extends AppCompatActivity
 
 					if (location != null) {
 
-						ftLatitude =  (float) location.getLatitude() /*-33.8788025f*/;
-						ftLongitude =  (float) location.getLongitude() /*151.2120050f*/;
+						ftLatitude = /*(float) location.getLatitude()*/ -33.8788025f;
+						ftLongitude = /*(float) location.getLongitude()*/  151.2120050f;
 						latitude = ftLatitude;
 						longitude = ftLongitude;
 						db.insertLocation(longitude, latitude);
@@ -435,8 +460,8 @@ public class AroundMeActivity extends AppCompatActivity
 			}
 		} else {
 			L.error("LOCATION INTELLIGENCE, Getting db location...");
-			ftLatitude =  Float.parseFloat(db.getLocationLatitude()) /*-33.8788025f*/;
-			ftLongitude =  Float.parseFloat(db.getLocationLongitude()) /*151.2120050f*/;
+			ftLatitude = /*Float.parseFloat(db.getLocationLatitude())*/ -33.8788025f;
+			ftLongitude = /*Float.parseFloat(db.getLocationLongitude())*/  151.2120050f;
 			latitude = ftLatitude;
 			longitude = ftLongitude;
 			SendLocToServer();
@@ -447,12 +472,12 @@ public class AroundMeActivity extends AppCompatActivity
 		us = null;
 		us = new ArrayList<Users>();
 		list = new ArrayList<Users>();
-		int dst = 100;
+		int dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 
 		try {
 			dst = Integer.parseInt(db.getBroadcastDist());
 		} catch (Exception e) {
-			dst = 100;
+			dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 		}
 
 		grid.invalidateViews();
@@ -723,9 +748,7 @@ public class AroundMeActivity extends AppCompatActivity
 			@Override
 			public void onResponse(String response) {
 				Log.e(TAG, "GET GEO Response: " + response.toString());
-				
-				
-				
+
 				try {
 					JSONObject jObj = new JSONObject(response);
 					boolean error = jObj.getBoolean("error");
@@ -743,7 +766,7 @@ public class AroundMeActivity extends AppCompatActivity
 						// JSONArray jArray = jObj.getJSONArray("geo");
 
 						Log.e("LOG", "*****JARRAY*****" + nearby_users.length());
-
+						db.deleteAllPeople();
 						///////////////////////
 						if (nearby_users.length() == 0) {
 							mSwipeRefreshLayout.setRefreshing(false);
@@ -832,30 +855,39 @@ public class AroundMeActivity extends AppCompatActivity
 
 								boolean containerContainsContent = org.apache.commons.lang.StringUtils
 										.containsIgnoreCase(existingUsers, "." + id + ".");
-								if (containerContainsContent == true) {
-									if (distance <= dst) {
-										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
-												"2012-12-12 09:09:09", 1, about_me, looking_type, status, email_address,
-												"1");
-									} else {
-										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
-												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
-												"0");
-									}
-								} else {
-									if (distance <= dst) {
+//								if (containerContainsContent == true) {
+//									if (distance <= dst) {
+//										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
+//												"2012-12-12 09:09:09", 1, about_me, looking_type, status, email_address,
+//												"1");
+//									} else {
+//										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
+//												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
+//												"0");
+//									}
+//								} else {
+//									if (distance <= dst) {
+//
+//										db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "",
+//												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
+//												"1");
+//									}
+//								}
+								
+								
+								
+								
+								db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "",
+										"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
+										"1");
 
-										db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "",
-												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
-												"1");
-									}
-								}
-
-								if (i == nearby_users.length() - 1) {
-									updateGrid("1");
-								}
+//								if (i == nearby_users.length() - 1) {
+//									updateGrid("1");
+//								}
 
 							}
+							
+							updateGrid("1");
 						}
 					} else {
 						makeNotify("Error occurred while collecting users", AppMsg.STYLE_ALERT);
@@ -863,13 +895,10 @@ public class AroundMeActivity extends AppCompatActivity
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				
-				
+
 			}
-			
-			
-		}
-		, new Response.ErrorListener() {
+
+		}, new Response.ErrorListener() {
 
 			@Override
 			public void onErrorResponse(VolleyError error) {
@@ -891,10 +920,13 @@ public class AroundMeActivity extends AppCompatActivity
 				params.put("pid", ins_user);
 				params.put("longitude", ins_longitude + "");
 				params.put("latitude", ins_latitude + "");
-				params.put("p_distance_pref", dst + "");
+				
+				SessionManager sm = new SessionManager(AroundMeActivity.this);
+				int newDistance = sm.isSuperuser() ? AppConfig.SUPERUSER_MAX_DISTANCE_KM : dst;
+				params.put("p_distance_pref", newDistance + "");
 				params.put("unit", "k");
 
-				//L.error("MAP, " + ins_user + " + " + ins_longitude + " :" + ins_latitude + ": " + dst);
+				 L.error("MAP, " + ins_user + " + " + ins_longitude + " :" +ins_latitude + ": " + newDistance);
 				// params.put("latitude", latitude +"");
 
 				return params;
@@ -915,11 +947,12 @@ public class AroundMeActivity extends AppCompatActivity
 
 		super.onResume();
 		isRunning = true;
-
+		
+		
 		try {
 			dst = Integer.parseInt(db.getBroadcastDist());
 		} catch (Exception e) {
-			dst = 100;
+			dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 		}
 
 		if (oldDst != dst) {

@@ -73,6 +73,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -195,11 +196,11 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			resetInteractor();
 			interactor = 31;
 		}
-		dst = 100;
+		dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 		try {
 			dst = Integer.parseInt(db.getBroadcastDist());
 		} catch (Exception e) {
-			dst = 100;
+			dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 		}
 
 	}
@@ -293,7 +294,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 
 						String fromName = StringUtils.parseBareAddress(message
 								.getFrom());
-						Log.e("XMPPChatDemoActivity", "Text Recieved: "
+						L.error("XMPPChatDemoActivity, Text Recieved: "
 								+ message.getBody() + " from " + fromName);
 
 						String senderRaw = message.getFrom();
@@ -461,7 +462,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 		lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 		lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 		dialogBroadcast.getWindow().setAttributes(lp);
-		
+	/*/	
 		btnGender.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -489,7 +490,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 				dialogPref.getWindow().setAttributes(lp);
 			}
 		});
-
+		//*/
 		btnDistance.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -501,11 +502,11 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 				rbDistance = (RangeBar) dialogPref
 						.findViewById(R.id.rbDistance);
 				rbDistance.setRangeBarEnabled(false);
-				dst = 100;
+				dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 				try {
 					dst = Integer.parseInt(db.getBroadcastDist());
 				} catch (Exception e) {
-					dst = 100;
+					dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 				}
 				rbDistance.setSeekPinByValue(dst);
 
@@ -532,11 +533,47 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					@Override
 					public void onClick(View v) {
 
-						db.updateBroadcastDist(distTick);
-						dst = Integer.parseInt(distTick);
+						try {
+							db.updateBroadcastDist(distTick);
+							dst = Integer.parseInt(distTick);
+
+						} catch (NumberFormatException e) {
+							dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
+						}
+						
+						
 						dialogPref.dismiss();
 					}
 				});
+				
+				
+				CheckBox cbxSuperUser = (CheckBox) dialogPref.findViewById(R.id.cbx_superuser);
+				SessionManager sm = new SessionManager(GroupChatHomeActivity.this);
+				cbxSuperUser.setChecked(sm.isSuperuser());
+				
+				cbxSuperUser.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						SessionManager sm = new SessionManager(GroupChatHomeActivity.this);
+						if (((CheckBox) v).isChecked()) {
+							rbDistance.setEnabled(false);
+							sm.setSuperuser(true);
+						} else {
+							sm.setSuperuser(false);
+							rbDistance.setEnabled(true);
+						}
+
+					}
+				});
+				
+				if (cbxSuperUser.isChecked()) {
+					rbDistance.setEnabled(false);
+				} else {
+					rbDistance.setEnabled(true);
+				}
+				
+				
 				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 				lp.copyFrom(dialogPref.getWindow().getAttributes());
 				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -546,6 +583,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			}
 		});
 
+		/*/
 		btnDistanceTest.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -595,7 +633,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 
 			}
 		});
-
+		//*/
 		btnPost.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -1323,7 +1361,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 	private void getNearbyUsersId() {
 		isSuccess = 0;
 		exactBroadCount = 0;
-		final String tag_string_req = "collect_user_id";
+		final String tag_string_req = "collect";
+		//final String tag_string_req = "collect_user_id";
 		StringRequest strReq = new StringRequest(Method.POST,
 				AppConfig.URL_NEARBY, new Response.Listener<String>() {
 					@Override
@@ -1353,7 +1392,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 												.getString(TAG_GEO_DIS);
 										float dis = Float.parseFloat(rawDis);
 										strUser = "";
-										if (dis <= dst) {
+										//if (dis <= dst) {
 											// try{
 											msg = new Message(
 													uname
@@ -1372,7 +1411,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 														"ds"
 																+ xmp.getLocalizedMessage());
 											}
-										}
+										//}
 
 										L.error("XMPPChatDemoActivity, Sending broadcast to: "+ uname);
 
@@ -1426,10 +1465,22 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 				String ins_latitude = db.getLocationLatitude();
 				String ins_longitude = db.getLocationLongitude();
 				String ins_user = db.getLoggedInID();
-				params.put("tag", tag_string_req);
+				
+				params.put("tag", "collect");
 				params.put("pid", ins_user);
 				params.put("longitude", ins_longitude + "");
 				params.put("latitude", ins_latitude + "");
+				
+				SessionManager sm = new SessionManager(GroupChatHomeActivity.this);
+				int newDistance = sm.isSuperuser() ? AppConfig.SUPERUSER_MAX_DISTANCE_KM : dst;
+				params.put("p_distance_pref", newDistance + "");
+				params.put("unit", "k");
+				
+				
+//				params.put("tag", tag_string_req);
+//				params.put("pid", ins_user);
+//				params.put("longitude", ins_longitude + "");
+//				params.put("latitude", ins_latitude + "");
 				return params;
 			}
 		};

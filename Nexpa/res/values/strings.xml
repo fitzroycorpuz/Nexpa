@@ -29,6 +29,7 @@
     <string name="action_enable_zoom">Enable Zoom</string>
     <string name="radio_male">Male</string>
     <string name="radio_female">Female</string>
+    <string name="radio_everyone">Eveyone</string>
     <string name="preferences">about me</string>
     <string name="sign_out">Sign out</string>
     <string name="sync">Sync</string>
@@ -88,7 +89,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="user_profile_header_distance">Distance Range</string>
     <string name="user_profile_ui_distance">Distance Settings</string>
-    <string name="user_profile_distance_bar">Range to broadcast and catch users (in meters)</string>
+    <string name="user_profile_distance_bar">Range to broadcast and catch users (in kilometers)</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="delete">delete</string>
     

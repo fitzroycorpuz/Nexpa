@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.lpoezy.nexpa.chatservice.OneComment;
+import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.objects.UserProfile;
@@ -254,7 +255,7 @@ public class SQLiteHandler {
 			String DATABASE_TABLE_5_INSERT_DEFAULT = "INSERT INTO " + DATABASE_TABLE_5 + "("
 					+ OPTION_IS_RECIEVING_BROADCAST + " ," + OPTION_IS_BROADCAST_TIMER_TICKING + " ,"
 					+ OPTION_IS_ACCOUNT_FAILED_TO_VALIDATE + ", " + OPTION_DISTANCE_PREF + " ) VALUES  (" + 0 + " ," + 0
-					+ "," + 0 + "," + 100 + ");";
+					+ "," + 0 + "," + AppConfig.SUPERUSER_MIN_DISTANCE_KM + ");";
 
 			db.execSQL(DATABASE_TABLE_5_INSERT_DEFAULT);
 			Log.e(TAG, "Database tables created: " + DATABASE_TABLE_5_INSERT_DEFAULT);
