@@ -52,11 +52,13 @@ public class RoundedImageView extends ImageView {
 	}
 
 	public Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
+		
 	    Bitmap sbmp;
 	    if(bmp.getWidth() != radius || bmp.getHeight() != radius)
 	        sbmp = Bitmap.createScaledBitmap(bmp, radius, radius, false);
 	    else
 	        sbmp = bmp;
+	    
 	    Bitmap output = Bitmap.createBitmap(sbmp.getWidth(),
 	            sbmp.getHeight(), Config.ARGB_8888);
 	    Canvas canvas = new Canvas(output);

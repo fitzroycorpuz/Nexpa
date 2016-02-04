@@ -390,12 +390,12 @@ public class SettingsActivity extends Activity {
 
 				rbDistance = (RangeBar) dialogPref.findViewById(R.id.rbDistance);
 				rbDistance.setRangeBarEnabled(false);
-				 int dst = 100;
+				 int dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 	        		try{
 	        			dst = Integer.parseInt(db.getBroadcastDist());
 	        		}
 	        		catch (Exception e){
-	        			dst = 100;
+	        			dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 	        		}
 	                rbDistance.setSeekPinByValue(dst);
 
