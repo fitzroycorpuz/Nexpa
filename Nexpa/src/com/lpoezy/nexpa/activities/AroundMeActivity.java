@@ -426,8 +426,9 @@ public class AroundMeActivity extends AppCompatActivity
 
 					if (location != null) {
 
-						ftLatitude = /*(float) location.getLatitude()*/ -33.8788025f;
-						ftLongitude = /*(float) location.getLongitude()*/  151.2120050f;
+						ftLatitude = (float) location.getLatitude() /*-33.8788025f*/;
+						ftLongitude = (float) location
+								.getLongitude() /* 151.2120050f */;
 						latitude = ftLatitude;
 						longitude = ftLongitude;
 						db.insertLocation(longitude, latitude);
@@ -460,8 +461,9 @@ public class AroundMeActivity extends AppCompatActivity
 			}
 		} else {
 			L.error("LOCATION INTELLIGENCE, Getting db location...");
-			ftLatitude = /*Float.parseFloat(db.getLocationLatitude())*/ -33.8788025f;
-			ftLongitude = /*Float.parseFloat(db.getLocationLongitude())*/  151.2120050f;
+			ftLatitude = Float.parseFloat(db.getLocationLatitude()) /*-33.8788025f*/;
+			ftLongitude = Float
+					.parseFloat(db.getLocationLongitude()) /* 151.2120050f */;
 			latitude = ftLatitude;
 			longitude = ftLongitude;
 			SendLocToServer();
