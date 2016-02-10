@@ -120,18 +120,8 @@
                             android:id="@+id/cbx_superuser"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="superuser" />
+                            android:text="Premium user - unlimited broadcast range" />
                     </LinearLayout>
-
-                    <Button
-                        android:id="@+id/dialogButtonOK"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="1dp"
-                        android:background="@color/toucan_green"
-                        android:text="Ok"
-                        android:textAllCaps="true"
-                        android:textColor="@color/flat_white" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -179,6 +169,17 @@
                         android:textAllCaps="true"
                         android:textColor="@color/old_black" />
                 </RadioGroup>
+
+                <Button
+                    android:id="@+id/dialogButtonOK"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="1dp"
+                    android:background="@color/toucan_green"
+                    android:text="Ok"
+                    android:textAllCaps="true"
+                    android:textColor="@color/flat_white" />
+
             </LinearLayout>
         </LinearLayout>
     </com.nirhart.parallaxscroll.views.ParallaxScrollView>

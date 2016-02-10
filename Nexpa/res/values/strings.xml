@@ -29,6 +29,7 @@
     <string name="action_enable_zoom">Enable Zoom</string>
     <string name="radio_male">Male</string>
     <string name="radio_female">Female</string>
+    <string name="radio_business">Business</string>
     <string name="radio_everyone">Eveyone</string>
     <string name="preferences">about me</string>
     <string name="sign_out">Sign out</string>

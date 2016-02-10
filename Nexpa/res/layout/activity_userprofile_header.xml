@@ -16,7 +16,7 @@
             android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@drawable/img_building"
             android:gravity="center"
             android:paddingTop="16dp"
             tools:ignore="HardcodedText" >
