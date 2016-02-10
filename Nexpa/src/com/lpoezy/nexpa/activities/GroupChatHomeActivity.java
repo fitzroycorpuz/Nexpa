@@ -723,8 +723,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			// *
 			btnFavorite = (LinearLayout) arg1.findViewById(R.id.btnFavorite);
 			btnFavorite.setOnClickListener(new OnClickListener() {
-				
-
+				 
 				@Override
 				public void onClick(View arg0) {
 					
@@ -738,6 +737,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					mNotifier.sendEmptyMessage(2);
 				};
 			});
+			
 			// */
 			// btnStarred = (LinearLayout) arg1.findViewById(R.id.btnReply);
 
@@ -1007,7 +1007,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 								//L.error(""+e);
 								clickCount = 1;
 							}
-							if(clickCount>=10)clickCount = 0;
+							if(clickCount>=2)clickCount = 0;
 							
 							
 //							if (clickCount%2!=0) {
