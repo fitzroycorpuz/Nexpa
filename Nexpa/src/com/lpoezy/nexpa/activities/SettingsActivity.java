@@ -45,9 +45,11 @@ import com.lpoezy.nexpa.utility.Utilz;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -77,7 +79,7 @@ public class SettingsActivity extends Activity {
 	LinearLayout ln_personal;
 	// LinearLayout ln_preference;
 	LinearLayout ln_settings;
-	LinearLayout ln_distance;
+	LinearLayout In_app_purchase;
 	Button ln_status;
 	Dialog dialog;
 	Dialog dialogPref;
@@ -381,9 +383,44 @@ public class SettingsActivity extends Activity {
 		});
 		//*/
 		
-		ln_distance = (LinearLayout) findViewById(R.id.ln_distance);
-		ln_distance.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View arg0) {
+		In_app_purchase = (LinearLayout) findViewById(R.id.In_app_purchase);
+		In_app_purchase.setOnClickListener(new View.OnClickListener() {
+			
+			   @Override
+			   public void onClick(View v) {
+			    AlertDialog.Builder builder = new AlertDialog.Builder(
+			    		SettingsActivity.this);
+			    builder.setTitle("In App Purchases");
+			    builder.setMessage("Premium user is coming soon..");
+			    builder.setPositiveButton("OK",
+			    new DialogInterface.OnClickListener() {
+			     public void onClick(DialogInterface dialog,
+			      int which) {
+			      Log.e("info", "OK");
+			     }
+			    });
+			    builder.show();
+			   }
+			  });
+		
+		/*
+			@Override
+			public void onClick(View v) {
+				
+				SessionManager session = new SessionManager(getApplicationContext());
+				if(session.isLoggedIn()){
+					UserProfileActivity.promptYesNoDialog("In App Purchase",
+							"is coming soon...",
+		   					SettingsActivity.this,
+		   					"DEAC",
+		   					true);
+				}
+				
+			}
+		});
+		*/	
+		
+			/*	public void onClick(View arg0) {
 				dialogPref = new Dialog(SettingsActivity.this);
 				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
 				dialogPref.setContentView(R.layout.activity_profile_distance_settings);
@@ -428,6 +465,8 @@ public class SettingsActivity extends Activity {
 				dialogPref.getWindow().setAttributes(lp);
 			}
 		});
+		
+		*/
 		
 		ln_signout = (LinearLayout) findViewById(R.id.ln_sign_out);
 		ln_signout.setOnClickListener(new View.OnClickListener() {

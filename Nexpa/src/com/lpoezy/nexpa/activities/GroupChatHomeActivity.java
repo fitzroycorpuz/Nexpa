@@ -497,7 +497,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 				dialogPref = new Dialog(GroupChatHomeActivity.this);
 				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
 				dialogPref
-						.setContentView(R.layout.activity_profile_distance_settings);
+						.setContentView(R.layout.broadcast_distance_settings);
 
 				rbDistance = (RangeBar) dialogPref
 						.findViewById(R.id.rbDistance);
