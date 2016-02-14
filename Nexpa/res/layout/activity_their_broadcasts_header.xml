@@ -110,27 +110,7 @@
             android:background="@color/white_smoke" >
         </TextView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:orientation="horizontal"
-            android:paddingRight="16dp" >
-
-            <ImageView
-                android:id="@+id/img_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
-                android:src="@drawable/ic_settings" />
-
-            <Button
-                android:id="@+id/btn_edit_profile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/edit_profile" >
-            </Button>
-        </LinearLayout>
+      
     </LinearLayout>
 
     <TextView

@@ -2,6 +2,7 @@ package com.lpoezy.nexpa.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jivesoftware.smack.PacketListener;
@@ -24,6 +25,9 @@ import com.appyvet.rangebar.RangeBar;
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.Favorite;
+import com.lpoezy.nexpa.objects.Favorites;
 import com.lpoezy.nexpa.objects.Users;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
@@ -154,6 +158,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 	private ImageView btnDistanceTest;
 	protected EditText rbDistance1;
 	private ImageView btnGender;
+	private Favorites mFavorites;
 
 	public static String displayName(String fname, String user) {
 		if ((fname.equals("")) || (fname == null) || (fname.equals("null"))) {
@@ -202,6 +207,10 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 		} catch (Exception e) {
 			dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 		}
+		
+		
+		mFavorites = new Favorites();
+		mFavorites.downloadOffline(GroupChatHomeActivity.this);
 
 	}
 
@@ -234,6 +243,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					"Interactor killed old packetlistener, counter has been reset.");
 
 		} catch (Exception e) {
+			
 		}
 	}
 
@@ -268,7 +278,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					connection.removePacketListener(packetListener);
 					packetListener = null;
 				} catch (Exception e) {
-					L.error(""+e);
+					L.error("" + e);
 				}
 			} else {
 				updateStatusText(2);
@@ -335,6 +345,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 	// true);
 	// }
 	// }
+	
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -462,42 +474,34 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 		lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 		lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 		dialogBroadcast.getWindow().setAttributes(lp);
-	/*/	
-		btnGender.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				dialogPref = new Dialog(GroupChatHomeActivity.this);
-				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialogPref
-						.setContentView(R.layout.activity_gender);
-				
-				
-				Button dialogButton = (Button) dialogPref
-						.findViewById(R.id.dialogButtonOK);
-				dialogButton.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialogPref.dismiss();
-					}
-				});
-				
-				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-				lp.copyFrom(dialogPref.getWindow().getAttributes());
-				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-				lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-				dialogPref.show();
-				dialogPref.getWindow().setAttributes(lp);
-			}
-		});
-		//*/
+		/*
+		 * / btnGender.setOnClickListener(new View.OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) { dialogPref = new
+		 * Dialog(GroupChatHomeActivity.this);
+		 * dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE); dialogPref
+		 * .setContentView(R.layout.activity_gender);
+		 * 
+		 * 
+		 * Button dialogButton = (Button) dialogPref
+		 * .findViewById(R.id.dialogButtonOK);
+		 * dialogButton.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) { dialogPref.dismiss(); } });
+		 * 
+		 * WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+		 * lp.copyFrom(dialogPref.getWindow().getAttributes()); lp.width =
+		 * WindowManager.LayoutParams.MATCH_PARENT; lp.height =
+		 * WindowManager.LayoutParams.WRAP_CONTENT; dialogPref.show();
+		 * dialogPref.getWindow().setAttributes(lp); } }); //
+		 */
 		btnDistance.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				dialogPref = new Dialog(GroupChatHomeActivity.this);
 				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
 				dialogPref
-						.setContentView(R.layout.activity_profile_distance_settings);
+						.setContentView(R.layout.broadcast_distance_settings);
 
 				rbDistance = (RangeBar) dialogPref
 						.findViewById(R.id.rbDistance);
@@ -540,22 +544,23 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						} catch (NumberFormatException e) {
 							dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 						}
-						
-						
+
 						dialogPref.dismiss();
 					}
 				});
-				
-				
-				CheckBox cbxSuperUser = (CheckBox) dialogPref.findViewById(R.id.cbx_superuser);
-				SessionManager sm = new SessionManager(GroupChatHomeActivity.this);
+
+				CheckBox cbxSuperUser = (CheckBox) dialogPref
+						.findViewById(R.id.cbx_superuser);
+				SessionManager sm = new SessionManager(
+						GroupChatHomeActivity.this);
 				cbxSuperUser.setChecked(sm.isSuperuser());
-				
+
 				cbxSuperUser.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
-						SessionManager sm = new SessionManager(GroupChatHomeActivity.this);
+						SessionManager sm = new SessionManager(
+								GroupChatHomeActivity.this);
 						if (((CheckBox) v).isChecked()) {
 							rbDistance.setEnabled(false);
 							sm.setSuperuser(true);
@@ -566,14 +571,13 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 
 					}
 				});
-				
+
 				if (cbxSuperUser.isChecked()) {
 					rbDistance.setEnabled(false);
 				} else {
 					rbDistance.setEnabled(true);
 				}
-				
-				
+
 				WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 				lp.copyFrom(dialogPref.getWindow().getAttributes());
 				lp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -583,57 +587,39 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			}
 		});
 
-		/*/
-		btnDistanceTest.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-
-				dialogPref = new Dialog(GroupChatHomeActivity.this);
-				dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				dialogPref
-						.setContentView(R.layout.android_profile_distance_tester);
-
-				rbDistance1 = (EditText) dialogPref
-						.findViewById(R.id.rbDistance);
-				dst = 100;
-				try {
-					dst = Integer.parseInt(db.getBroadcastDist());
-				} catch (Exception e) {
-					dst = 100;
-				}
-
-				Button dialogButton1 = (Button) dialogPref
-						.findViewById(R.id.dialogButtonOK);
-				dialogButton1.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-
-						try {
-							dst = Integer.parseInt(rbDistance1.getText()
-									.toString());
-						} catch (Exception e) {
-							dst = 100;
-						}
-						Log.e("dst", dst + " c");
-						
-						//db.updateBroadcastDist(distTick);
-						//dst = Integer.parseInt(distTick);
-						//showList();
-						dialogPref.dismiss();
-					}
-				});
-
-				WindowManager.LayoutParams lp1 = new WindowManager.LayoutParams();
-				lp1.copyFrom(dialogPref.getWindow().getAttributes());
-				lp1.width = WindowManager.LayoutParams.MATCH_PARENT;
-				lp1.height = WindowManager.LayoutParams.WRAP_CONTENT;
-				dialogPref.show();
-				dialogPref.getWindow().setAttributes(lp1);
-
-			}
-		});
-		//*/
+		/*
+		 * / btnDistanceTest.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) {
+		 * 
+		 * dialogPref = new Dialog(GroupChatHomeActivity.this);
+		 * dialogPref.requestWindowFeature(Window.FEATURE_NO_TITLE); dialogPref
+		 * .setContentView(R.layout.android_profile_distance_tester);
+		 * 
+		 * rbDistance1 = (EditText) dialogPref .findViewById(R.id.rbDistance);
+		 * dst = 100; try { dst = Integer.parseInt(db.getBroadcastDist()); }
+		 * catch (Exception e) { dst = 100; }
+		 * 
+		 * Button dialogButton1 = (Button) dialogPref
+		 * .findViewById(R.id.dialogButtonOK);
+		 * dialogButton1.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) {
+		 * 
+		 * try { dst = Integer.parseInt(rbDistance1.getText() .toString()); }
+		 * catch (Exception e) { dst = 100; } Log.e("dst", dst + " c");
+		 * 
+		 * //db.updateBroadcastDist(distTick); //dst =
+		 * Integer.parseInt(distTick); //showList(); dialogPref.dismiss(); } });
+		 * 
+		 * WindowManager.LayoutParams lp1 = new WindowManager.LayoutParams();
+		 * lp1.copyFrom(dialogPref.getWindow().getAttributes()); lp1.width =
+		 * WindowManager.LayoutParams.MATCH_PARENT; lp1.height =
+		 * WindowManager.LayoutParams.WRAP_CONTENT; dialogPref.show();
+		 * dialogPref.getWindow().setAttributes(lp1);
+		 * 
+		 * } }); //
+		 */
 		btnPost.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -696,6 +682,9 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			btnReply = (LinearLayout) arg1.findViewById(R.id.btnReply);
 			txtBroadId = (TextView) arg1.findViewById(R.id.broad_id);
 			br_id = txtBroadId.getText().toString();
+			
+			TextView tvFrm =(TextView) arg1.findViewById(R.id.broad_from);
+			final String frm = tvFrm.getText().toString();
 
 			btnDel = (LinearLayout) arg1.findViewById(R.id.btnDelete);
 			btnDel.setOnClickListener(new View.OnClickListener() {
@@ -705,7 +694,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 					String strDel = txtDel.getText().toString();
 					txtBroadId = (TextView) arg1.findViewById(R.id.broad_id);
 					br_id = txtBroadId.getText().toString();
-
+					
 					if (strDel.equals("1")) {
 						promptYesNoDialog(
 								"Are you sure you want to delete this post?",
@@ -723,51 +712,83 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			// *
 			btnFavorite = (LinearLayout) arg1.findViewById(R.id.btnFavorite);
 			btnFavorite.setOnClickListener(new OnClickListener() {
-				 
+
 				@Override
 				public void onClick(View arg0) {
 					
-					ImageButton btnFave = (ImageButton)btnFavorite.findViewById(R.id.btnFave);
-					//Integer broadcastId = (Integer)btnFavorite.getTag(R.id.broad_id);
-					//btnFavorite.setTag(R.id.curr_broadcast_id, broadcastId);
-					clickedBroadcastId = (Integer)btnFavorite.getTag(R.id.broad_id);
+					TextView tvClickCount = (TextView) arg1.findViewById(R.id.click_count);
+					
+					int clickCount = Integer.parseInt(tvClickCount.getText().toString());
+					
+					tvClickCount.setText((++clickCount)+"");
+					ImageButton btnFave = (ImageButton) arg1.findViewById(R.id.btnFave);
+
 					
 					
+					Favorite favorite = new Favorite();
+					favorite.setName(frm);
 					
-					mNotifier.sendEmptyMessage(2);
+					
+					//toggle btn star
+					if (clickCount % 2 != 0) {
+						btnFave.setBackgroundResource(R.drawable.btn_star_yellow);
+						//save favorite
+						favorite.saveLocal(GroupChatHomeActivity.this);
+						
+						
+					} else {
+
+						btnFave.setBackgroundResource(R.drawable.btn_star);
+						//delte fave
+						favorite.deleteLocal(GroupChatHomeActivity.this);
+
+					}
+					
+					
+
 				};
 			});
-			
 			// */
 			// btnStarred = (LinearLayout) arg1.findViewById(R.id.btnReply);
 
 			btnReply.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
+					
 					txtReply = (TextView) arg1.findViewById(R.id.txtReply);
 					String strReply = txtReply.getText().toString();
 					if (strReply.equals("REPLY")) {
-						txBroad = (TextView) arg1
-								.findViewById(R.id.broad_message);
-						txtUser = (TextView) arg1
-								.findViewById(R.id.broad_from_raw);
-						TextView db = (TextView) arg1
-								.findViewById(R.id.date_broad);
-						String dBroad = db.getText().toString();
-
-						Intent explicitIntent = new Intent(
-								GroupChatHomeActivity.this, ChatActivity.class);
-						explicitIntent.putExtra("INTENT_MESSAGE", txBroad
-								.getText().toString());
-						explicitIntent.putExtra("INTENT_MESSAGE_DATE", dBroad);
-						explicitIntent.putExtra("INTENT_MESSAGE_TYPE",
-								"BROADCAST");
-						explicitIntent.putExtra("username", txtUser.getText()
-								.toString());
-						Log.e("111sdf", "XX" + txBroad.getText().toString());
-						Log.e("111sdf", "XX" + txtUser.getText().toString());
-						startActivity(explicitIntent);
+//						txBroad = (TextView) arg1
+//								.findViewById(R.id.broad_message);
+//						txtUser = (TextView) arg1
+//								.findViewById(R.id.broad_from_raw);
+//						TextView db = (TextView) arg1
+//								.findViewById(R.id.date_broad);
+//						String dBroad = db.getText().toString();
+//
+//						Intent explicitIntent = new Intent(
+//								GroupChatHomeActivity.this, ChatActivity.class);
+//						explicitIntent.putExtra("INTENT_MESSAGE", txBroad
+//								.getText().toString());
+//						explicitIntent.putExtra("INTENT_MESSAGE_DATE", dBroad);
+//						explicitIntent.putExtra("INTENT_MESSAGE_TYPE",
+//								"BROADCAST");
+//						explicitIntent.putExtra("username", txtUser.getText()
+//								.toString());
+//						Log.e("111sdf", "XX" + txBroad.getText().toString());
+//						Log.e("111sdf", "XX" + txtUser.getText().toString());
+//						startActivity(explicitIntent);
 						// finish();
+						
+						Intent intent = new Intent(GroupChatHomeActivity.this, OthersBroadcastActivity.class);
+						Correspondent correspondent = new Correspondent();
+						correspondent.setUsername(frm);
+						correspondent.downloadCorrespondentIdOffline(GroupChatHomeActivity.this);
+						intent.putExtra(OthersBroadcastActivity.TAG_USER_ID, correspondent.getId());
+						intent.putExtra(OthersBroadcastActivity.TAG_USERNAME, correspondent.getUsername());
+						
+						startActivity(intent);
+						
 					}
 					// else{
 					// Log.e("yy","UNINTENT");
@@ -783,7 +804,6 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 	boolean setType;
 	int incr = 0;
 	protected int clickedBroadcastId = -1;
-	
 
 	private void showList() {
 
@@ -817,19 +837,21 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 							R.id.broad_id, R.id.broad_from, R.id.date_broad,
 							R.id.location_local, R.id.broad_message,
 							R.id.reach, R.id.txtReply, R.id.imgReply,
-							R.id.btnReply, R.id.broad_from_raw, R.id.btnFave, R.id.btnTrash,
-							R.id.txtFave, R.id.txtDel }, 0);
+							R.id.btnReply, R.id.broad_from_raw, R.id.btnFave,
+							R.id.btnTrash, R.id.txtFave, R.id.txtDel }, 0);
 			mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-				
+
 				@Override
 				public boolean setViewValue(View view, Cursor cursor, int column) {
-					
+
 					String broadType = "";
 					String statVal = "";
 					broadType = cursor.getString(cursor
 							.getColumnIndex("broad_type_of"));
-					int broadcastId = cursor.getInt(cursor.getColumnIndex(SQLiteHandler.BROAD_ID));
-					((View)view.getParent()).setTag(R.id.broad_id, broadcastId);
+					int broadcastId = cursor.getInt(cursor
+							.getColumnIndex(SQLiteHandler.BROAD_ID));
+					((View) view.getParent())
+							.setTag(R.id.broad_id, broadcastId);
 					if (view.getId() == R.id.broad_from) {
 						TextView tv = (TextView) view;
 						if (broadType.equals("1")) {
@@ -841,7 +863,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 							broad_user_type = 1;
 							// setType = false;
 							// }
-							//return true;
+							// return true;
 						} else {
 							// if (setType == true){
 							broad_user_type = 0;
@@ -853,9 +875,9 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 											+ "", cursor.getString(cursor
 											.getColumnIndex("broad_from")));
 							tv.setText(statVal);
-							//return true;
+							// return true;
 						}
-						
+
 						return true;
 					}
 
@@ -905,18 +927,18 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						}
 						return true;
 					}
-					
-					//*
-					 if (view.getId() == R.id.txtFave) {
+
+					// *
+					if (view.getId() == R.id.txtFave) {
 
 						TextView txtFave = (TextView) view;
 						String strFave = txtFave.getText().toString();
 						if (broad_user_type == 1) {
-							
+
 						}
 						return true;
 					}
-					 //*/
+					// */
 
 					if (view.getId() == R.id.txtDel) {
 
@@ -929,8 +951,6 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						}
 						return true;
 					}
-
-					
 
 					if (view.getId() == R.id.location_local) {
 						String strLoc = cursor.getString(cursor
@@ -990,60 +1010,21 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						}
 						return true;
 					}
-					
+					// */
 					if (view.getId() == R.id.btnFave) {
-						//L.debug("cursor.getColumnIndex(SQLiteHandler.BROAD_ID: "+cursor.getLong(cursor.getColumnIndex(SQLiteHandler.BROAD_ID)));
-						//Integer btnFaveResId = (Integer) ((View)view.getParent()).getTag(R.id.btn_fave_res_id);
-						//Integer clickedBroadcastId = (Integer) ((View)view.getParent()).getTag(R.id.curr_broadcast_id);
-						//L.debug(", broadcastId: "+broadcastId+", clickedBroadcastId: "+clickedBroadcastId);
-						Integer clickCount = (Integer)((View)view.getParent()).getTag(R.id.btn_star_click_count);
-						if(clickedBroadcastId == broadcastId){
-							
-							
-							try{
-								
-								clickCount++;	
-							}catch(NullPointerException e){
-								//L.error(""+e);
-								clickCount = 1;
-							}
-							if(clickCount>=2)clickCount = 0;
-							
-							
-//							if (clickCount%2!=0) {
-//
-//								// btnFavorite.setTag(R.id.btn_fave_res_id,
-//								// R.drawable.btn_star_yellow);
-//								view.setBackgroundResource(R.drawable.btn_star_yellow);
-//							} else {
-//
-//								view.setBackgroundResource(R.drawable.btn_star);
-//								// btnFavorite.setTag(R.id.btn_fave_res_id,
-//								// R.drawable.btn_star);
-//							}
-							
-							clickedBroadcastId = -1;
-							
-							
-							
-							
-							((View)view.getParent()).setTag(R.id.btn_star_click_count, clickCount);
-//							if(view.getBackground().getConstantState() == getResources().getDrawable(R.drawable.btn_star).getConstantState()){
-//								
-//								//btnFavorite.setTag(R.id.btn_fave_res_id, R.drawable.btn_star_yellow);
-//								view.setBackgroundResource(R.drawable.btn_star_yellow);
-//							}else{
-//								
-//								view.setBackgroundResource(R.drawable.btn_star);
-//								//btnFavorite.setTag(R.id.btn_fave_res_id, R.drawable.btn_star);
-//							}
+						// L.debug("cursor.getColumnIndex(SQLiteHandler.BROAD_ID: "+cursor.getLong(cursor.getColumnIndex(SQLiteHandler.BROAD_ID)));
+
+						if (mFavorites.getNames().indexOf(statVal)>=0) {
+							view.setBackgroundResource(R.drawable.btn_star_yellow);
+						} else {
+
+							view.setBackgroundResource(R.drawable.btn_star);
+
 						}
 						
-						L.debug(broadcastId+"clickCount: "+clickCount);
-						//((View)view.getParent()).setTag(BRODCAST_ID,""+cursor.getLong(cursor.getColumnIndex(SQLiteHandler.BROAD_ID)));
 						return true;
 					}
-
+					// */
 					return false;
 				}
 
@@ -1362,7 +1343,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 		isSuccess = 0;
 		exactBroadCount = 0;
 		final String tag_string_req = "collect";
-		//final String tag_string_req = "collect_user_id";
+		// final String tag_string_req = "collect_user_id";
 		StringRequest strReq = new StringRequest(Method.POST,
 				AppConfig.URL_NEARBY, new Response.Listener<String>() {
 					@Override
@@ -1380,40 +1361,56 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 												+ nearby_users.length());
 								if (nearby_users.length() == 0) {
 									isSuccess = 1;
-
 								} else {
-
+									
+									List<String> nearbyUsers = new ArrayList<String>();
+									
 									for (int i = 0; i < nearby_users.length(); i++) {
 										JSONObject c = nearby_users
 												.getJSONObject(i);
+										String uname = c
+												.getString(TAG_GEO_USER);
+										
+										if(mFavorites.getNames().indexOf(uname)==-1){
+											Favorite newFavorite = new Favorite();
+											newFavorite.setName(uname);
+											mFavorites.add(newFavorite);
+										}
+									}
+									
+									for (int i = 0; i < nearby_users.length(); i++) {
+										JSONObject c = nearby_users
+												.getJSONObject(i);
+							
 										String uname = c
 												.getString(TAG_GEO_USER);
 										String rawDis = c
 												.getString(TAG_GEO_DIS);
 										float dis = Float.parseFloat(rawDis);
 										strUser = "";
-										//if (dis <= dst) {
-											// try{
-											msg = new Message(
-													uname
-															+ "@vps.gigapros.com/Smack",
-													Message.Type.normal);
-											msg.setBody(StringFormattingUtils
-													.setBroadcastChatEquivalent(
-															locationName,
-															edBroad.getText()
-																	.toString()));
-											try {
-												connection.sendPacket(msg);
-												exactBroadCount++;
-											} catch (Exception xmp) {
-												Log.e("ERR",
-														"ds"
-																+ xmp.getLocalizedMessage());
-											}
-										//}
+										// if (dis <= dst) {
+										// try{
+										
+										msg = new Message(uname
+												+ "@vps.gigapros.com/Smack",
+												Message.Type.normal);
+										msg.setBody(StringFormattingUtils
+												.setBroadcastChatEquivalent(
+														locationName, edBroad
+																.getText()
+																.toString()));
+										try {
+											connection.sendPacket(msg);
+											exactBroadCount++;
+										} catch (Exception xmp) {
+											Log.e("ERR",
+													"ds"
+															+ xmp.getLocalizedMessage());
+										}
+										// }
 
-										L.error("XMPPChatDemoActivity, Sending broadcast to: "+ uname);
+										L.error("XMPPChatDemoActivity, Sending broadcast to: "
+												+ uname);
 
 										if (i + 1 == nearby_users.length()) {
 											db.insertBroadcast(
@@ -1458,29 +1455,30 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 						failedToBroadcast(isSuccess);
 					}
 				}) {
-			
+
 			@Override
 			protected Map<String, String> getParams() {
 				Map<String, String> params = new HashMap<String, String>();
 				String ins_latitude = db.getLocationLatitude();
 				String ins_longitude = db.getLocationLongitude();
 				String ins_user = db.getLoggedInID();
-				
+
 				params.put("tag", "collect");
 				params.put("pid", ins_user);
 				params.put("longitude", ins_longitude + "");
 				params.put("latitude", ins_latitude + "");
-				
-				SessionManager sm = new SessionManager(GroupChatHomeActivity.this);
-				int newDistance = sm.isSuperuser() ? AppConfig.SUPERUSER_MAX_DISTANCE_KM : dst;
+
+				SessionManager sm = new SessionManager(
+						GroupChatHomeActivity.this);
+				int newDistance = sm.isSuperuser() ? AppConfig.SUPERUSER_MAX_DISTANCE_KM
+						: dst;
 				params.put("p_distance_pref", newDistance + "");
 				params.put("unit", "k");
-				
-				
-//				params.put("tag", tag_string_req);
-//				params.put("pid", ins_user);
-//				params.put("longitude", ins_longitude + "");
-//				params.put("latitude", ins_latitude + "");
+
+				// params.put("tag", tag_string_req);
+				// params.put("pid", ins_user);
+				// params.put("longitude", ins_longitude + "");
+				// params.put("latitude", ins_latitude + "");
 				return params;
 			}
 		};

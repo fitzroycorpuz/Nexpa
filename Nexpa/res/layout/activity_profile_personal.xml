@@ -135,6 +135,14 @@
             android:button="@drawable/flat_btn_radio"
             android:text="@string/radio_female"
             />
+            
+            <RadioButton android:id="@+id/radioBusiness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true" android:textColor="@color/old_black"
+            android:button="@drawable/flat_btn_radio"
+            android:text="@string/radio_business"
+            />
              
             </RadioGroup>
             

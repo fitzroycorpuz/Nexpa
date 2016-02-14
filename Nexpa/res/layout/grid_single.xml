@@ -13,6 +13,14 @@
         android:scaleType="centerCrop"
          android:animateLayoutChanges="true" 
     />  
+    
+  <ImageView
+        android:id="@+id/offline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="82dp"
+        android:paddingLeft="80dp"
+        android:src="@drawable/offline" />
 
     <LinearLayout
         android:id="@+id/layout_login"

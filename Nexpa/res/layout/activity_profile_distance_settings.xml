@@ -120,18 +120,8 @@
                             android:id="@+id/cbx_superuser"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="superuser" />
+                            android:text="Premium user - unlimited broadcast range" />
                     </LinearLayout>
-
-                    <Button
-                        android:id="@+id/dialogButtonOK"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="1dp"
-                        android:background="@color/toucan_green"
-                        android:text="Ok"
-                        android:textAllCaps="true"
-                        android:textColor="@color/flat_white" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -144,41 +134,37 @@
                 android:paddingBottom="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp" >
+                
+                <CheckBox
+                            android:id="@+id/cbx_male"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Male" />
+                
+                 <CheckBox
+                            android:id="@+id/cbx_female"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Female" />
+                 
+                  <CheckBox
+                            android:id="@+id/cbx_business"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Business" />
 
-                <RadioGroup
-                    android:id="@+id/radioSex"
+                
+
+                <Button
+                    android:id="@+id/dialogButtonOK"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white_smoke" >
+                    android:layout_marginBottom="1dp"
+                    android:background="@color/toucan_green"
+                    android:text="Ok"
+                    android:textAllCaps="true"
+                    android:textColor="@color/flat_white" />
 
-                    <RadioButton
-                        android:id="@+id/radioMale"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/flat_btn_radio"
-                        android:checked="true"
-                        android:text="@string/radio_male"
-                        android:textAllCaps="true"
-                        android:textColor="@color/old_black" />
-
-                    <RadioButton
-                        android:id="@+id/radioFemale"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/flat_btn_radio"
-                        android:text="@string/radio_female"
-                        android:textAllCaps="true"
-                        android:textColor="@color/old_black" />
-
-                    <RadioButton
-                        android:id="@+id/radioEveryone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/flat_btn_radio"
-                        android:text="@string/radio_everyone"
-                        android:textAllCaps="true"
-                        android:textColor="@color/old_black" />
-                </RadioGroup>
             </LinearLayout>
         </LinearLayout>
     </com.nirhart.parallaxscroll.views.ParallaxScrollView>
