@@ -19,6 +19,7 @@ import android.os.Looper;
 
 public class SyncUserProfileService extends Service {
 	
+	private static final int SECONDS =  1000;
 	private static final int MINUTE =  1000 * 60;
 
 	private IBinder mBinder = new LocalBinder();
@@ -26,7 +27,7 @@ public class SyncUserProfileService extends Service {
 	private volatile Looper mServiceLooper;
 	private volatile Handler mServiceHandler;
 
-	private int retry = MINUTE;
+	private int retry = SECONDS;
 	private int n = 0;
 
 	public static boolean isRunning;
@@ -90,15 +91,16 @@ public class SyncUserProfileService extends Service {
 						userProfile.setSyncedOnline(true);
 						userProfile.updateOffline(getApplicationContext());
 					}
-					retry = MINUTE;
+					retry = SECONDS;
 				}else{
 					L.debug("(2<<"+n+") : "+(2<<n));
-					retry = (2<<n)* MINUTE;
-					if(n<2)n++;
+					retry = (2<<n)* SECONDS;
+					if(n<5)n++;
 					
 					L.debug("SyncUserProfileService, no changes to update online");
 				}
-				L.debug("SyncUserProfileService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
+				//L.debug("SyncUserProfileService, next update is after  "+TimeUnit.MILLISECONDS.toMinutes(retry)+" minute(s)");
+				L.debug("SyncProfilePictureService, next update is after  "+TimeUnit.MILLISECONDS.toSeconds(retry)+" second(s)");
 				mServiceHandler.postDelayed(this, retry);
 			}
 		}, retry);

@@ -90,11 +90,9 @@ public class CustomGrid extends BaseAdapter {
                grid = (View) convertView;
            }
 
-           
            TextView textView = (TextView) grid.findViewById(R.id.grid_text);
            ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
            //TextView txtAvailView = (TextView) grid.findViewById(R.id.txtAvail);
-           
            
            //Roster roster = Roster.
            
@@ -103,7 +101,6 @@ public class CustomGrid extends BaseAdapter {
            textView.setText(web.get(position)+ "|"  /*+ distance.get(position) +"m"*/+avalability);
            //imageView.setImageResource(Imageid.get(position));
           
-           
            Bitmap rawImage = BitmapFactory.decodeResource(mContext.getResources(),
 			        R.drawable.pic_sample_girl);
            
