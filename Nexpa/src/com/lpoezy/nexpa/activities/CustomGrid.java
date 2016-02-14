@@ -93,16 +93,19 @@ public class CustomGrid extends BaseAdapter {
            
            TextView textView = (TextView) grid.findViewById(R.id.grid_text);
            ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+           ImageView offline = (ImageView)grid.findViewById(R.id.offline);
            //TextView txtAvailView = (TextView) grid.findViewById(R.id.txtAvail);
            
            
            //Roster roster = Roster.
            
           // Presence presence = 
+  
           String avalability = mCorrespondents.get(position).isAvailable()?"Online":"Offline";
-           textView.setText(web.get(position)+ "|"  /*+ distance.get(position) +"m"*/+avalability);
+           textView.setText(web.get(position)/*+  "|" */ /*+ distance.get(position) +"m" +avalability*/ );
            //imageView.setImageResource(Imageid.get(position));
           
+       
            
            Bitmap rawImage = BitmapFactory.decodeResource(mContext.getResources(),
 			        R.drawable.pic_sample_girl);
