@@ -38,6 +38,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
 public class ChatHistoryListFragment extends Fragment implements Correspondent.OnCorrespondentUpdateListener {
@@ -264,7 +265,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 			
 			RoundedImageView riv = new RoundedImageView(getActivity());
 			Bitmap circImage = riv.getCroppedBitmap(rawImage, 68);
-
+			
 			vh.imgProfilePic.setImageBitmap(circImage);
 			
 			vh.tvMsg.setText(msg.getBody());
@@ -289,6 +290,8 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 				tvBuddys = (TextView) view.findViewById(R.id.tv_buddys_name);
 				tvMsg = (TextView) view.findViewById(R.id.tv_buddys_msg);
 				imgProfilePic = (ImageView) view.findViewById(R.id.img_profile_pic);
+				//imgProfilePic.setAdjustViewBounds(true);
+				//imgProfilePic.setScaleType(ScaleType.CENTER_CROP);
 				view.setOnClickListener(this);
 			}
 

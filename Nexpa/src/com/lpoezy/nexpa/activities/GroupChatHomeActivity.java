@@ -683,8 +683,29 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			txtBroadId = (TextView) arg1.findViewById(R.id.broad_id);
 			br_id = txtBroadId.getText().toString();
 			
+			
+			txtReply = (TextView) arg1.findViewById(R.id.txtReply);
+			final String strReply = txtReply.getText().toString();
+			
 			TextView tvFrm =(TextView) arg1.findViewById(R.id.broad_from);
 			final String frm = tvFrm.getText().toString();
+			LinearLayout btnBroadcastHistory = (LinearLayout)arg1.findViewById(R.id.btn_broadcast_history);
+			btnBroadcastHistory.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					if (strReply.equals("REPLY")) {
+						Intent intent = new Intent(GroupChatHomeActivity.this, OthersBroadcastActivity.class);
+						Correspondent correspondent = new Correspondent();
+						correspondent.setUsername(frm);
+						correspondent.downloadCorrespondentIdOffline(GroupChatHomeActivity.this);
+						intent.putExtra(OthersBroadcastActivity.TAG_USER_ID, correspondent.getId());
+						intent.putExtra(OthersBroadcastActivity.TAG_USERNAME, correspondent.getUsername());
+						
+						startActivity(intent);
+					}
+				}
+			});
 
 			btnDel = (LinearLayout) arg1.findViewById(R.id.btnDelete);
 			btnDel.setOnClickListener(new View.OnClickListener() {
@@ -755,39 +776,31 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 				@Override
 				public void onClick(View arg0) {
 					
-					txtReply = (TextView) arg1.findViewById(R.id.txtReply);
-					String strReply = txtReply.getText().toString();
+					
 					if (strReply.equals("REPLY")) {
-//						txBroad = (TextView) arg1
-//								.findViewById(R.id.broad_message);
-//						txtUser = (TextView) arg1
-//								.findViewById(R.id.broad_from_raw);
-//						TextView db = (TextView) arg1
-//								.findViewById(R.id.date_broad);
-//						String dBroad = db.getText().toString();
-//
-//						Intent explicitIntent = new Intent(
-//								GroupChatHomeActivity.this, ChatActivity.class);
-//						explicitIntent.putExtra("INTENT_MESSAGE", txBroad
-//								.getText().toString());
-//						explicitIntent.putExtra("INTENT_MESSAGE_DATE", dBroad);
-//						explicitIntent.putExtra("INTENT_MESSAGE_TYPE",
-//								"BROADCAST");
-//						explicitIntent.putExtra("username", txtUser.getText()
-//								.toString());
-//						Log.e("111sdf", "XX" + txBroad.getText().toString());
-//						Log.e("111sdf", "XX" + txtUser.getText().toString());
-//						startActivity(explicitIntent);
+						txBroad = (TextView) arg1
+								.findViewById(R.id.broad_message);
+						txtUser = (TextView) arg1
+								.findViewById(R.id.broad_from_raw);
+						TextView db = (TextView) arg1
+								.findViewById(R.id.date_broad);
+						String dBroad = db.getText().toString();
+
+						Intent explicitIntent = new Intent(
+								GroupChatHomeActivity.this, ChatActivity.class);
+						explicitIntent.putExtra("INTENT_MESSAGE", txBroad
+								.getText().toString());
+						explicitIntent.putExtra("INTENT_MESSAGE_DATE", dBroad);
+						explicitIntent.putExtra("INTENT_MESSAGE_TYPE",
+								"BROADCAST");
+						explicitIntent.putExtra("username", txtUser.getText()
+								.toString());
+						Log.e("111sdf", "XX" + txBroad.getText().toString());
+						Log.e("111sdf", "XX" + txtUser.getText().toString());
+						startActivity(explicitIntent);
 						// finish();
 						
-						Intent intent = new Intent(GroupChatHomeActivity.this, OthersBroadcastActivity.class);
-						Correspondent correspondent = new Correspondent();
-						correspondent.setUsername(frm);
-						correspondent.downloadCorrespondentIdOffline(GroupChatHomeActivity.this);
-						intent.putExtra(OthersBroadcastActivity.TAG_USER_ID, correspondent.getId());
-						intent.putExtra(OthersBroadcastActivity.TAG_USERNAME, correspondent.getUsername());
 						
-						startActivity(intent);
 						
 					}
 					// else{
