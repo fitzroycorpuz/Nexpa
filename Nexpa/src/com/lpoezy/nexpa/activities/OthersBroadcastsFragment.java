@@ -11,6 +11,7 @@ import org.jivesoftware.smack.util.Base64;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Announcement;
+import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.parallaxrecyclerview.HeaderLayoutManagerFixed;
@@ -36,7 +37,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,22 +46,24 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class MyBroadcastsFragment extends Fragment {
+public class OthersBroadcastsFragment extends Fragment implements Correspondent.OnCorrespondentUpdateListener{
 	
-
 	List<Announcement> mAnouncements;
 	//private MyBroascastsAdapter mAdapter;
 	private RecyclerView mRvBroadcasts;
 	protected String mUsername;
 	
 	
-	public static MyBroadcastsFragment newInstance() {
-		MyBroadcastsFragment fragment = new MyBroadcastsFragment();
-		
+	public static OthersBroadcastsFragment newInstance(long id, String name) {
+		OthersBroadcastsFragment fragment = new OthersBroadcastsFragment();
+		Bundle args = new Bundle();
+		args.putLong(OthersBroadcastActivity.TAG_USER_ID, id);
+		args.putLong(OthersBroadcastActivity.TAG_USERNAME, id);
+		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public MyBroadcastsFragment() {
+	public OthersBroadcastsFragment() {
 		// Required empty public constructor
 	}
 	
@@ -83,18 +85,10 @@ public class MyBroadcastsFragment extends Fragment {
 	private TextView mTvUrl0;
 	private TextView mTvUrl1;
 	private TextView mTvUrl2;
+	private Correspondent mCorrespondent;
+	protected long userId;
 	
-	private BroadcastReceiver mActionUserProfileUpdatedReceived = new BroadcastReceiver(){
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			
-			resetProfilePic();
-			resetUserInfo();
-		}
-	};
-	
-	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -107,10 +101,11 @@ public class MyBroadcastsFragment extends Fragment {
 		
 		//mAdapter = new MyBroascastsAdapter(getActivity());
 		
+		userId = getArguments().getLong(OthersBroadcastActivity.TAG_USER_ID, -1);
+		
 		mAdapter = new ParallaxRecyclerAdapter<Announcement>(mAnouncements) {
 			
 			
-
 			@Override
 			public void onBindViewHolderImpl(android.support.v7.widget.RecyclerView.ViewHolder viewHolder,
 					ParallaxRecyclerAdapter<Announcement> adapter, int position) {
@@ -122,6 +117,7 @@ public class MyBroadcastsFragment extends Fragment {
 				
 				vh .tvBroadMsg.setText(ann.getMessage());
 				vh.tvReply.setText("REACHED " + ann.getReach());
+				vh.tvReply.setVisibility(View.INVISIBLE);
 				vh.ImgReply.setBackgroundResource(R.drawable.btn_reach);
 				vh.tvBroadFrm.setText(mUsername);
 				
@@ -163,7 +159,7 @@ public class MyBroadcastsFragment extends Fragment {
 		};
 		
 		mRvBroadcasts.setLayoutManager(new LinearLayoutManager(getActivity()));
-        View header = getActivity().getLayoutInflater().inflate(R.layout.activity_userprofile_header, mRvBroadcasts, false);
+        View header = getActivity().getLayoutInflater().inflate(R.layout.activity_their_broadcasts_header, mRvBroadcasts, false);
         mAdapter.setParallaxHeader(header, mRvBroadcasts);
         mAdapter.setData(mAnouncements);
         mRvBroadcasts.setAdapter(mAdapter);
@@ -178,29 +174,6 @@ public class MyBroadcastsFragment extends Fragment {
         mTvUrl2 = (TextView)header.findViewById(R.id.tv_url2);
         
         
-        ((ImageView)header.findViewById(R.id.img_settings)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				getActivity().startActivity(new Intent(getActivity(), SettingsActivity.class));
-			}
-		});
-        
-        ((Button)header.findViewById(R.id.btn_edit_profile)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				
-				//mCallback.onShowEditProfileScreen();
-				EditProfileFragment editProfileFrag = EditProfileFragment.newInstance();
-				
-				editProfileFrag.show(getFragmentManager().beginTransaction(), EditProfileFragment.TAG);
-				
-			}
-		});
-		
 		return v;
 	}
 	
@@ -209,49 +182,60 @@ public class MyBroadcastsFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onPause();
 		
-		getActivity().unregisterReceiver(mActionUserProfileUpdatedReceived);
+		
 	}
 	
 	@Override
 	public void onResume() {
 		L.debug("MyBroadcastFragment, onResume");
 		super.onResume();
-		
-		getActivity().registerReceiver(mActionUserProfileUpdatedReceived , new IntentFilter(AppConfig.ACTION_USER_PROFILE_UPDATED));
-		
+	
 		resetProfilePic();
 		resetUserInfo();
 		
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				
-				SQLiteHandler db = new SQLiteHandler(getActivity().getApplicationContext());
-				db.openToRead();
-				
-				final List<Announcement> announcements = db.downloadPersonalBroadcasts();
-				
-				mUsername = GroupChatHomeActivity.displayName(db.getFName() + "", db.getUsername());
-				
-				db.close();
-				
-				
-				mRvBroadcasts.post(new Runnable() {
-					
-					@Override
-					public void run() {
-						
-						mAnouncements.clear();
-						mAnouncements.addAll(announcements);
-						
-						L.debug("mAnouncements.size "+mAnouncements.size());
-						mAdapter.notifyDataSetChanged();
-					}
-				});
-				
-			}
-		}).start();
+		SQLiteHandler db = new SQLiteHandler(getActivity().getApplicationContext());
+		db.openToRead();
+		
+		final List<Announcement> announcements = db.downloadOthersBroadcasts(mUsername);
+		
+		//mUsername = GroupChatHomeActivity.displayName(db.getFName() + "", db.getUsername());
+		mAnouncements.clear();
+		mAnouncements.addAll(announcements);
+		
+		L.debug("mAnouncements.size "+mAnouncements.size());
+		mAdapter.notifyDataSetChanged();
+		db.close();
+		
+//		new Thread(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				
+//				SQLiteHandler db = new SQLiteHandler(getActivity().getApplicationContext());
+//				db.openToRead();
+//				
+//				final List<Announcement> announcements = db.downloadPersonalBroadcasts();
+//				
+//				mUsername = GroupChatHomeActivity.displayName(db.getFName() + "", db.getUsername());
+//	
+//				db.close();
+//				
+//				
+//				mImgProfile.post(new Runnable() {
+//					
+//					@Override
+//					public void run() {
+//						L.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+//						mAnouncements.clear();
+//						mAnouncements.addAll(announcements);
+//						
+//						L.debug("mAnouncements.size "+mAnouncements.size());
+//						mAdapter.notifyDataSetChanged();
+//					}
+//				});
+//				
+//			}
+//		}).start();
 	}
 	
 	
@@ -261,7 +245,7 @@ public class MyBroadcastsFragment extends Fragment {
 		db.openToRead();
 		
 		UserProfile profile = new UserProfile();
-		profile.setId(Long.parseLong(db.getLoggedInID()));
+		profile.setId(this.userId);
 		profile.downloadOffline(getActivity());
 		
 		mTvJobTitle.setVisibility(View.GONE);
@@ -277,7 +261,8 @@ public class MyBroadcastsFragment extends Fragment {
 		
 		if(profile.getUsername()!=null &&!profile.getUsername().equalsIgnoreCase("null") && !profile.getUsername().equals("")){
 			mTvUname.setVisibility(View.VISIBLE);
-			mTvUname.setText(profile.getUsername());
+			mUsername = profile.getUsername();
+			mTvUname.setText(mUsername);
 		}
 		
 		if(profile.getUrl0()!=null &&!profile.getUrl0().equalsIgnoreCase("null") && !profile.getUrl0().equals("")){
@@ -298,32 +283,30 @@ public class MyBroadcastsFragment extends Fragment {
 		db.close();
 		
 	}
-
-	private void resetProfilePic(){
+	
+	
+private void resetProfilePic(){
 		
 		String imgDecodableString = ProfilePicture.getUserImgDecodableString(getActivity());
 		
-        Bitmap rawImage = BitmapFactory.decodeResource(getActivity().getResources(),
+        Bitmap rawImage = BitmapFactory.decodeResource(getResources(),
         R.drawable.pic_sample_girl);
-       L.debug("MyBroadcastFragment, imgDecodableString "+imgDecodableString);
-        if(imgDecodableString!=null && !imgDecodableString.isEmpty()){
-        	
-        	// Get the dimensions of the View
-            int targetW = mImgProfile.getWidth();
-            int targetH = mImgProfile.getHeight();
-            
-            BmpFactory  bmpFactory = new BmpFactory();
-        	
-        	Bitmap newImage = bmpFactory.getBmpWithTargetWTargetHFrm(targetW, targetH, imgDecodableString);
-          
-        	if(newImage!=null)rawImage = newImage;
-        }
-        
-        L.debug("imgDecodableString "+imgDecodableString+", rawImage "+rawImage);
+      
         RoundedImageView riv = new RoundedImageView(getActivity());
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 380);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
         mImgProfile.setImageBitmap(circImage);
-       // mImgProfile.setImageBitmap(rawImage);
+        
+        mCorrespondent = new Correspondent();
+		mCorrespondent.addListener(this);
+        
+        new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				mCorrespondent.downloadProfilePicOnline(getActivity(), userId);
+				
+			}
+		}).start();
 	}
 	
 //	private class MyBroascastsAdapter extends RecyclerView.Adapter<MyBroascastsAdapter.ViewHolder>{
@@ -447,6 +430,26 @@ public class MyBroadcastsFragment extends Fragment {
 			
 		
 		}
+	}
+	
+	@Override
+	public void onCorrespondentUpdate() {
+		Bitmap rawImage = mCorrespondent.getProfilePic();
+		try{
+			RoundedImageView riv = new RoundedImageView(getActivity());
+	        final Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+	        
+	        mImgProfile.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					
+					mImgProfile.setImageBitmap(circImage);
+					
+				}
+			});
+		}catch(Exception e){}
+		
 	}
 	
 	

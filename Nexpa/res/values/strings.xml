@@ -93,14 +93,15 @@
     <string name="user_profile_distance_bar">Range to broadcast and catch users (in kilometers)</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="delete">delete</string>
-    
+
     <!-- alerts -->
     <string name="msg_no_internet">Sorry your internet connection is not working, please enable it!</string>
-    
+
     <!-- hints -->
     <string name="short_description">Short description</string>
     <string name="profession">Profession</string>
     <string name="username">Username</string>
     <string name="url">URL</string>
+    <string name="title_activity_others_broadcast">OthersBroadcastActivity</string>
 
 </resources>

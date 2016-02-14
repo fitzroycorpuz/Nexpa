@@ -10,6 +10,7 @@ import java.util.Map;
 import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.Favorite;
 import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.objects.Announcement;
@@ -74,6 +75,13 @@ public class SQLiteHandler {
 	public static final String USER_PROFILE_URL2 = "url2";
 	public static final String USER_PROFILE_DATE_UPDATED = "date_updated";
 	public static final String USER_PROFILE_IS_SYNCED_ONLINE = "is_synced_online";
+	
+	
+	private static final String TABLE_FAVORITES = "favorites";
+	public static final String FAVORITE_ID = "_id";
+	public static final String FAVORITE_USERNAME = "username";
+	
+	
 
 	private static final String TABLE_CORRESPONDENTS = "correspondents";
 	public static final String CORRESPONDENT_ID = "_id";
@@ -197,10 +205,16 @@ public class SQLiteHandler {
 			// Log.e("CREATE_TABLE_CORRESPONDENTS",
 			// CREATE_TABLE_CORRESPONDENTS);
 			// db.execSQL(CREATE_TABLE_CORRESPONDENTS);
-
+			
+			
+			String CREATE_TABLE_FAVORITES = "CREATE TABLE " + TABLE_FAVORITES + "(" + FAVORITE_ID
+					+ " INTEGER PRIMARY KEY, " + FAVORITE_USERNAME + " TEXT UNIQUE);";
+			
+			db.execSQL(CREATE_TABLE_FAVORITES);
+			
 			String CREATE_TABLE_CORRESPONDENTS = "CREATE TABLE " + TABLE_CORRESPONDENTS + "(" + CORRESPONDENT_ID
 					+ " INTEGER PRIMARY KEY, " + CORRESPONDENT_USERNAME + " TEXT UNIQUE);";
-			Log.e("CREATE_TABLE_CORRESPONDENTS", CREATE_TABLE_CORRESPONDENTS);
+			
 			db.execSQL(CREATE_TABLE_CORRESPONDENTS);
 
 			String CREATE_TABLE_PROFILE_PICTURES = "CREATE TABLE " + TABLE_PROFILE_PICTURES + "(" + IMG_ID
@@ -1001,6 +1015,32 @@ public class SQLiteHandler {
 
 		return map;
 	}
+	
+	
+	
+	public List<Favorite> downloadAllFavorites() {
+		
+		Cursor c = sqLiteDatabase.query(TABLE_FAVORITES, new String[]{FAVORITE_USERNAME}, null, null, null, null, null);
+		List<Favorite> favorites = new ArrayList<Favorite>();
+		if (c.moveToFirst()) {
+			do {
+
+				//long id = Long.parseLong(c.getString(c.getColumnIndex(PROFILE_USER_ID)));
+				String uname = c.getString(c.getColumnIndex(FAVORITE_USERNAME));
+
+				Favorite favorite = new Favorite();
+				//correspondent.setId(id);
+				favorite.setName(uname);
+
+				favorites.add(favorite);
+
+			} while (c.moveToNext());
+		}
+		c.close();
+		return favorites;
+		
+	}
+	
 
 	public List<Correspondent> downloadAllCorrespondents() {
 		L.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -1162,7 +1202,29 @@ public class SQLiteHandler {
 		return correspondent;
 
 	}
+	
+	
+	public int deleteFavorite(String name) {
+		
+		return sqLiteDatabase.delete(TABLE_FAVORITES, FAVORITE_USERNAME+"=?", new String[]{name});
+		
+	}
+	
+	public long saveFavorite(String name) {
+		
+		ContentValues values = new ContentValues();
 
+		values.put(FAVORITE_USERNAME, name);
+
+		long id = sqLiteDatabase.insertWithOnConflict(TABLE_FAVORITES, null, values,
+				SQLiteDatabase.CONFLICT_IGNORE);
+		// long id = sqLiteDatabase.insert(TABLE_CORRESPONDENTS, null, values);
+		L.debug(TAG + " new favorite inserted into sqlite: " + name);
+		return id;
+		
+	}
+	
+	
 	public long saveCorrespondent(String username) {
 		ContentValues values = new ContentValues();
 
@@ -1413,7 +1475,45 @@ public class SQLiteHandler {
 		// db.close();
 		L.error(TAG+ " Broadcast inserted to sqlite: message " + id);
 	}
+	
+	
+	public List<Announcement> downloadOthersBroadcasts(String uname) {
+		L.debug("downloadOthersBroadcasts "+uname);
+		//String uid = Long.toString(userId);
+		Cursor c = sqLiteDatabase.query(DATABASE_TABLE_3,
+				new String[] { BROAD_ID, BROADCAST_TYPE, BROADCAST_FROM, BROADCAST_MESSAGE, BROADCAST_DATE,
+						BROADCAST_LOCATION_LONG, BROADCAST_LOCATION_LAT, BROADCAST_LOCATION_LOCAL, BROADCAST_REACH,
+						BROADCAST_STATUS },
+						BROADCAST_TYPE+"=? AND "+BROADCAST_FROM + " = ?", new String[] { 2+"", uname }, null, null, null);//BROAD_ID + " DESC"
+		List<Announcement> announcements = new ArrayList<Announcement>();
+		L.debug("==============");
+		if (c.moveToFirst()) {
+			
+			do {
 
+				long id = c.getLong(c.getColumnIndex(BROAD_ID));
+				int type = c.getInt(c.getColumnIndex(BROADCAST_TYPE));
+				int from = c.getInt(c.getColumnIndex(BROADCAST_FROM));
+				String message = c.getString(c.getColumnIndex(BROADCAST_MESSAGE));
+				String date = c.getString(c.getColumnIndex(BROADCAST_DATE));
+				long locLongitude = c.getLong(c.getColumnIndex(BROADCAST_LOCATION_LONG));
+				long locLatitude = c.getLong(c.getColumnIndex(BROADCAST_LOCATION_LAT));
+				String locLocal = c.getString(c.getColumnIndex(BROADCAST_LOCATION_LOCAL));
+				int reach = c.getInt(c.getColumnIndex(BROADCAST_REACH));
+				int status = c.getInt(c.getColumnIndex(BROADCAST_STATUS));
+
+				Announcement ann = new Announcement(id, type, from, message, date, locLongitude, locLatitude, locLocal,
+						reach, status);
+
+				announcements.add(ann);
+
+			} while (c.moveToNext());
+		}
+		c.close();
+
+		return announcements;
+	}
+	
 	public List<Announcement> downloadPersonalBroadcasts() {
 		L.debug("downloadPersonalBroadcasts");
 		String uid = getLoggedInID();
@@ -1421,7 +1521,7 @@ public class SQLiteHandler {
 				new String[] { BROAD_ID, BROADCAST_TYPE, BROADCAST_FROM, BROADCAST_MESSAGE, BROADCAST_DATE,
 						BROADCAST_LOCATION_LONG, BROADCAST_LOCATION_LAT, BROADCAST_LOCATION_LOCAL, BROADCAST_REACH,
 						BROADCAST_STATUS },
-				BROADCAST_FROM + " = ?", new String[] { uid + "0" }, null, null, BROAD_ID + " DESC");
+						BROADCAST_TYPE+"=? AND "+BROADCAST_FROM + " = ?", new String[] { 1+"", uid + "0" }, null, null, BROAD_ID + " DESC");
 		List<Announcement> announcements = new ArrayList<Announcement>();
 		if (c.moveToFirst()) {
 
@@ -1469,7 +1569,7 @@ public class SQLiteHandler {
 
 		long id = sqLiteDatabase.insert(DATABASE_TABLE_3, null, values);
 		// db.close();
-		Log.e(TAG, "Broadcast inserted to sqlite: message " + broad_message + " TYPE:" + broad_type);
+		Log.e(TAG, "Broadcast inserted to sqlite: message " + broad_message + " TYPE:" + broad_type+", broad_from: "+broad_from);
 	}
 
 	public void formatBroadcast() {

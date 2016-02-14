@@ -12,15 +12,15 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".configuration.AppController"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-         android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
@@ -38,33 +38,38 @@
         <activity android:name=".activities.PeopleActivity" />
         <activity
             android:name=".activities.TabHostActivity"
-          
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activities.SearchActivity" />
         <activity android:name=".activities.MapActivity" />
-        <activity android:name=".activities.ChatActivity" 
-             android:theme="@style/AppTheme"
-            android:parentActivityName=".activities.TabHostActivity">		<meta-data
+        <activity
+            android:name=".activities.ChatActivity"
+            android:parentActivityName=".activities.TabHostActivity"
+            android:theme="@style/AppTheme" >
+            <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.TabHostActivity" />
         </activity>
         <activity android:name=".activities.CreateAccountActivity" />
-        <activity android:name=".activities.PeopleProfileActivity" 
-			android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".activities.PeopleProfileActivity"
+            android:theme="@style/AppTheme" />
         <activity android:name=".activities.RegisterActivity" />
-        <activity android:name=".activities.SearchPostActivity" 
-             android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".activities.SearchPostActivity"
+            android:theme="@style/AppTheme" />
         <activity android:name=".activities.LogInActivity" />
-        <activity android:name=".activities.GroupChatHomeActivity" 
-             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".activities.GroupChatHomeActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".activities.GroupChatMainActivity" />
         <activity android:name=".activities.ProfileActivity" />
         <activity
             android:name=".activities.UserProfileActivity"
-            android:windowSoftInputMode="adjustPan" 
-              android:theme="@style/AppTheme"/>
-        <activity android:name=".activities.MainSignInActivity" 
-              android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activities.MainSignInActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".activities.GroupActivity" />
         <activity android:name=".activities.AroundMeActivity" />
         <activity
@@ -77,8 +82,7 @@
 
         <activity
             android:name=".activities.ChatHistoryActivity"
-            android:label="@string/title_activity_chat_history"  
-           />
+            android:label="@string/title_activity_chat_history" />
 
         <service
             android:name=".chatservice.ChatMessagesService"
@@ -90,20 +94,35 @@
             android:name=".TestActivity"
             android:label="@string/title_activity_test" >
         </activity>
-        
+
         <receiver
-            android:name="com.lpoezy.nexpa.chatservice.NetworkChangeReceiver"
+            android:name=".chatservice.NetworkChangeReceiver"
             android:label="NetworkChangeReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>
-        <activity android:name=".activities.SettingsActivity"
-             android:theme="@style/AppTheme"/>
-        <service android:name=".chatservice.SyncDataService"></service>
-        <service android:name=".chatservice.SyncUserProfileService"></service>
-        <service android:name=".chatservice.SyncProfilePictureService"></service>
+
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:theme="@style/AppTheme" />
+
+        <service android:name=".chatservice.SyncDataService" >
+        </service>
+        <service android:name=".chatservice.SyncUserProfileService" >
+        </service>
+        <service android:name=".chatservice.SyncProfilePictureService" >
+        </service>
+
+        <activity
+            android:name="com.lpoezy.nexpa.activities.OthersBroadcastActivity"
+            android:parentActivityName=".activities.GroupChatHomeActivity"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.GroupChatHomeActivity" />
+        </activity>
         
     </application>
 
