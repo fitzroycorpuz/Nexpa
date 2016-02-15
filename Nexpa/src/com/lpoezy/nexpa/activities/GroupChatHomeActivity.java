@@ -377,6 +377,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 		// lnBroadcastExist.setOnClickListener(mBuyButtonClickListener);
 
 		lnBroadcastMini = (LinearLayout) findViewById(R.id.lnBroadcastMini);
+		
 		dialogBroadcast = new Dialog(GroupChatHomeActivity.this);
 		dialogBroadcast.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialogBroadcast.setContentView(R.layout.activity_group_chat_main);
@@ -829,7 +830,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			lnEmpty.setEnabled(false);
 			lnEmpty.setVisibility(LinearLayout.GONE);
 			lnBroadcast.setVisibility(LinearLayout.GONE);
-			lnBroadcastMini.setVisibility(LinearLayout.VISIBLE);
+			//lnBroadcastMini.setVisibility(LinearLayout.VISIBLE);
 			lnBroadcastExist.setEnabled(true);
 			lnBroadcastExist.setVisibility(LinearLayout.VISIBLE);
 			mAdapter = new SimpleCursorAdapter(this, R.layout.list_broadcast,
@@ -1073,7 +1074,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 			lnEmpty.setEnabled(true);
 			lnEmpty.setVisibility(LinearLayout.VISIBLE);
 			lnBroadcast.setVisibility(LinearLayout.VISIBLE);
-			lnBroadcastMini.setVisibility(LinearLayout.GONE);
+			//lnBroadcastMini.setVisibility(LinearLayout.GONE);
 			lnBroadcastExist.setEnabled(false);
 			lnBroadcastExist.setVisibility(LinearLayout.GONE);
 		}
