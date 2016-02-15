@@ -173,7 +173,7 @@ public class UserProfileActivityOld extends Activity
         RoundedImageView riv = new RoundedImageView(this);
         Bitmap rawImage = BitmapFactory.decodeResource(this.getResources(),
         R.drawable.pic_sample_girl);
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
         imgProfile.setImageBitmap(circImage);
         ln_status = (Button) findViewById(R.id.btnStatus);
         

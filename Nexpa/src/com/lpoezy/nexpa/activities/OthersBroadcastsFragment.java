@@ -293,7 +293,7 @@ private void resetProfilePic(){
         R.drawable.pic_sample_girl);
       
         RoundedImageView riv = new RoundedImageView(getActivity());
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
         mImgProfile.setImageBitmap(circImage);
         
         mCorrespondent = new Correspondent();
@@ -437,7 +437,7 @@ private void resetProfilePic(){
 		Bitmap rawImage = mCorrespondent.getProfilePic();
 		try{
 			RoundedImageView riv = new RoundedImageView(getActivity());
-	        final Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+	        final Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
 	        
 	        mImgProfile.post(new Runnable() {
 				

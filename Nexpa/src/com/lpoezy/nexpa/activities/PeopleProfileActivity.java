@@ -201,7 +201,7 @@ public class PeopleProfileActivity extends Activity implements Correspondent.OnC
         R.drawable.pic_sample_girl);
       
         RoundedImageView riv = new RoundedImageView(this);
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
         imgProfile.setImageBitmap(circImage);
         
         mCorrespondent = new Correspondent();
@@ -268,7 +268,7 @@ public class PeopleProfileActivity extends Activity implements Correspondent.OnC
 		Bitmap rawImage = mCorrespondent.getProfilePic();
 		
 		RoundedImageView riv = new RoundedImageView(PeopleProfileActivity.this);
-        final Bitmap circImage = riv.getCroppedBitmap(rawImage, 400);
+        final Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
         
         imgProfile.post(new Runnable() {
 			

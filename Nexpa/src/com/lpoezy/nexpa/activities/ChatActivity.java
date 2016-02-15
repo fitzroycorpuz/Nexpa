@@ -433,7 +433,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 
 				iv = new ImageView(context);
 				iv.setId(1);
-				RelativeLayout.LayoutParams layoutParams0 = new RelativeLayout.LayoutParams(68, 68);
+				RelativeLayout.LayoutParams layoutParams0 = new RelativeLayout.LayoutParams(50, 50); 
 				wrapper.addView(iv, layoutParams0);
 
 				countryName = new TextView(context);
@@ -546,7 +546,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 			}
 
 			RoundedImageView riv = new RoundedImageView(context);
-			Bitmap circImage = riv.getCroppedBitmap(rawImage, 48);
+			Bitmap circImage = riv.getCroppedBitmap(rawImage, 80);
 
 			return circImage;
 		}
@@ -575,7 +575,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 			}
 
 			RoundedImageView riv = new RoundedImageView(context);
-			Bitmap circImage = riv.getCroppedBitmap(rawImage, 48);
+			Bitmap circImage = riv.getCroppedBitmap(rawImage, 80);
 
 			return circImage;
 		}

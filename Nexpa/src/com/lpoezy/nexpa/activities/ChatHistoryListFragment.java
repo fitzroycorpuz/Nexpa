@@ -14,6 +14,7 @@ import com.lpoezy.nexpa.objects.Correspondents;
 import com.lpoezy.nexpa.objects.Messages;
 import com.lpoezy.nexpa.objects.NewMessage;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.BitmapScaler;
 import com.lpoezy.nexpa.utility.DividerItemDecoration;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.RoundedImageView;
@@ -264,7 +265,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 			}
 			
 			RoundedImageView riv = new RoundedImageView(getActivity());
-			Bitmap circImage = riv.getCroppedBitmap(rawImage, 68);
+			Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
 			
 			vh.imgProfilePic.setImageBitmap(circImage);
 			
@@ -290,8 +291,7 @@ public class ChatHistoryListFragment extends Fragment implements Correspondent.O
 				tvBuddys = (TextView) view.findViewById(R.id.tv_buddys_name);
 				tvMsg = (TextView) view.findViewById(R.id.tv_buddys_msg);
 				imgProfilePic = (ImageView) view.findViewById(R.id.img_profile_pic);
-				//imgProfilePic.setAdjustViewBounds(true);
-				//imgProfilePic.setScaleType(ScaleType.CENTER_CROP);
+				
 				view.setOnClickListener(this);
 			}
 

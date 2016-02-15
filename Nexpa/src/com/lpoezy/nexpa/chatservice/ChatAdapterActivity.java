@@ -103,7 +103,7 @@ public class ChatAdapterActivity extends ArrayAdapter<OneComment> implements Cor
 		}
 		
 		 RoundedImageView riv = new RoundedImageView(context);
-		 Bitmap circImage = riv.getCroppedBitmap(rawImage, 80);
+		 Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
 		 
 		return circImage;
 	}
@@ -127,7 +127,7 @@ public class ChatAdapterActivity extends ArrayAdapter<OneComment> implements Cor
         }
         
         RoundedImageView riv = new RoundedImageView(context);
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 80);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
         
 		return circImage;
 	}

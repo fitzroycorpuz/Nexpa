@@ -321,7 +321,7 @@ public class MyBroadcastsFragment extends Fragment {
         
         L.debug("imgDecodableString "+imgDecodableString+", rawImage "+rawImage);
         RoundedImageView riv = new RoundedImageView(getActivity());
-        Bitmap circImage = riv.getCroppedBitmap(rawImage, 380);
+        Bitmap circImage = riv.getCroppedBitmap(rawImage, 100);
         mImgProfile.setImageBitmap(circImage);
        // mImgProfile.setImageBitmap(rawImage);
 	}
