@@ -116,14 +116,15 @@
         </service>
 
         <activity
-            android:name="com.lpoezy.nexpa.activities.OthersBroadcastActivity"
+            android:name=".activities.OthersBroadcastActivity"
             android:parentActivityName=".activities.GroupChatHomeActivity"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.GroupChatHomeActivity" />
         </activity>
-        
+       
+        <activity android:name=".activities.BuddyRequestActivity"></activity>
     </application>
 
 </manifest>

@@ -1,4 +1,5 @@
 package com.lpoezy.nexpa.openfire;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,26 +41,31 @@ public class Account {
 	public static final String SERVICE_LOGIN = "@198.154.106.139/Smack";
 	public static final String SERVICE_UNAME = "admin";
 	private static final String SERVICE_PWORD = "9db9b6749ffbf61e19aea4358a11d837";
-	
+
 	SQLiteHandler db;
 	private XMPPConnection connection;
-	
-	public void ReTryCreateChatAccount(final Context cnt, final String username, final String password, final String email) {
+
+	public void ReTryCreateChatAccount(final Context cnt, final String username, final String password,
+			final String email) {
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, SERVICE);
+					// connConfig.setRosterLoadedAtLogin(false);
 					XMPPConnection connection = new XMPPConnection(connConfig);
+
+					connection.disconnect();
+
 					connection.connect();
 					Log.e("XMPPChatDemoActivity", "Connected to " + connection.getHost());
-					
+
 					try {
 						connection.login(SERVICE_UNAME, SERVICE_PWORD);
 						Log.e("XMPPChatDemoActivity", "Logged in as " + connection.getUser());
 						String kk = connection.getUser();
 						AccountManager accountManager = connection.getAccountManager();
-						Map < String, String > map = new HashMap < String, String > ();
+						Map<String, String> map = new HashMap<String, String>();
 						map.put("username", username + "@vps.gigapros.com");
 						map.put("name", "");
 						map.put("password", password);
@@ -68,41 +74,44 @@ public class Account {
 						accountManager.createAccount(username, password, map);
 						connection.disconnect();
 						setConnection(null);
-						
-				        validateAccountOnServer(cnt, username);
-						
+
+						validateAccountOnServer(cnt, username);
+
 					} catch (XMPPException ex) {
-						Log.e("XMPPChatDemoActivity", "Failed to Register in as " + username + " reason: " + ex.getLocalizedMessage());
+						Log.e("XMPPChatDemoActivity",
+								"Failed to Register in as " + username + " reason: " + ex.getLocalizedMessage());
 						connection.disconnect();
 					}
-					
+
 				} catch (XMPPException ex) {
 					Log.e("XMPPChatDemoActivity", "Chat server failed");
 					Log.e("XMPPChatDemoActivity", "" + ex.getLocalizedMessage());
 				}
 			}
 		});
-		
+
 		t.start();
-		}
-		
-		public boolean CreateChatAccount(final Context cnt, final String username, final String password, final String email) {
+	}
+
+	public boolean CreateChatAccount(final Context cnt, final String username, final String password,
+			final String email) {
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, SERVICE);
+					// connConfig.setRosterLoadedAtLogin(false);
 					XMPPConnection connection = new XMPPConnection(connConfig);
-					
+					connection.disconnect();
 					connection.connect();
-					Log.e("XMPPChatDemoActivity", email+" Connected to " + connection.getHost());
-					
+					Log.e("XMPPChatDemoActivity", email + " Connected to " + connection.getHost());
+
 					try {
 						connection.login(SERVICE_UNAME, SERVICE_PWORD);
 						Log.e("XMPP REGISTER", "Logged in as: " + connection.getUser());
 						String kk = connection.getUser();
 						AccountManager accountManager = connection.getAccountManager();
-						Map < String, String > map = new HashMap < String, String > ();
+						Map<String, String> map = new HashMap<String, String>();
 						map.put("username", username + "@vps.gigapros.com");
 						map.put("name", "");
 						map.put("password", password);
@@ -112,36 +121,40 @@ public class Account {
 						validateAccountOnServer(cnt, username);
 						connection.disconnect();
 						setConnection(null);
-						
+
 					} catch (XMPPException ex) {
-						Log.e("XMPP REGISTER", "Failed to Register in as " + username + " reason: " + ex.getLocalizedMessage());
+						Log.e("XMPP REGISTER",
+								"Failed to Register in as " + username + " reason: " + ex.getLocalizedMessage());
 						connection.disconnect();
 					}
-					
+
 				} catch (XMPPException ex) {
 					Log.e("XMPP REGISTER", "XMPPException Chat server failed: " + ex.getLocalizedMessage());
 				}
 			}
 		});
-		
+
 		t.start();
-		
+
 		Thread tj = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, email + SERVICE_LOGIN);
+					// connConfig.setRosterLoadedAtLogin(false);
 					XMPPConnection connection = new XMPPConnection(connConfig);
-					L.error("user: " +username);
-					L.error("password: "+ password);
-					L.error("email: "+ email);
+					L.error("user: " + username);
+					L.error("password: " + password);
+					L.error("email: " + email);
 					connection.disconnect();
 					connection.connect();
 					L.error("XMPP REGISTER, Connected to " + connection.getHost());
-					
+
 					try {
-						//XMPP REGISTER, Failed to log in as tet@test.com : SASL authentication failed using mechanism DIGEST-MD5: 
-						
+						// XMPP REGISTER, Failed to log in as tet@test.com :
+						// SASL authentication failed using mechanism
+						// DIGEST-MD5:
+
 						connection.login(username, password);
 						Log.e("XMPP REGISTER", "Logged in as " + connection.getUser());
 						Presence presence = new Presence(Presence.Type.available);
@@ -149,9 +162,9 @@ public class Account {
 						setConnection(connection);
 						XMPPLogic.getInstance().setConnection(connection);
 						Roster roster = connection.getRoster();
-						Collection < RosterEntry > entries = roster.getEntries();
-						
-						for (RosterEntry entry: entries) {
+						Collection<RosterEntry> entries = roster.getEntries();
+
+						for (RosterEntry entry : entries) {
 							L.error("XMPPChatDemoActivity, --------------------------------------");
 							L.error("XMPPChatDemoActivity, RosterEntry " + entry);
 							L.error("XMPPChatDemoActivity, User: " + entry.getUser());
@@ -159,16 +172,17 @@ public class Account {
 							L.error("XMPPChatDemoActivity, Presence Status: " + entryPresence.getStatus());
 							L.error("XMPPChatDemoActivity, Presence Type: " + entryPresence.getType());
 							Presence.Type type = entryPresence.getType();
-							
-							if (type == Presence.Type.available) Log.e("XMPPChatDemoActivity", "Presence AVAILABLE");
+
+							if (type == Presence.Type.available)
+								Log.e("XMPPChatDemoActivity", "Presence AVAILABLE");
 							L.debug("XMPPChatDemoActivity, Presence : " + entryPresence);
 						}
-						
+
 					} catch (XMPPException ex) {
-						L.error("XMPP REGISTER, Failed to log in as " + email +" : "+ ex.toString());
+						L.error("XMPP REGISTER, Failed to log in as " + email + " : " + ex.toString());
 						setConnection(null);
 					}
-					
+
 				} catch (XMPPException ex) {
 					L.error("XMPP REGISTER, Chat server failed:" + ex.getLocalizedMessage());
 					setConnection(null);
@@ -176,7 +190,7 @@ public class Account {
 			}
 		});
 		tj.start();
-		
+
 		try {
 			tj.join();
 			return true;
@@ -185,94 +199,90 @@ public class Account {
 			return false;
 		}
 	}
-	
-	 private void validateAccountOnServer(Context cn, final String uname) {
-	    
-		  db = new SQLiteHandler(cn);
-			db.openToWrite();
-			 Log.e("Validate Account", "Register Responsexxxx: " + uname);
-             
-	        // Tag used to cancel the request
-	        final String tag_string_req = "update_valid";
-	        StringRequest strReq = new StringRequest(Method.POST,
-	                AppConfig.URL_REGISTER, new Response.Listener<String>() {
-	 
-	                    @Override
-	                    public void onResponse(String response) {
-	                        Log.e("Validate Account", "Register Response: " + response.toString());
-	                       
-	                        try {
-	                            JSONObject jObj = new JSONObject(response);
-	                            boolean error = jObj.getBoolean("error");
-	                            if (!error) {
-	                            	db.updateAccountValidate(1);
-	                            	 Log.e("Validate Account", "Successfully Validated Chat Use On Server!: " + uname);
-	                            } else {
-	 
-	                            	String errorMsg = jObj.getString("error_msg");
-	                            	db.updateAccountValidate(0);
-	                                Log.e("Validate Account", "Registration Error lvl 1: " + errorMsg);
-	                            }
-	                        } catch (JSONException e) {
-	                        	  Log.e("Validate Account", "Registration Error lvl 2: " + e.getLocalizedMessage());
-	                            db.updateAccountValidate(0);
-	                        }
-	                    }
-	                }, new Response.ErrorListener() {
-	 
-	                    @Override
-	                    public void onErrorResponse(VolleyError error) {
-	                    	// db.updateAccountValidate(0);
-	                        //Log.e("Validate Account", "Registration Error lvl 3: " + error.getMessage());
-	                       
-	                    }
-	                }) {
-	            @Override
-	            protected Map<String, String> getParams() {
-	                // Posting params to register url
-	                Map<String, String> params = new HashMap<String, String>();
-	                params.put("tag", tag_string_req);
-	                params.put("username", uname);
-	                params.put("is_valid", "1");
-	 
-	                return params;
-	            }
-	        };
-	        // Adding request to request queue
-	        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
-	    }
-	 
-	public void LogInChatAccount(final String username, final String password, final String email, final OnXMPPConnectedListener callback) {
-		try{
+
+	private void validateAccountOnServer(Context cn, final String uname) {
+
+		db = new SQLiteHandler(cn);
+		db.openToWrite();
+		Log.e("Validate Account", "Register Responsexxxx: " + uname);
+
+		// Tag used to cancel the request
+		final String tag_string_req = "update_valid";
+		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_REGISTER, new Response.Listener<String>() {
+
+			@Override
+			public void onResponse(String response) {
+				Log.e("Validate Account", "Register Response: " + response.toString());
+
+				try {
+					JSONObject jObj = new JSONObject(response);
+					boolean error = jObj.getBoolean("error");
+					if (!error) {
+						db.updateAccountValidate(1);
+						Log.e("Validate Account", "Successfully Validated Chat Use On Server!: " + uname);
+					} else {
+
+						String errorMsg = jObj.getString("error_msg");
+						db.updateAccountValidate(0);
+						Log.e("Validate Account", "Registration Error lvl 1: " + errorMsg);
+					}
+				} catch (JSONException e) {
+					Log.e("Validate Account", "Registration Error lvl 2: " + e.getLocalizedMessage());
+					db.updateAccountValidate(0);
+				}
+			}
+		}, new Response.ErrorListener() {
+
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				// db.updateAccountValidate(0);
+				// Log.e("Validate Account", "Registration Error lvl 3: " +
+				// error.getMessage());
+
+			}
+		}) {
+			@Override
+			protected Map<String, String> getParams() {
+				// Posting params to register url
+				Map<String, String> params = new HashMap<String, String>();
+				params.put("tag", tag_string_req);
+				params.put("username", uname);
+				params.put("is_valid", "1");
+
+				return params;
+			}
+		};
+		// Adding request to request queue
+		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+	}
+
+	public void LogInChatAccount(final String username, final String password, final String email,
+			final OnXMPPConnectedListener callback) {
+		try {
 			GroupChatHomeActivity.updateStatusText(3);
-		}
-		catch(Exception e){
-			Log.e("XMPP STATUS", "Trying to log-in... "+ e);
-			L.debug("XMPP STATUS, Trying to log-in... "+ e);
+		} catch (Exception e) {
+			//Log.e("XMPP STATUS", "Trying to log-in... " + e);
+			//L.debug("XMPP STATUS, Trying to log-in... " + e);
 		}
 		Log.e("XMPP STATUS", "Trying to log-in...");
 		L.debug("XMPP STATUS, Trying to log-in...");
-		Thread t = new Thread(new Runnable() {@Override
+		Thread t = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, email + SERVICE_LOGIN);
-					
+
 					XMPPConnection connection = new XMPPConnection(connConfig);
 					Log.e("user", username);
 					Log.e("password", password);
 					Log.e("email", email);
-					
-					
-					L.debug("user "+username);
-					L.debug("password "+ password);
-					L.debug("email "+ email);
+
 					//connection.disconnect();
-					
+
 					connection.connect();
-					Log.e("XMPPChatDemoActivity", "Connected to " + connection.getHost());
 					L.debug("XMPPChatDemoActivity, Connected to " + connection.getHost());
 					try {
-						
+
 						connection.login(username, password);
 						Log.i("XMPPChatDemoActivity", "Logged in as " + connection.getUser());
 						L.debug("XMPPChatDemoActivity, Logged in as " + connection.getUser());
@@ -281,27 +291,38 @@ public class Account {
 						setConnection(connection);
 						XMPPLogic.getInstance().setConnection(connection);
 						
-//						Roster roster = connection.getRoster();
-//						Collection < RosterEntry > entries = roster.getEntries();						
-//						L.debug("XMPPChatDemoActivity, entries: " + entries.size());
-//						
-//						for (RosterEntry entry: entries) {
-//							L.error("XMPPChatDemoActivity, --------------------------------------");
-//							L.error("XMPPChatDemoActivity, RosterEntry " + entry);
-//							L.error("XMPPChatDemoActivity, User: " + entry.getUser());
-//							
-//							L.debug("XMPPChatDemoActivity, User: " + entry.getUser());
-//							Presence entryPresence = roster.getPresence(entry.getUser());
-//							Log.e("XMPPChatDemoActivity", "Presence Status: " + entryPresence.getStatus());
-//							Log.e("XMPPChatDemoActivity", "Presence Type: " + entryPresence.getType());
-//							Presence.Type type = entryPresence.getType();
-//							if (type == Presence.Type.available) 
-//								L.error("XMPPChatDemoActivity, Presence AVIALABLE");
-//							Log.d("XMPPChatDemoActivity", "Presence : " + entryPresence);
-//						}
-						
-						if(callback!=null)callback.onXMPPConnected(connection);
-						
+						// Roster roster = connection.getRoster();
+						// Collection < RosterEntry > entries =
+						// roster.getEntries();
+						// L.debug("XMPPChatDemoActivity, entries: " +
+						// entries.size());
+						//
+						// for (RosterEntry entry: entries) {
+						// L.error("XMPPChatDemoActivity,
+						// --------------------------------------");
+						// L.error("XMPPChatDemoActivity, RosterEntry " +
+						// entry);
+						// L.error("XMPPChatDemoActivity, User: " +
+						// entry.getUser());
+						//
+						// L.debug("XMPPChatDemoActivity, User: " +
+						// entry.getUser());
+						// Presence entryPresence =
+						// roster.getPresence(entry.getUser());
+						// Log.e("XMPPChatDemoActivity", "Presence Status: " +
+						// entryPresence.getStatus());
+						// Log.e("XMPPChatDemoActivity", "Presence Type: " +
+						// entryPresence.getType());
+						// Presence.Type type = entryPresence.getType();
+						// if (type == Presence.Type.available)
+						// L.error("XMPPChatDemoActivity, Presence AVIALABLE");
+						// Log.d("XMPPChatDemoActivity", "Presence : " +
+						// entryPresence);
+						// }
+
+						if (callback != null)
+							callback.onXMPPConnected(connection);
+
 					} catch (XMPPException ex) {
 						Log.e("XMPPChatDemoActivity", "Failed to log in as " + email);
 						Log.e("XMPPChatDemoActivity", ex.toString());
@@ -316,10 +337,12 @@ public class Account {
 		});
 		t.start();
 	}
-	
-	public void ReLogInChatAccount(final String username, final String password, final String email, final String message) {
+
+	public void ReLogInChatAccount(final String username, final String password, final String email,
+			final String message) {
 		Log.e("", "ENTER!");
-		Thread t = new Thread(new Runnable() {@Override
+		Thread t = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					ConnectionConfiguration connConfig = new ConnectionConfiguration(HOST, PORT, email + SERVICE_LOGIN);
@@ -340,8 +363,8 @@ public class Account {
 						setConnection(connection);
 						XMPPLogic.getInstance().setConnection(connection);
 						Roster roster = connection.getRoster();
-						Collection < RosterEntry > entries = roster.getEntries();
-						for (RosterEntry entry: entries) {
+						Collection<RosterEntry> entries = roster.getEntries();
+						for (RosterEntry entry : entries) {
 							Log.e("XMPPChatDemoActivity", "--------------------------------------");
 							Log.e("XMPPChatDemoActivity", "RosterEntry " + entry);
 							Log.e("XMPPChatDemoActivity", "User: " + entry.getUser());
@@ -349,7 +372,8 @@ public class Account {
 							Log.e("XMPPChatDemoActivity", "Presence Status: " + entryPresence.getStatus());
 							Log.e("XMPPChatDemoActivity", "Presence Type: " + entryPresence.getType());
 							Presence.Type type = entryPresence.getType();
-							if (type == Presence.Type.available) Log.e("XMPPChatDemoActivity", "Presence AVIALABLE");
+							if (type == Presence.Type.available)
+								Log.e("XMPPChatDemoActivity", "Presence AVIALABLE");
 							Log.d("XMPPChatDemoActivity", "Presence : " + entryPresence);
 						}
 					} catch (XMPPException ex) {
@@ -365,7 +389,7 @@ public class Account {
 		});
 		t.start();
 	}
-	
+
 	public void setConnection(XMPPConnection connection) {
 		this.connection = connection;
 		if (connection != null) {

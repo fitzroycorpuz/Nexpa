@@ -20,6 +20,7 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
+import org.jivesoftware.smack.packet.Presence.Type;
 import org.jivesoftware.smack.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +42,8 @@ import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.objects.Users;
+import com.lpoezy.nexpa.openfire.Account;
+import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -160,7 +163,7 @@ public class AroundMeActivity extends AppCompatActivity
 	private static final String TAG_GEO_STATUS = "status";
 
 	private static final String TAG_GEO_EMAIL = "email_address";
-	//private static final int DEFAULT_TICK_START = 1;
+	// private static final int DEFAULT_TICK_START = 1;
 
 	public static boolean isRunning = false;
 	private int dst;
@@ -210,9 +213,8 @@ public class AroundMeActivity extends AppCompatActivity
 			} catch (Exception e) {
 				dst = AppConfig.SUPERUSER_MIN_DISTANCE_KM;
 			}
-			
-			
-			L.debug("db.getBroadcastDist()"+db.getBroadcastDist());
+
+			L.debug("db.getBroadcastDist()" + db.getBroadcastDist());
 			rbDistance.setSeekPinByValue(dst);
 
 			rbDistance.setPinColor(getResources().getColor(R.color.EDWARD));
@@ -245,15 +247,11 @@ public class AroundMeActivity extends AppCompatActivity
 					dialogPref.dismiss();
 				}
 			});
-			
-			
-			
-			
 
 			CheckBox cbxSuperUser = (CheckBox) dialogPref.findViewById(R.id.cbx_superuser);
 			SessionManager sm = new SessionManager(AroundMeActivity.this);
 			cbxSuperUser.setChecked(sm.isSuperuser());
-			
+
 			cbxSuperUser.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -269,7 +267,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 				}
 			});
-			
+
 			if (cbxSuperUser.isChecked()) {
 				rbDistance.setEnabled(false);
 			} else {
@@ -517,53 +515,6 @@ public class AroundMeActivity extends AppCompatActivity
 		 * (Exception e) {}
 		 */
 
-		// roy@vps.gigapros.com/Smack
-		// L.debug("xxxxxxxxxxxxxxxxxx isAvailable,
-		// "+roster.getPresence("leki@vps.gigapros.com/Smack"));
-
-		// Roster roster = xmppManager.connection.getRoster();
-		// roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
-		// Presence subscribed = new Presence(Presence.Type.subscribed);
-
-		// Presence response = new Presence(Presence.Type.subscribed);
-		// response.setTo("leki");
-		// connection.sendPacket(response);
-		//
-		// try {
-		// roster.createEntry("leki", "leki@tes.com", null);
-		// } catch (XMPPException e) {
-		// L.error(""+e);
-		// }
-		//
-		// Collection<RosterEntry> entries = roster.getEntries();
-		// for (RosterEntry entry : entries) {
-		//
-		//
-		// Presence presence = roster.getPresence(entry.getUser());
-		//
-		// // User A always not available even I set User A to available
-		// L.error("presence.isAvailable() = " + presence.isAvailable());
-		//
-		// // User A's status always empty
-		// L.error("presence.getStatus() = " + presence.getStatus());
-		// L.error("presence.getType() = " + presence.getType());
-		// L.debug("entry.getUser() "+entry.getUser());
-		// // User A's getName() always null
-		//// if (entry.getName() != null)
-		//// {
-		//// L.debug(entry.getName());
-		//// }
-		//// else
-		//// L.debug("GetName is null");
-		//
-		// if (presence.getType() == Presence.Type.subscribe){
-		// L.debug(entry.getUser()+", subscribe");
-		// }else if(presence.getType() == Presence.Type.unsubscribe){
-		// L.debug(entry.getUser()+", unsubscribe");
-		// }
-		//
-		// }
-
 		for (int j = 0; j < us.size(); j++) {
 			// L.debug("ccccccccccc userID: "+us.get(j).getUserId()+",
 			// username:"+us.get(j).getUserName());
@@ -605,6 +556,8 @@ public class AroundMeActivity extends AppCompatActivity
 				arr_email.add(j, us.get(j).getEmail());
 				arr_status.add(j, us.get(j).getStatus());
 
+				// @vps.gigapros.com
+
 				// }
 
 				// }
@@ -644,9 +597,62 @@ public class AroundMeActivity extends AppCompatActivity
 				arr_email.add(j, us.get(j).getEmail());
 				arr_status.add(j, us.get(j).getStatus());
 			}
+			
+			
+			
+			final String name = us.get(j).getUserName();
+			//final String address = name+"@vps.gigapros.com";
+			final String address = us.get(j).getEmail();
+			final XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+			
+			if (connection == null || !connection.isConnected()) {
+				
+				SQLiteHandler db = new SQLiteHandler(getApplicationContext());
+				db.openToWrite();
+
+				Account ac = new Account();
+				ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
+
+					@Override
+					public void onXMPPConnected(XMPPConnection con) {
+
+						requestSubscription(con, address, name);
+					}
+
+				});
+
+				db.close();
+			}else{
+				L.error("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+				requestSubscription(connection, address, name);
+			}
+			
+			
 		}
+		
+		
+		
+		
+		
 		adapter.notifyDataSetChanged();
 		mSwipeRefreshLayout.setRefreshing(false);
+	}
+
+	private void requestSubscription(XMPPConnection connection, String address, String name) {
+		
+		Presence response = new Presence(Presence.Type.subscribe);
+		response.setTo(address);
+		connection.sendPacket(response);
+
+		Roster roster = connection.getRoster();
+		roster.setSubscriptionMode(Roster.SubscriptionMode.manual);
+		try {
+			L.error("sending subscription request to address: "+address);
+			roster.createEntry(address, null, null);
+		} catch (XMPPException e) {
+			L.error("" + e);
+		}
+		
 	}
 
 	private String displayGridCellName(String fname, String user) {
@@ -802,10 +808,7 @@ public class AroundMeActivity extends AppCompatActivity
 														 * c.getString(
 														 * TAG_GEO_LOOKING_TYPE)
 														 */;
-								String email_address = ""/*
-															 * c.getString(
-															 * TAG_GEO_EMAIL)
-															 */;
+								String email_address = c.getString(TAG_GEO_EMAIL);
 
 								Date bday = new Date()/*
 														 * du.
@@ -857,38 +860,40 @@ public class AroundMeActivity extends AppCompatActivity
 
 								boolean containerContainsContent = org.apache.commons.lang.StringUtils
 										.containsIgnoreCase(existingUsers, "." + id + ".");
-//								if (containerContainsContent == true) {
-//									if (distance <= dst) {
-//										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
-//												"2012-12-12 09:09:09", 1, about_me, looking_type, status, email_address,
-//												"1");
-//									} else {
-//										db.updateUser(id, uname, distance, fname, lname, age, sex, "",
-//												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
-//												"0");
-//									}
-//								} else {
-//									if (distance <= dst) {
-//
-//										db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "",
-//												"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
-//												"1");
-//									}
-//								}
-								
-								
-								
-								
-								db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "",
-										"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address,
-										"1");
+								// if (containerContainsContent == true) {
+								// if (distance <= dst) {
+								// db.updateUser(id, uname, distance, fname,
+								// lname, age, sex, "",
+								// "2012-12-12 09:09:09", 1, about_me,
+								// looking_type, status, email_address,
+								// "1");
+								// } else {
+								// db.updateUser(id, uname, distance, fname,
+								// lname, age, sex, "",
+								// "2012-12-12 09:09:09", 0, about_me,
+								// looking_type, status, email_address,
+								// "0");
+								// }
+								// } else {
+								// if (distance <= dst) {
+								//
+								// db.insertNearbyUser(id, uname, distance,
+								// fname, lname, age, sex, "",
+								// "2012-12-12 09:09:09", 0, about_me,
+								// looking_type, status, email_address,
+								// "1");
+								// }
+								// }
 
-//								if (i == nearby_users.length() - 1) {
-//									updateGrid("1");
-//								}
+								db.insertNearbyUser(id, uname, distance, fname, lname, age, sex, "",
+										"2012-12-12 09:09:09", 0, about_me, looking_type, status, email_address, "1");
+
+								// if (i == nearby_users.length() - 1) {
+								// updateGrid("1");
+								// }
 
 							}
-							
+
 							updateGrid("1");
 						}
 					} else {
@@ -922,13 +927,13 @@ public class AroundMeActivity extends AppCompatActivity
 				params.put("pid", ins_user);
 				params.put("longitude", ins_longitude + "");
 				params.put("latitude", ins_latitude + "");
-				
+
 				SessionManager sm = new SessionManager(AroundMeActivity.this);
 				int newDistance = sm.isSuperuser() ? AppConfig.SUPERUSER_MAX_DISTANCE_KM : dst;
 				params.put("p_distance_pref", newDistance + "");
 				params.put("unit", "k");
 
-				 L.error("MAP, " + ins_user + " + " + ins_longitude + " :" +ins_latitude + ": " + newDistance);
+				L.error("MAP, " + ins_user + " + " + ins_longitude + " :" + ins_latitude + ": " + newDistance);
 				// params.put("latitude", latitude +"");
 
 				return params;
@@ -949,8 +954,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 		super.onResume();
 		isRunning = true;
-		
-		
+
 		try {
 			dst = Integer.parseInt(db.getBroadcastDist());
 		} catch (Exception e) {
@@ -964,6 +968,71 @@ public class AroundMeActivity extends AppCompatActivity
 		}
 		adapter.notifyDataSetChanged();
 
+		final XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+
+		if (connection == null || !connection.isConnected()) {
+			SQLiteHandler db = new SQLiteHandler(getApplicationContext());
+			db.openToWrite();
+
+			// db.updateBroadcasting(0);
+			// db.updateBroadcastTicker(0);
+
+			Account ac = new Account();
+			ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
+
+				@Override
+				public void onXMPPConnected(XMPPConnection con) {
+
+					subscriptionRequestListener(con);
+				}
+
+			});
+
+			db.close();
+		} else {
+
+			subscriptionRequestListener(connection);
+
+		}
+
+	}
+	
+	private void subscriptionRequestListener(final XMPPConnection connection){
+		
+		connection.addPacketListener(new PacketListener() {
+		    public void processPacket(Packet packet) {
+		        final Presence newPresence = (Presence) packet;
+			    final Presence.Type presenceType = newPresence.getType();
+			    final String fromId = newPresence.getFrom();
+			    final String toId = newPresence.getTo();
+			    Roster roster = connection.getRoster();
+				final RosterEntry newEntry = roster.getEntry(fromId);
+			    final String name = fromId.substring(0, fromId.indexOf("@"));
+			    if (presenceType == Presence.Type.subscribed) {
+			        L.error("test-chat, #####SUBSCRIBED#########");
+			    }
+				if (presenceType == Presence.Type.subscribe) {
+					// adding buddy request to local DB
+				}
+		    }
+		 }, new PacketFilter() {
+		     public boolean accept(Packet packet) {
+		     if (packet instanceof Presence) {
+		         Presence presence = (Presence) packet;
+		     if (presence.getType().equals(Presence.Type.subscribed)
+		        || presence.getType().equals(Presence.Type.subscribe)
+		        || presence.getType().equals(Presence.Type.unsubscribed)
+		        || presence.getType().equals(Presence.Type.unsubscribe)
+		        || presence.getType().equals(Presence.Type.available)
+		        || presence.getType().equals(Presence.Type.unavailable)) {
+		         return true;
+		     }
+		     }
+		     return false;
+		  }
+		});
+		
+		
 	}
 
 	private void tryGridToUpdate() {

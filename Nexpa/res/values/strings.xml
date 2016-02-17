@@ -103,5 +103,6 @@
     <string name="username">Username</string>
     <string name="url">URL</string>
     <string name="title_activity_others_broadcast">OthersBroadcastActivity</string>
+    <string name="title_activity_buddy_request">BuddyRequestActivity</string>
 
 </resources>

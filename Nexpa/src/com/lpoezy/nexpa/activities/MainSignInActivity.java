@@ -415,11 +415,10 @@ public class MainSignInActivity extends Activity {
 													
 													
 													
-													
+													Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
 													
 
-													Intent intent = new Intent(MainSignInActivity.this,
-															TabHostActivity.class);
+													//Intent intent = new Intent(MainSignInActivity.this,TabHostActivity.class);
 													startActivity(intent);
 
 													finish();
@@ -500,7 +499,11 @@ public class MainSignInActivity extends Activity {
 							db.addUser(server_name, server_email, server_uid, server_created_at, public_pass);
 							public_pass = "";
 							session.setLogin(true);
-							Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
+							
+							
+							
+							Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
+							//Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
 							startActivity(intent);
 							finish();
 							timer.cancel();

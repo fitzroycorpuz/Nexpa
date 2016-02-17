@@ -189,7 +189,7 @@ public class Correspondent {
 		
 		if(connection != null && connection.isConnected()){
 			final Roster roster = connection.getRoster();
-			 boolean isAvailable = roster.getPresence(this.username+"@vps.gigapros.com/Smack").isAvailable();
+			 boolean isAvailable = roster.getPresence(this.username+"@vps.gigapros.com").isAvailable();
 			
 			 setAvailable(isAvailable);
 		}
