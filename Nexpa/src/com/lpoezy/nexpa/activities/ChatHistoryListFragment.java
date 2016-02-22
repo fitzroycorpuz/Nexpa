@@ -1,26 +1,8 @@
 package com.lpoezy.nexpa.activities;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import com.lpoezy.nexpa.R;
-import com.lpoezy.nexpa.chatservice.OneComment;
-import com.lpoezy.nexpa.configuration.AppConfig;
-import com.lpoezy.nexpa.objects.Correspondent;
-import com.lpoezy.nexpa.objects.Correspondents;
-import com.lpoezy.nexpa.objects.Messages;
-import com.lpoezy.nexpa.objects.NewMessage;
-import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.utility.BitmapScaler;
-import com.lpoezy.nexpa.utility.DividerItemDecoration;
-import com.lpoezy.nexpa.utility.L;
-import com.lpoezy.nexpa.utility.RoundedImageView;
-import com.lpoezy.nexpa.utility.SystemUtilz;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -39,8 +21,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
+
+import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.configuration.AppConfig;
+import com.lpoezy.nexpa.objects.Correspondent;
+import com.lpoezy.nexpa.objects.Correspondents;
+import com.lpoezy.nexpa.objects.NewMessage;
+import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.utility.DividerItemDecoration;
+import com.lpoezy.nexpa.utility.L;
+import com.lpoezy.nexpa.utility.RoundedImageView;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 
 public class ChatHistoryListFragment extends Fragment implements Correspondent.OnCorrespondentUpdateListener {
 
