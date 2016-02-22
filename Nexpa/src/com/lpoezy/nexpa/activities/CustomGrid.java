@@ -17,6 +17,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,15 +96,13 @@ public class CustomGrid extends BaseAdapter {
            ImageView offline = (ImageView)grid.findViewById(R.id.offline);
            //TextView txtAvailView = (TextView) grid.findViewById(R.id.txtAvail);
            
-           //Roster roster = Roster.
-           
-          // Presence presence = 
-  
-          String avalability = mCorrespondents.get(position).isAvailable()?"Online":"Offline";
+         
            textView.setText(web.get(position)/*+  "|" */ /*+ distance.get(position) +"m" +avalability*/ );
            //imageView.setImageResource(Imageid.get(position));
           
-
+          
+		   int avalability = mCorrespondents.get(position).isAvailable()?R.drawable.online:R.drawable.offline;
+		offline.setImageResource(avalability);
            Bitmap rawImage = BitmapFactory.decodeResource(mContext.getResources(),
 			        R.drawable.pic_sample_girl);
            

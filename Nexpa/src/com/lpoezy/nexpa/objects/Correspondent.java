@@ -53,6 +53,7 @@ public class Correspondent {
 	}
 
 	public Correspondent() {
+		
 	}
 
 	public long getId() {

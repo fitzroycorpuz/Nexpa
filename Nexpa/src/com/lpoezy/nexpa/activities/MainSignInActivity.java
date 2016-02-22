@@ -415,10 +415,10 @@ public class MainSignInActivity extends Activity {
 													
 													
 													
-													Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
+													//Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
 													
 
-													//Intent intent = new Intent(MainSignInActivity.this,TabHostActivity.class);
+													Intent intent = new Intent(MainSignInActivity.this,TabHostActivity.class);
 													startActivity(intent);
 
 													finish();
@@ -502,8 +502,8 @@ public class MainSignInActivity extends Activity {
 							
 							
 							
-							Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
-							//Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
+							//Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
+							Intent intent = new Intent(MainSignInActivity.this, TabHostActivity.class);
 							startActivity(intent);
 							finish();
 							timer.cancel();

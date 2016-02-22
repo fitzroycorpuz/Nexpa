@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
@@ -514,25 +516,27 @@ public class AroundMeActivity extends AppCompatActivity
 		 * 1, ""); web.add(i - 1, ""); distance.add(i - 1, 9999); } } } } catch
 		 * (Exception e) {}
 		 */
-
+		final XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+		
 		for (int j = 0; j < us.size(); j++) {
 			// L.debug("ccccccccccc userID: "+us.get(j).getUserId()+",
 			// username:"+us.get(j).getUserName());
-
+			
 			final Correspondent correspondent = new Correspondent();
 			correspondent.setUsername(us.get(j).getUserName());
 			correspondent.addListener(this);
 			final long userId = Long.parseLong(Integer.toString(us.get(j).getUserId()));
 			correspondent.setId(userId);
 			arr_correspondents.add(j, correspondent);
-
+			
+			
+			
 			new Thread(new Runnable() {
 
 				@Override
 				public void run() {
-
-					correspondent.checkIfOnline();
-
+					
+					
 					correspondent.downloadProfilePicOnline(AroundMeActivity.this, userId);
 
 				}
@@ -598,61 +602,86 @@ public class AroundMeActivity extends AppCompatActivity
 				arr_status.add(j, us.get(j).getStatus());
 			}
 			
-			
-			
 			final String name = us.get(j).getUserName();
-			//final String address = name+"@vps.gigapros.com";
-			final String address = us.get(j).getEmail();
-			final XMPPConnection connection = XMPPLogic.getInstance().getConnection();
 			
-			if (connection == null || !connection.isConnected()) {
+			new Thread(new Runnable() {
 				
-				SQLiteHandler db = new SQLiteHandler(getApplicationContext());
-				db.openToWrite();
+				@Override
+				public void run() {
+					
+					
+					final String address = name+"@vps.gigapros.com/Smack";
+					
+					updateCorrespondentsAvailability(correspondent, address, connection);
+					
+					//L.error(address+" is available? "+connection.getRoster().getPresence(address).isAvailable());
+					
+					
+					//final String address = us.get(j).getEmail();
+					if (connection == null || !connection.isConnected()) {
+						
+						SQLiteHandler db = new SQLiteHandler(getApplicationContext());
+						db.openToWrite();
 
-				Account ac = new Account();
-				ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
+						Account ac = new Account();
+						ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
 
-					@Override
-					public void onXMPPConnected(XMPPConnection con) {
+							@Override
+							public void onXMPPConnected(XMPPConnection con) {
+								
+								requestSubscription(con, address);
+							}
 
-						requestSubscription(con, address, name);
+						});
+
+						db.close();
+					}else{
+						
+						requestSubscription(connection, address);
 					}
-
-				});
-
-				db.close();
-			}else{
-				L.error("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-				requestSubscription(connection, address, name);
-			}
+					
+				}
+			}).start();
+			
 			
 			
 		}
-		
-		
-		
 		
 		
 		adapter.notifyDataSetChanged();
 		mSwipeRefreshLayout.setRefreshing(false);
 	}
 
-	private void requestSubscription(XMPPConnection connection, String address, String name) {
+	protected void updateCorrespondentsAvailability(Correspondent correspondent, String address, XMPPConnection connection) {
 		
-		Presence response = new Presence(Presence.Type.subscribe);
-		response.setTo(address);
-		connection.sendPacket(response);
+		boolean isAvailable = connection.getRoster().getPresence(address).isAvailable();
+		correspondent.setAvailable(isAvailable);
+		mSwipeRefreshLayout.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				adapter.notifyDataSetChanged();
+				mSwipeRefreshLayout.setRefreshing(false);
+				
+			}
+		});
+		
+	}
+
+	private void requestSubscription(XMPPConnection connection, String address) {
+
+		//L.error("sending subscription request to address: " + address);
+		Presence subscribe = new Presence(Presence.Type.subscribe);
+		subscribe.setTo(address);
+		connection.sendPacket(subscribe);
 
 		Roster roster = connection.getRoster();
-		roster.setSubscriptionMode(Roster.SubscriptionMode.manual);
 		try {
-			L.error("sending subscription request to address: "+address);
 			roster.createEntry(address, null, null);
 		} catch (XMPPException e) {
 			L.error("" + e);
 		}
-		
+
 	}
 
 	private String displayGridCellName(String fname, String user) {
@@ -997,42 +1026,60 @@ public class AroundMeActivity extends AppCompatActivity
 
 	}
 	
-	private void subscriptionRequestListener(final XMPPConnection connection){
-		
+	private void subscriptionRequestListener(final XMPPConnection connection) {
+
 		connection.addPacketListener(new PacketListener() {
-		    public void processPacket(Packet packet) {
-		        final Presence newPresence = (Presence) packet;
-			    final Presence.Type presenceType = newPresence.getType();
-			    final String fromId = newPresence.getFrom();
-			    final String toId = newPresence.getTo();
-			    Roster roster = connection.getRoster();
-				final RosterEntry newEntry = roster.getEntry(fromId);
-			    final String name = fromId.substring(0, fromId.indexOf("@"));
-			    if (presenceType == Presence.Type.subscribed) {
-			        L.error("test-chat, #####SUBSCRIBED#########");
-			    }
-				if (presenceType == Presence.Type.subscribe) {
-					// adding buddy request to local DB
+
+			@Override
+			public void processPacket(Packet packet) {
+				
+				final Presence presence = (Presence) packet;
+		        final String fromId = presence.getFrom();
+		        //final RosterEntry newEntry = connection.getRoster().getEntry(fromId);
+		        final String uname = fromId.split("@")[0];
+		        
+		      
+		        
+		        Correspondent correspondent = null;
+				for(Correspondent c : arr_correspondents){
+		        	if(c.getUsername().equals(uname)){
+		        		 correspondent = c;
+		        		break;
+		        	}
+		        }
+		       // Correspondent correspondent = arr_correspondents.;
+		        
+				if (presence.getType() == Type.subscribe) {
+					
+					L.debug("subscribe: "+fromId);
+					//approved request
+					Presence subscribed = new Presence(Presence.Type.subscribed);
+					subscribed.setTo(fromId);
+					connection.sendPacket(subscribed);
+					
+				} else if (presence.getType() == Type.unsubscribe) {
+					L.debug("unsubscribe: "+fromId);
+				} else if (presence.getType() == Type.subscribed) {
+					L.debug("subscribed: "+fromId);
+				} else if (presence.getType() == Type.unsubscribed) {
+					L.debug("unsubscribed: "+fromId);
+				} else if (presence.getType() == Type.available) {
+					L.debug("available: "+fromId);
+					
+					 updateCorrespondentsAvailability(correspondent, fromId, connection);
+				} else if (presence.getType() == Type.unavailable) {
+					L.debug("unavailable: "+fromId);
+					
+					//arr_correspondents.add(j, correspondent);
+			        updateCorrespondentsAvailability(correspondent, fromId, connection);
+			        
+					
+					
+					
 				}
-		    }
-		 }, new PacketFilter() {
-		     public boolean accept(Packet packet) {
-		     if (packet instanceof Presence) {
-		         Presence presence = (Presence) packet;
-		     if (presence.getType().equals(Presence.Type.subscribed)
-		        || presence.getType().equals(Presence.Type.subscribe)
-		        || presence.getType().equals(Presence.Type.unsubscribed)
-		        || presence.getType().equals(Presence.Type.unsubscribe)
-		        || presence.getType().equals(Presence.Type.available)
-		        || presence.getType().equals(Presence.Type.unavailable)) {
-		         return true;
-		     }
-		     }
-		     return false;
-		  }
-		});
-		
-		
+			}
+		}, new PacketTypeFilter(Presence.class));
+
 	}
 
 	private void tryGridToUpdate() {

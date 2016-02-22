@@ -264,8 +264,8 @@ public class Account {
 			//Log.e("XMPP STATUS", "Trying to log-in... " + e);
 			//L.debug("XMPP STATUS, Trying to log-in... " + e);
 		}
-		Log.e("XMPP STATUS", "Trying to log-in...");
-		L.debug("XMPP STATUS, Trying to log-in...");
+		
+		L.error("XMPP STATUS, Trying to log-in...");
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -280,17 +280,16 @@ public class Account {
 					//connection.disconnect();
 
 					connection.connect();
-					L.debug("XMPPChatDemoActivity, Connected to " + connection.getHost());
+					L.error("XMPPChatDemoActivity, Connected to " + connection.getHost());
 					try {
 
 						connection.login(username, password);
-						Log.i("XMPPChatDemoActivity", "Logged in as " + connection.getUser());
-						L.debug("XMPPChatDemoActivity, Logged in as " + connection.getUser());
+						L.error("XMPPChatDemoActivity, Logged in as " + connection.getUser());
 						Presence presence = new Presence(Presence.Type.available);
 						connection.sendPacket(presence);
 						setConnection(connection);
 						XMPPLogic.getInstance().setConnection(connection);
-						
+						 
 						// Roster roster = connection.getRoster();
 						// Collection < RosterEntry > entries =
 						// roster.getEntries();
