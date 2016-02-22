@@ -402,30 +402,40 @@ public class MainSignInActivity extends Activity {
 
 										@Override
 										public void run() {
-											
-											updateChatHistory();
-											
-											updateUserProfile();
-											
-											
-											btnLogin.post(new Runnable() {
+											if(connection.isConnected()){
+												updateChatHistory();
+												
+												updateUserProfile();
+												
+												btnLogin.post(new Runnable() {
 
-												@Override
-												public void run() {
-													
-													
-													
-													//Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
-													
+													@Override
+													public void run() {
+														
+														//Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
+														
+														
+														Intent intent = new Intent(MainSignInActivity.this,TabHostActivity.class);
+														startActivity(intent);
 
-													Intent intent = new Intent(MainSignInActivity.this,TabHostActivity.class);
-													startActivity(intent);
+														finish();
 
-													finish();
-
-													hideDialog();
-												}
-											});
+														hideDialog();
+													}
+												});
+											}else{
+												btnLogin.post(new Runnable() {
+													
+													@Override
+													public void run() {
+														makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
+														hideDialog();
+														
+													}
+												});
+												
+											}
+											
 											
 										}
 									});

@@ -120,7 +120,7 @@ public class ChatMessagesService extends Service {
 
 				@Override
 				public void onXMPPConnected(XMPPConnection con) {
-
+					
 					addPacketListener(con);
 				}
 
