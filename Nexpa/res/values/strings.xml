@@ -10,10 +10,13 @@
     <string name="hint_uname">Username</string>
     <string name="hint_password">Password</string>
     <string name="hint_name">Username</string>
+    <string name="hint_forgotpass">Email</string>
     <string name="btn_login">LOGIN</string>
+    <string name="btn_sendemail">RESET PASSWORD</string>
     <string name="btn_register">REGISTER</string>
     <string name="strGender">Filter Gender</string>
     <string name="btn_link_to_register">Not a member? Sign up now.</string>
+    <string name="btn_link_to_forgotpassword">Forgot Password?</string>
     <string name="btn_link_to_login">Already registred! Login Me Now.</string>
     <string name="welcome">Welcome</string>
     <string name="btn_logout">DEACTIVATE</string>

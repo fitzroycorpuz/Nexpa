@@ -84,10 +84,8 @@
 		<!-- Link to Login Screen -->
 		
 		<TextView android:id="@+id/username" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:layout_margin="10dp" android:textSize="16sp" />
-		
-		
-	</LinearLayout>
-	<Button android:id="@+id/btnLinkToRegisterScreen" 
+	
+		<Button android:id="@+id/btnLinkToRegisterScreen" 
 		    android:layout_width="fill_parent" 
 		    android:layout_alignParentBottom="true" 
 		    android:layout_height="wrap_content" 
@@ -96,5 +94,19 @@
 		    android:text="@string/btn_link_to_register" 
 		    android:textAllCaps="false" 
 		    android:textColor="@color/white" 
+		    android:textSize="15dp" />	
+		
+	</LinearLayout>
+	<Button android:id="@+id/btnLinkToForgotPassword" 
+		    android:layout_width="fill_parent" 
+		    android:layout_alignParentBottom="true" 
+		    android:layout_height="wrap_content" 
+		    android:layout_marginBottom="10dip"
+		    android:background="@null" 
+		    android:text="@string/btn_link_to_forgotpassword" 
+		    android:textAllCaps="false" 
+		    android:textColor="@color/white" 
 		    android:textSize="15dp" />
+	
+	
 </RelativeLayout>

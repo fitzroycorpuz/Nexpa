@@ -65,6 +65,7 @@ public class MainSignInActivity extends Activity {
 	private static final String TAG = MainSignInActivity.class.getSimpleName();
 	private Button btnLogin;
 	private Button btnLinkToRegister;
+	private Button btnLinkToForgotPassword;
 	private EditText inputEmail;
 	private EditText inputPassword;
 	private ProgressDialog pDialog;
@@ -112,6 +113,7 @@ public class MainSignInActivity extends Activity {
 		inputPassword = (EditText) findViewById(R.id.password);
 		btnLogin = (Button) findViewById(R.id.btnLogin);
 		btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
+		btnLinkToForgotPassword = (Button) findViewById(R.id.btnLinkToForgotPassword);
 		pDialog = new ProgressDialog(this);
 		pDialog.setCancelable(false);
 		session = new SessionManager(getApplicationContext());
@@ -160,6 +162,14 @@ public class MainSignInActivity extends Activity {
 			btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
 					Intent i = new Intent(getApplicationContext(), CreateAccountActivity.class);
+					startActivity(i);
+					finish();
+				}
+			});
+			
+			btnLinkToForgotPassword.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View view) {
+					Intent i = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
 					startActivity(i);
 					finish();
 				}
