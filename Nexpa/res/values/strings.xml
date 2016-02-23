@@ -99,6 +99,7 @@
 
     <!-- alerts -->
     <string name="msg_no_internet">Sorry your internet connection is not working, please enable it!</string>
+     <string name="msg_request_to_reset_password_success">Please check your email to reset your Nexpa password.</string>
 
     <!-- hints -->
     <string name="short_description">Short description</string>

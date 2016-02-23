@@ -171,7 +171,7 @@ public class MainSignInActivity extends Activity {
 				public void onClick(View view) {
 					Intent i = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
 					startActivity(i);
-					finish();
+					//finish();
 				}
 			});
 		}

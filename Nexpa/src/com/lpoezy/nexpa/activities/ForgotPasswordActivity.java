@@ -1,52 +1,35 @@
 package com.lpoezy.nexpa.activities;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
-import com.lpoezy.nexpa.configuration.AppController;
 import com.lpoezy.nexpa.openfire.Account;
-import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.sqlite.SessionManager;
+import com.lpoezy.nexpa.utility.HttpUtilz;
+import com.lpoezy.nexpa.utility.L;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class ForgotPasswordActivity extends Activity {
 	private static final String TAG = ForgotPasswordActivity.class.getSimpleName();
 	private Button btnResetPassword;
 	private EditText inputEmail;
-	private ProgressDialog pDialog;
-	private SessionManager session;
-	private SQLiteHandler db;
+
 	
 	Timer timer;
 	Account ac;
@@ -57,33 +40,76 @@ public class ForgotPasswordActivity extends Activity {
 		setContentView(R.layout.activity_forgot_password);
 		inputEmail = (EditText) findViewById(R.id.email);
 		btnResetPassword = (Button) findViewById(R.id.btnResetPassword);
-		pDialog = new ProgressDialog(this);
-		pDialog.setCancelable(false);
-		session = new SessionManager(getApplicationContext());
-		db = new SQLiteHandler(this);
-		db.openToWrite();
-		ac = new Account();
-		
-//		if (session.isLoggedIn()) {
-//			Intent intent = new Intent(CreateAccountActivity.this, ProfileActivity.class);
-//			startActivity(intent);
-//			finish();
-//		}
 		
 		btnResetPassword.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				String email = inputEmail.getText().toString();
+				final String email = inputEmail.getText().toString();
 				if (email.isEmpty()) {
-					Toast.makeText(getApplicationContext(), "Please fill out your registered email", Toast.LENGTH_LONG).show();
+					makeNotify("Please fill out your registered email", AppMsg.STYLE_ALERT);
+					
 				} else if (isEmailValid(email) == false) {
-					Toast.makeText(getApplicationContext(), "Email address is not valid", Toast.LENGTH_LONG).show();
+					makeNotify("Email address is not valid", AppMsg.STYLE_ALERT);
 				} else {
-					if (isEmailValid(email) == true) {
-						Log.e("ABLE", "reg chat");
-					} else {
-						Log.e("ENABLABLE", "reg chat");
-					}
+					new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							
+							
+							HashMap<String, String> postDataParams = new HashMap<String, String>();
+							postDataParams.put("tag", "reset_password");
+							postDataParams.put("email", email);
+							
+
+							final String spec = AppConfig.URL_SEND_EMAIL;
+							String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+
+							
+//							JSONObject result;
+//							try {
+//								result = new JSONObject(webPage);
+//								boolean error = result.getBoolean("error");
+//								
+//								if(!error){
+//									final String msg = result.getString("msg");
+//									
+//									inputEmail.post(new Runnable() {
+//										
+//										@Override
+//										public void run() {
+//											makeNotify(msg, AppMsg.STYLE_INFO);
+//											
+//										}
+//									});
+//									
+//								}
+//								
+//							} catch (JSONException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+							
+							
+						}
+					}).start();
+					
+					
+					inputEmail.postDelayed(new Runnable() {
+						
+						@Override
+						public void run() {
+							String msg = getResources().getString(R.string.msg_request_to_reset_password_success);
+							makeNotify(msg, AppMsg.STYLE_INFO);
+							
+						}
+					}, 500);
+					
+					
+					
 				}
+				
+				
+				
 			}
 		});
 	
@@ -100,148 +126,10 @@ public class ForgotPasswordActivity extends Activity {
 		}
 		return isValid;
 	}
-	boolean succession;
 	
-	private boolean registerUser(final String name, final String email, final String password) {
-		succession = false;
-		String tag_string_req = "register";
-		pDialog.setMessage("Registering ...");
-		showDialog();
-		
-		StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_REGISTER, new Response.Listener < String > () {@Override
-			
-			public void onResponse(String response) {
-				Log.e(TAG, "Register Response: " + response.toString());
-				try {
-					JSONObject jObj = new JSONObject(response);
-					boolean error = jObj.getBoolean("error");
-					if (!error) {
-						ac.CreateChatAccount(ForgotPasswordActivity.this, name, password, email);
-						String uid = jObj.getString("id");
-						JSONObject user = jObj.getJSONObject("user");
-						String name = user.getString("name");
-						String email = user.getString("email");
-						String created_at = user.getString("created_at");
-						db.addUser(name, email, uid, created_at, password);
-						succession = true;
-						session.setLogin(true);
-						timer = new Timer();
-						initializeTimerTask();
-						timer.scheduleAtFixedRate(showMainPageIntent, 1000, 2000);
-					} else {
-						String errorMsg = jObj.getString("error_msg");
-						makeNotify(errorMsg, AppMsg.STYLE_ALERT);
-						//Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
-						hideDialog();
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		}, new Response.ErrorListener() {@Override
-			public void onErrorResponse(VolleyError error) {
-				Log.e(TAG, "Registration Error: " + error.getMessage());
-				Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-				hideDialog();
-			}
-		}) {@Override
-			protected Map < String, String > getParams() {
-				Map < String, String > params = new HashMap < String, String > ();
-				params.put("tag", "register");
-				params.put("name", name);
-				params.put("email", email);
-				params.put("password", password);
-				params.put("user_type", "1");
-				return params;
-			}
-		};
-		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
-		return succession;
-	}
-
-	TimerTask showMainPageIntent;
-	final Handler handler = new Handler();
-	int load_timeout = 10;
-	public void initializeTimerTask() {
-		showMainPageIntent = new TimerTask() {
-			public void run() {
-				handler.post(new Runnable() {
-					public void run() {
-						Log.e(TAG, "Timer ticking...");
-						load_timeout--;
-						if (load_timeout < 1){
-							hideDialog();
-							session.setLogin(false);
-					        db.deleteUsers();
-					        promptOkWaitDialog("Failed to sync on server","Toucan was able to register your account but wasnt able to sync data. \n\nPlease try to log-in later.",ForgotPasswordActivity.this,"warning"); 
-							timer.cancel();
-							
-						}
-						else{
-								if (db.checkAccountValidate().equals("1")) {
-								hideDialog();
-								Intent intent = new Intent(ForgotPasswordActivity.this, TabHostActivity.class);
-								startActivity(intent);
-								finish();
-								timer.cancel();
-							}
-						}
-					}
-				});
-			}
-		};
-	}
-	
-	private static Dialog dialogStatusYN;
-	    static LinearLayout lnHeader;
-	    static TextView edtStatusHead;
-	    static TextView edtStatus1;
-	    private void promptOkWaitDialog(String caption, String message, Context cn, final String fcType){
-	    	
-	    	dialogStatusYN = new Dialog(cn);
-	    	dialogStatusYN.requestWindowFeature(Window.FEATURE_NO_TITLE);
-	    	dialogStatusYN.setContentView(R.layout.dialog_yesno);
-	        Button dialogButton = (Button) dialogStatusYN.findViewById(R.id.dialogButtonYes);
-	        Button dialogButtonNo = (Button) dialogStatusYN.findViewById(R.id.dialogButtonNo);
-	        lnHeader = (LinearLayout) dialogStatusYN.findViewById(R.id.lnHeader);
-	        edtStatusHead = (TextView) dialogStatusYN.findViewById(R.id.edtStatusHead);
-	        edtStatus1 = (TextView) dialogStatusYN.findViewById(R.id.edtStatus);
-	        
-	        edtStatusHead.setText(caption);
-	        edtStatus1.setText(message);
-	        
-	        dialogButton.setBackgroundColor(cn.getResources().getColor(R.color.toucan_yellow));
-	        dialogButtonNo.setBackgroundColor(cn.getResources().getColor(R.color.toucan_yellow));
-	        dialogButton.setVisibility(View.INVISIBLE);
-	       	lnHeader.setBackgroundColor(cn.getResources().getColor(R.color.toucan_yellow));
-	       	dialogButtonNo.setText("OK");
-	       	dialogButtonNo.setOnClickListener(new OnClickListener()
-	        {	
-	        	@Override
-	            public void onClick(View v){	
-	        			Intent intent = new Intent(ForgotPasswordActivity.this, MainSignInActivity.class);
-						startActivity(intent);
-						finish();
-	            }
-	        });
-
-	        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-	        lp.copyFrom(dialogStatusYN.getWindow().getAttributes());
-	        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-	        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-	        dialogStatusYN.show();
-	        dialogStatusYN.getWindow().setAttributes(lp);
-	    }
-	    
 	private void makeNotify(CharSequence con, Style style) {
 		AppMsg.makeText(this, con, style).show();
 	}
 	
-	private void showDialog() {
-		if (!pDialog.isShowing()) pDialog.show();
-	}
 	
-	private void hideDialog() {
-		if (pDialog.isShowing()) pDialog.dismiss();
-	}
 }
