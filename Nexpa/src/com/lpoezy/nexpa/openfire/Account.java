@@ -73,7 +73,7 @@ public class Account {
 						map.put("creationDate", "" + System.currentTimeMillis() / 1000L);
 						accountManager.createAccount(username, password, map);
 						connection.disconnect();
-						setConnection(null);
+						//setConnection(null);
 
 						validateAccountOnServer(cnt, username);
 
@@ -120,7 +120,7 @@ public class Account {
 						accountManager.createAccount(username, password, map);
 						validateAccountOnServer(cnt, username);
 						connection.disconnect();
-						setConnection(null);
+						//setConnection(null);
 
 					} catch (XMPPException ex) {
 						Log.e("XMPP REGISTER",
@@ -159,7 +159,7 @@ public class Account {
 						Log.e("XMPP REGISTER", "Logged in as " + connection.getUser());
 						Presence presence = new Presence(Presence.Type.available);
 						connection.sendPacket(presence);
-						setConnection(connection);
+						//setConnection(connection);
 						XMPPLogic.getInstance().setConnection(connection);
 						Roster roster = connection.getRoster();
 						Collection<RosterEntry> entries = roster.getEntries();
@@ -180,12 +180,12 @@ public class Account {
 
 					} catch (XMPPException ex) {
 						L.error("XMPP REGISTER, Failed to log in as " + email + " : " + ex.toString());
-						setConnection(null);
+						//setConnection(null);
 					}
 
 				} catch (XMPPException ex) {
 					L.error("XMPP REGISTER, Chat server failed:" + ex.getLocalizedMessage());
-					setConnection(null);
+					//setConnection(null);
 				}
 			}
 		});
@@ -280,58 +280,39 @@ public class Account {
 					//connection.disconnect();
 
 					connection.connect();
-					L.error("XMPPChatDemoActivity, Connected to " + connection.getHost());
+					
 					try {
-
-						connection.login(username, password);
-						L.error("XMPPChatDemoActivity, Logged in as " + connection.getUser());
-						Presence presence = new Presence(Presence.Type.available);
-						connection.sendPacket(presence);
-						setConnection(connection);
-						XMPPLogic.getInstance().setConnection(connection);
+						if(connection.isConnected()){
+							L.error("XMPPChatDemoActivity, Connected to " + connection.getHost());
+							
+							connection.login(username, password);
+							L.error("XMPPChatDemoActivity, Logged in as " + connection.getUser());
+							Presence presence = new Presence(Presence.Type.available);
+							connection.sendPacket(presence);
+							//setConnection(connection);
+							XMPPLogic.getInstance().setConnection(connection);
+							
+							if (callback != null)
+								callback.onXMPPConnected(connection);
+							
+						}else{
+							L.error("XMPPChatDemoActivity, Chat server failed");
+						}
 						 
-						// Roster roster = connection.getRoster();
-						// Collection < RosterEntry > entries =
-						// roster.getEntries();
-						// L.debug("XMPPChatDemoActivity, entries: " +
-						// entries.size());
-						//
-						// for (RosterEntry entry: entries) {
-						// L.error("XMPPChatDemoActivity,
-						// --------------------------------------");
-						// L.error("XMPPChatDemoActivity, RosterEntry " +
-						// entry);
-						// L.error("XMPPChatDemoActivity, User: " +
-						// entry.getUser());
-						//
-						// L.debug("XMPPChatDemoActivity, User: " +
-						// entry.getUser());
-						// Presence entryPresence =
-						// roster.getPresence(entry.getUser());
-						// Log.e("XMPPChatDemoActivity", "Presence Status: " +
-						// entryPresence.getStatus());
-						// Log.e("XMPPChatDemoActivity", "Presence Type: " +
-						// entryPresence.getType());
-						// Presence.Type type = entryPresence.getType();
-						// if (type == Presence.Type.available)
-						// L.error("XMPPChatDemoActivity, Presence AVIALABLE");
-						// Log.d("XMPPChatDemoActivity", "Presence : " +
-						// entryPresence);
-						// }
-
-						if (callback != null)
-							callback.onXMPPConnected(connection);
-
 					} catch (XMPPException ex) {
+						
 						Log.e("XMPPChatDemoActivity", "Failed to log in as " + email);
 						Log.e("XMPPChatDemoActivity", ex.toString());
-						setConnection(null);
+						//setConnection(null);
 					}
+					
 				} catch (XMPPException ex) {
 					Log.e("XMPPChatDemoActivity", "Chat server failed: " + ex.getLocalizedMessage());
 					L.error("XMPPChatDemoActivity, Chat server failed: " + ex.getLocalizedMessage());
-					setConnection(null);
+					//setConnection(null);
 				}
+				
+				
 			}
 		});
 		t.start();
@@ -359,7 +340,7 @@ public class Account {
 						connection.sendPacket(presence);
 						Message msg = new Message(message, Message.Type.chat);
 						connection.sendPacket(msg);
-						setConnection(connection);
+						//setConnection(connection);
 						XMPPLogic.getInstance().setConnection(connection);
 						Roster roster = connection.getRoster();
 						Collection<RosterEntry> entries = roster.getEntries();
@@ -378,31 +359,31 @@ public class Account {
 					} catch (XMPPException ex) {
 						Log.e("XMPPChatDemoActivity", "Failed to log in as " + email);
 						Log.e("XMPPChatDemoActivity", ex.toString());
-						setConnection(null);
+						//setConnection(null);
 					}
 				} catch (XMPPException ex) {
 					Log.e("XMPPChatDemoActivity", "Chat server failed");
-					setConnection(null);
+					//setConnection(null);
 				}
 			}
 		});
 		t.start();
 	}
 
-	public void setConnection(XMPPConnection connection) {
-		this.connection = connection;
-		if (connection != null) {
-			PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-			connection.addPacketListener(new PacketListener() {
-				@Override
-				public void processPacket(Packet packet) {
-					Message message = (Message) packet;
-					if (message.getBody() != null) {
-						String fromName = StringUtils.parseBareAddress(message.getFrom());
-						Log.e("XMPPChatDemoActivity", "Text Recieved " + message.getBody() + " from " + fromName);
-					}
-				}
-			}, filter);
-		}
-	}
+//	public void setConnection(XMPPConnection connection) {
+//		this.connection = connection;
+//		if (connection != null) {
+//			PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
+//			connection.addPacketListener(new PacketListener() {
+//				@Override
+//				public void processPacket(Packet packet) {
+//					Message message = (Message) packet;
+//					if (message.getBody() != null) {
+//						String fromName = StringUtils.parseBareAddress(message.getFrom());
+//						Log.e("XMPPChatDemoActivity", "Text Recieved " + message.getBody() + " from " + fromName);
+//					}
+//				}
+//			}, filter);
+//		}
+//	}
 }

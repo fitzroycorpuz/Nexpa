@@ -96,9 +96,13 @@
     <string name="user_profile_distance_bar">Range to broadcast and catch users (in kilometers)</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="delete">delete</string>
+    
+    <!-- dialog msgs -->
+    <string name="dialog_msg_sending_email">Sending email...</string>
 
     <!-- alerts -->
     <string name="msg_no_internet">Sorry your internet connection is not working, please enable it!</string>
+     <string name="msg_request_to_reset_password_success">Please check your email to reset your Nexpa password.</string>
 
     <!-- hints -->
     <string name="short_description">Short description</string>

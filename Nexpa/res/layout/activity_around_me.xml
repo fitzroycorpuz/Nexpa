@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    
+    android:cacheColorHint="#333"
     tools:context=".AroundMeActivity" >
 
     <include
@@ -12,24 +12,22 @@
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/activity_main_swipe_refresh_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/toolbar" >
 
         <GridView
             android:id="@+id/grid"
             android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:cacheColorHint="@color/white"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:numColumns="3"
-        android:padding="5dp"
-        android:scrollbars="none"
-        android:stretchMode="columnWidth"
-        android:gravity="center"
-            
-            />
+            android:layout_height="wrap_content"
+            android:cacheColorHint="@color/white"
+            android:gravity="center"
+            android:horizontalSpacing="10dp"
+            android:numColumns="3"
+            android:padding="5dp"
+            android:scrollbars="none"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dp" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

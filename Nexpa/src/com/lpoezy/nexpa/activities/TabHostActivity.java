@@ -50,6 +50,8 @@ public class TabHostActivity extends TabActivity {
 		
 		super.onResume();
 		
+		L.debug("onResume");
+		
 		//start chat service here and syncdata service,
 		//this will only be stop when the user deactivated/cancel their account
 		Intent msgService = new Intent(this, ChatMessagesService.class);
