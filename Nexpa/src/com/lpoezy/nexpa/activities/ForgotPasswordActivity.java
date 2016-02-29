@@ -1,4 +1,5 @@
 package com.lpoezy.nexpa.activities;
+
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.regex.Matcher;
@@ -18,6 +19,7 @@ import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,91 +32,79 @@ public class ForgotPasswordActivity extends Activity {
 	private Button btnResetPassword;
 	private EditText inputEmail;
 
-	
 	Timer timer;
 	Account ac;
-	
+	private ProgressDialog pDialog;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_forgot_password);
 		inputEmail = (EditText) findViewById(R.id.email);
 		btnResetPassword = (Button) findViewById(R.id.btnResetPassword);
-		
+
+		pDialog = new ProgressDialog(this);
+		pDialog.setCancelable(false);
+
 		btnResetPassword.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				final String email = inputEmail.getText().toString();
 				if (email.isEmpty()) {
 					makeNotify("Please fill out your registered email", AppMsg.STYLE_ALERT);
-					
+
 				} else if (isEmailValid(email) == false) {
 					makeNotify("Email address is not valid", AppMsg.STYLE_ALERT);
 				} else {
+					String msg = getResources().getString(R.string.dialog_msg_sending_email);
+					pDialog.setMessage(msg);
+					showDialog();
+
 					new Thread(new Runnable() {
-						
+
 						@Override
 						public void run() {
-							
-							
+
 							HashMap<String, String> postDataParams = new HashMap<String, String>();
 							postDataParams.put("tag", "reset_password");
 							postDataParams.put("email", email);
-							
 
 							final String spec = AppConfig.URL_SEND_EMAIL;
 							String webPage = HttpUtilz.makeRequest(spec, postDataParams);
 
-							
-//							JSONObject result;
-//							try {
-//								result = new JSONObject(webPage);
-//								boolean error = result.getBoolean("error");
-//								
-//								if(!error){
-//									final String msg = result.getString("msg");
-//									
-//									inputEmail.post(new Runnable() {
-//										
-//										@Override
-//										public void run() {
-//											makeNotify(msg, AppMsg.STYLE_INFO);
-//											
-//										}
-//									});
-//									
-//								}
-//								
-//							} catch (JSONException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-							
-							
+							JSONObject result;
+							try {
+								result = new JSONObject(webPage);
+								final boolean error = result.getBoolean("error");
+
+								final String msg = result.getString("msg");
+
+								inputEmail.post(new Runnable() {
+
+									@Override
+									public void run() {
+
+										hideDialog();
+
+										makeNotify(msg, AppMsg.STYLE_INFO); 
+
+									}
+								});
+
+							} catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
 						}
 					}).start();
-					
-					
-					inputEmail.postDelayed(new Runnable() {
-						
-						@Override
-						public void run() {
-							String msg = getResources().getString(R.string.msg_request_to_reset_password_success);
-							makeNotify(msg, AppMsg.STYLE_INFO);
-							
-						}
-					}, 500);
-					
-					
-					
+
 				}
-				
-				
-				
+
 			}
 		});
-	
+
 	}
-	
+
 	public static boolean isEmailValid(String email) {
 		boolean isValid = false;
 		String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
@@ -126,10 +116,18 @@ public class ForgotPasswordActivity extends Activity {
 		}
 		return isValid;
 	}
-	
+
 	private void makeNotify(CharSequence con, Style style) {
 		AppMsg.makeText(this, con, style).show();
 	}
-	
-	
+
+	private void showDialog() {
+		if (!pDialog.isShowing())
+			pDialog.show();
+	}
+
+	private void hideDialog() {
+		if (pDialog.isShowing())
+			pDialog.dismiss();
+	}
 }
