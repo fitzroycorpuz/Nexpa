@@ -45,6 +45,18 @@
                 android:text="Large Text"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/tv_buddys_msg_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
     </LinearLayout>
 
 </RelativeLayout>

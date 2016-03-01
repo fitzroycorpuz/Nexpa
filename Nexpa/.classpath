@@ -9,6 +9,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jackson-core-2.7.0-rc2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackson-databind-2.7.0-rc2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.7.0-rc2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/joda-time-2.4.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>

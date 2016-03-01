@@ -16,10 +16,13 @@ public class DateUtils {
 
 	public enum DateFormatz {
 
-		DATE_FORMAT_0("yyyy-MM-dd hh:mm:ss"), DATE_FORMAT_1("dd/MM/yyyy hh:mm:ss"), DATE_FORMAT_2(
-				"MMMM dd, yyyy h:mm:ss aa"), DATE_FORMAT_3("EEEE, MMMM dd, yyyy h:mm:ss aa"), DATE_FORMAT_4(
-						"MM/dd/yyyy hh:mm:ss"), DATE_FORMAT_5("yyyy-MM-dd HH:mm:ss");
-
+		DATE_FORMAT_0("yyyy-MM-dd hh:mm:ss"), 
+		DATE_FORMAT_1("dd/MM/yyyy hh:mm:ss"), 
+		DATE_FORMAT_2("MMMM dd, yyyy h:mm:ss aa"), 
+		DATE_FORMAT_3("EEEE, MMMM dd, yyyy h:mm:ss aa"), 
+		DATE_FORMAT_4("MM/dd/yyyy hh:mm:ss"), 
+		DATE_FORMAT_5("yyyy-MM-dd HH:mm:ss"),
+		DATE_FORMAT_6("HH:mm:ss");
 		private String format;
 
 		DateFormatz(String format) {
@@ -46,6 +49,39 @@ public class DateUtils {
 		}
 
 		return localTime;
+	}
+	
+	public static String toMonth(int month){
+		
+		String monthStr = "";
+		if (Calendar.JANUARY == month)
+			monthStr = "Jan.";
+		else if (Calendar.FEBRUARY == month)
+			monthStr = "Feb.";
+		else if (Calendar.MARCH == month)
+			monthStr = "Mar.";
+		else if (Calendar.APRIL == month)
+			monthStr = "Apr.";
+		else if (Calendar.MAY == month)
+			monthStr = "May";
+		else if (Calendar.JUNE == month)
+			monthStr = "Jun.";
+		else if (Calendar.JULY == month)
+			monthStr = "Jul.";
+		else if (Calendar.AUGUST == month)
+			monthStr = "Aug.";
+		else if (Calendar.SEPTEMBER == month)
+			monthStr = "Sept.";
+		else if (Calendar.OCTOBER == month)
+			monthStr = "Oct.";
+		else if (Calendar.NOVEMBER == month)
+			monthStr = "Nov.";
+		else if (Calendar.DECEMBER == month)
+			monthStr = "Dec.";
+		
+		
+		return monthStr;
+		
 	}
 
 	public Date convertStringToDateToLocal(String dateToConv) {
