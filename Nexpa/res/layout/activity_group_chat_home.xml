@@ -141,14 +141,24 @@ android:orientation="vertical">
 				android:layout_width="1139dp" android:layout_height="262dp"
 				android:background="@drawable/img_building"
 				/>
-				<TextView android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:paddingBottom="80dp" android:paddingLeft="45dp"
-				android:fontFamily="sans-serif-medium"
-				android:paddingRight="45dp" android:text="Broadcasts allow you to send messages to anyone nearby."
-				android:textAllCaps="true" android:textColor="@color/white"
-				android:textSize="20dp" />
 			</FrameLayout>
+
+			  <TextView
+			      android:layout_width="fill_parent"
+			      android:layout_height="wrap_content"
+			      android:layout_alignParentLeft="true"
+			      android:layout_alignParentTop="true"
+			      android:fontFamily="sans-serif-medium"
+			      android:gravity="center"
+			      android:paddingTop="40dp"
+			      android:paddingBottom="50dp"
+			      android:paddingLeft="45dp"
+			      android:paddingRight="45dp"
+			      android:text="Broadcasts allow you to send messages to anyone nearby."
+			      android:textAllCaps="true"
+			      android:textColor="@color/white"
+			      android:textSize="20dp" />
+
 		</RelativeLayout>
 	</LinearLayout>
 	<LinearLayout android:id="@+id/lnBroadcastExist"

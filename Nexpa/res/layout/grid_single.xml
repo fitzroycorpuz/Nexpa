@@ -8,8 +8,8 @@
 
     <ImageView 
         android:id="@+id/grid_image" 
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:scaleType="centerCrop"
          android:animateLayoutChanges="true" 
     />  
@@ -18,8 +18,8 @@
         android:id="@+id/offline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="82dp"
-        android:paddingLeft="80dp"
+        android:paddingTop="100dp"
+        android:paddingLeft="85dp"
         android:src="@drawable/offline" />
 
     <LinearLayout
