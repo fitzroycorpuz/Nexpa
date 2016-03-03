@@ -1,19 +1,9 @@
 package com.lpoezy.nexpa.activities;
 
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Presence.Type;
 
 import com.lpoezy.nexpa.R;
-import com.lpoezy.nexpa.openfire.Account;
-import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.L;
@@ -47,7 +37,7 @@ public class BuddyRequestActivity extends Activity {
 
 					SQLiteHandler db = new SQLiteHandler(getApplicationContext());
 					db.openToWrite();
-
+					/*/
 					Account ac = new Account();
 					ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
 
@@ -58,7 +48,7 @@ public class BuddyRequestActivity extends Activity {
 						}
 
 					});
-
+					//*/
 					db.close();
 				} else {
 					requestSubscription(connection, address);
@@ -69,19 +59,19 @@ public class BuddyRequestActivity extends Activity {
 	}
 
 	private void requestSubscription(XMPPConnection connection, String address) {
-
+		/*/
 		L.error("sending subscription request to address: " + address);
 		Presence subscribe = new Presence(Presence.Type.subscribe);
 		subscribe.setTo(address);
 		connection.sendPacket(subscribe);
-
+		
 		Roster roster = connection.getRoster();
 		try {
 			roster.createEntry(address, null, null);
 		} catch (XMPPException e) {
 			L.error("" + e);
 		}
-
+		//*/
 	}
 
 	@Override
@@ -97,7 +87,7 @@ public class BuddyRequestActivity extends Activity {
 
 			// db.updateBroadcasting(0);
 			// db.updateBroadcastTicker(0);
-
+			/*/
 			Account ac = new Account();
 			ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
 
@@ -108,7 +98,7 @@ public class BuddyRequestActivity extends Activity {
 				}
 
 			});
-
+			//*/
 			db.close();
 		} else {
 
@@ -118,7 +108,7 @@ public class BuddyRequestActivity extends Activity {
 	}
 
 	private void subscriptionRequestListener(final XMPPConnection connection) {
-
+		/*/
 		connection.addPacketListener(new PacketListener() {
 
 			@Override
@@ -149,6 +139,6 @@ public class BuddyRequestActivity extends Activity {
 				}
 			}
 		}, new PacketTypeFilter(Presence.class));
-
+		//*/
 	}
 }

@@ -54,20 +54,20 @@ public class TabHostActivity extends TabActivity {
 		
 		//start chat service here and syncdata service,
 		//this will only be stop when the user deactivated/cancel their account
-		Intent msgService = new Intent(this, ChatMessagesService.class);
-		startService(msgService);
-		
-		Intent syncDataService = new Intent(this, SyncDataService.class);
-		startService(syncDataService);
-		
-		Intent syncProfileService = new Intent(this, SyncUserProfileService.class);
-		startService(syncProfileService);
-		
-		Intent syncProfilePictureService = new Intent(this, SyncProfilePictureService.class);
-		startService(syncProfilePictureService);
-		
-		registerReceiver(mUpdateMsgCount, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
-		isRunning = true;
+//		Intent msgService = new Intent(this, ChatMessagesService.class);
+//		startService(msgService);
+//		
+//		Intent syncDataService = new Intent(this, SyncDataService.class);
+//		startService(syncDataService);
+//		
+//		Intent syncProfileService = new Intent(this, SyncUserProfileService.class);
+//		startService(syncProfileService);
+//		
+//		Intent syncProfilePictureService = new Intent(this, SyncProfilePictureService.class);
+//		startService(syncProfilePictureService);
+//		
+//		registerReceiver(mUpdateMsgCount, new IntentFilter(AppConfig.ACTION_RECEIVED_MSG));
+//		isRunning = true;
 		
 	}
 	
@@ -75,7 +75,7 @@ public class TabHostActivity extends TabActivity {
 	protected void onPause() {
 		
 		super.onPause();
-		unregisterReceiver(mUpdateMsgCount);
+//		unregisterReceiver(mUpdateMsgCount);
 		isRunning = false;
 		
 		L.debug("TabHost, onPause");

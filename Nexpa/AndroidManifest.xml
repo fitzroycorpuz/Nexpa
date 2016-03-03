@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lpoezy.nexpa"
-    android:versionCode="1"
-    android:versionName="1.0"
     android:largeHeap="true"
-     >
+    android:versionCode="1"
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -38,7 +37,7 @@
         </activity>
         <activity android:name=".activities.SampActivity" />
         <activity android:name=".activities.PeopleActivity" />
-         <activity android:name=".activities.ForgotPasswordActivity" />
+        <activity android:name=".activities.ForgotPasswordActivity" />
         <activity
             android:name=".activities.TabHostActivity"
             android:windowSoftInputMode="adjustPan" />
@@ -126,8 +125,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.GroupChatHomeActivity" />
         </activity>
-       
-        <activity android:name=".activities.BuddyRequestActivity"></activity>
+        <activity android:name=".activities.BuddyRequestActivity" >
+        </activity>
+
+        <service
+            android:name="com.lpoezy.nexpa.chatservice.XMPPService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

@@ -393,83 +393,83 @@ public class MainSignInActivity extends Activity {
 						server_created_at = user.getString("created_at");
 						String is_activated = user.getString("isActive");
 
-						if (is_activated.equals("1")) {
-
-							db.addUser(server_name, server_email, server_uid, server_created_at, password);
-							session.setLogin(true);
-							
-							
-							Account ac = new Account();
-							
-							ac.LogInChatAccount(server_name, password, server_email, new OnXMPPConnectedListener() {
-
-								@Override
-								public void onXMPPConnected(final XMPPConnection connection) {
-
-									// download user profile pic info
-									ExecutorService exec = Executors.newCachedThreadPool();
-									exec.submit(new Runnable() {
-
-										@Override
-										public void run() {
-											if(connection.isConnected()){
-												updateChatHistory();
-												
-												updateUserProfile();
-												
-												btnLogin.post(new Runnable() {
-
-													@Override
-													public void run() {
-														
-														//Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
-														
-														
-														Intent intent = new Intent(MainSignInActivity.this,TabHostActivity.class);
-														startActivity(intent);
-
-														finish();
-
-														hideDialog();
-													}
-												});
-											}else{
-												btnLogin.post(new Runnable() {
-													
-													@Override
-													public void run() {
-														makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
-														hideDialog();
-														
-													}
-												});
-												
-											}
-											
-											
-										}
-									});
-									exec.shutdown();
-									try {
-										exec.awaitTermination(1, TimeUnit.HOURS);
-									} catch (InterruptedException e) {
-										L.error("" + e);
-									}
-
-								}
-
-							});
-
-						} else {
-							
-							Account ac = new Account();
-							ac.ReTryCreateChatAccount(MainSignInActivity.this, server_name, password, server_email);
-							public_pass = password;
-							timer = new Timer();
-							initializeTimerTask();
-							timer.scheduleAtFixedRate(showMainPageIntent, 1000, 3000);
-							
-						}
+//						if (is_activated.equals("1")) {
+//
+//							db.addUser(server_name, server_email, server_uid, server_created_at, password);
+//							session.setLogin(true);
+//							
+//							
+//							Account ac = new Account();
+//							
+//							ac.LogInChatAccount(server_name, password, server_email, new OnXMPPConnectedListener() {
+//
+//								@Override
+//								public void onXMPPConnected(final XMPPConnection connection) {
+//
+//									// download user profile pic info
+//									ExecutorService exec = Executors.newCachedThreadPool();
+//									exec.submit(new Runnable() {
+//
+//										@Override
+//										public void run() {
+//											if(connection.isConnected()){
+//												updateChatHistory();
+//												
+//												updateUserProfile();
+//												
+//												btnLogin.post(new Runnable() {
+//
+//													@Override
+//													public void run() {
+//														
+//														//Intent intent = new Intent(MainSignInActivity.this, BuddyRequestActivity.class);
+//														
+//														
+//														Intent intent = new Intent(MainSignInActivity.this,TabHostActivity.class);
+//														startActivity(intent);
+//
+//														finish();
+//
+//														hideDialog();
+//													}
+//												});
+//											}else{
+//												btnLogin.post(new Runnable() {
+//													
+//													@Override
+//													public void run() {
+//														makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
+//														hideDialog();
+//														
+//													}
+//												});
+//												
+//											}
+//											
+//											
+//										}
+//									});
+//									exec.shutdown();
+//									try {
+//										exec.awaitTermination(1, TimeUnit.HOURS);
+//									} catch (InterruptedException e) {
+//										L.error("" + e);
+//									}
+//
+//								}
+//
+//							});
+//
+//						} else {
+//							
+//							Account ac = new Account();
+//							ac.ReTryCreateChatAccount(MainSignInActivity.this, server_name, password, server_email);
+//							public_pass = password;
+//							timer = new Timer();
+//							initializeTimerTask();
+//							timer.scheduleAtFixedRate(showMainPageIntent, 1000, 3000);
+//							
+//						}
 					} else {
 						hideDialog();
 						String errorMsg = jObj.getString("error_msg");

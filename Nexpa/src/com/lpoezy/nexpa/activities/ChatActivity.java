@@ -249,7 +249,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 							Account ac = new Account();
 							SQLiteHandler db = new SQLiteHandler(getApplicationContext());
 							db.openToWrite();
-
+							/*/
 							ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(),
 									new OnXMPPConnectedListener() {
 
@@ -260,7 +260,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 
 								}
 							});
-
+							//*/
 							db.close();
 						}
 
@@ -268,7 +268,7 @@ public class ChatActivity extends Activity implements Correspondent.OnCorrespond
 
 					else {
 						L.debug("XMPPChatDemoActivity, Sending text " + text + " to " + to);
-						connection.sendPacket(msg);
+						//connection.sendPacket(msg);
 					
 						isSuccessful = true;
 						NewMessage comment = new NewMessage(senderName, receiverName, body, isLeft, isSuccessful, isUnread, isSyncedOnline, date);

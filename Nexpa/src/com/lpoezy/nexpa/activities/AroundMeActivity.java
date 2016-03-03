@@ -1,29 +1,13 @@
 package com.lpoezy.nexpa.activities;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Presence.Mode;
-import org.jivesoftware.smack.packet.Presence.Type;
-import org.jivesoftware.smack.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +17,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.appyvet.rangebar.RangeBar;
-import com.lpoezy.nexpa.activities.CustomGrid;
 import com.devspark.appmsg.AppMsg;
 import com.devspark.appmsg.AppMsg.Style;
 import com.lpoezy.nexpa.R;
@@ -44,8 +27,6 @@ import com.lpoezy.nexpa.objects.Correspondent;
 import com.lpoezy.nexpa.objects.ProfilePicture;
 import com.lpoezy.nexpa.objects.UserProfile;
 import com.lpoezy.nexpa.objects.Users;
-import com.lpoezy.nexpa.openfire.Account;
-import com.lpoezy.nexpa.openfire.OnXMPPConnectedListener;
 import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -54,12 +35,10 @@ import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.MyLocation;
 import com.lpoezy.nexpa.utility.MyLocation.LocationResult;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -75,9 +54,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -624,7 +603,7 @@ public class AroundMeActivity extends AppCompatActivity
 						
 						SQLiteHandler db = new SQLiteHandler(getApplicationContext());
 						db.openToWrite();
-
+						/*/
 						Account ac = new Account();
 						ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
 
@@ -635,7 +614,7 @@ public class AroundMeActivity extends AppCompatActivity
 							}
 
 						});
-
+						//*/
 						db.close();
 					}else{
 						updateCorrespondentsAvailability(correspondent, address, connection);
@@ -656,6 +635,8 @@ public class AroundMeActivity extends AppCompatActivity
 
 	protected void updateCorrespondentsAvailability(Correspondent correspondent, String address, XMPPConnection connection) {
 		if(connection.isConnected()){
+			
+			/*/
 			boolean isAvailable = connection.getRoster().getPresence(address).isAvailable();
 			correspondent.setAvailable(isAvailable);
 			mSwipeRefreshLayout.post(new Runnable() {
@@ -667,6 +648,7 @@ public class AroundMeActivity extends AppCompatActivity
 					
 				}
 			});
+			//*/
 		}else{
 			
 			mSwipeRefreshLayout.post(new Runnable() {
@@ -684,7 +666,7 @@ public class AroundMeActivity extends AppCompatActivity
 	}
 
 	private void requestSubscription(XMPPConnection connection, String address) {
-
+		/*/
 		//L.error("sending subscription request to address: " + address);
 		Presence subscribe = new Presence(Presence.Type.subscribe);
 		subscribe.setTo(address);
@@ -696,7 +678,7 @@ public class AroundMeActivity extends AppCompatActivity
 		} catch (XMPPException e) {
 			L.error("requestSubscription: " + e);
 		}
-
+		//*/
 	}
 
 	private String displayGridCellName(String fname, String user) {
@@ -1020,7 +1002,7 @@ public class AroundMeActivity extends AppCompatActivity
 
 			// db.updateBroadcasting(0);
 			// db.updateBroadcastTicker(0);
-
+			/*/
 			Account ac = new Account();
 			ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
 
@@ -1031,7 +1013,7 @@ public class AroundMeActivity extends AppCompatActivity
 				}
 
 			});
-
+			//*/
 			db.close();
 		} else {
 
@@ -1042,8 +1024,10 @@ public class AroundMeActivity extends AppCompatActivity
 	}
 	
 	private void subscriptionRequestListener(final XMPPConnection connection) {
+		
+		/*/
 		if(connection.isConnected()){
-			
+			//*
 			connection.addPacketListener(new PacketListener() {
 
 				@Override
@@ -1094,6 +1078,8 @@ public class AroundMeActivity extends AppCompatActivity
 		}else{
 			makeNotify("Cannot connect to server", AppMsg.STYLE_ALERT);
 		}
+		
+		//*/
 	}
 
 	private void tryGridToUpdate() {

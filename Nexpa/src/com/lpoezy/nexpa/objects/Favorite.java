@@ -1,10 +1,5 @@
 package com.lpoezy.nexpa.objects;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.xbill.DNS.MFRecord;
-
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 
 import android.content.Context;

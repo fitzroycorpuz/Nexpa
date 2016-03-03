@@ -1,20 +1,10 @@
 package com.lpoezy.nexpa.activities;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.jivesoftware.smack.AccountManager;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-
 import com.lpoezy.nexpa.R;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -83,63 +73,64 @@ private void getIntentData() {
 
 private void connect() {
     // TODO Auto-generated method stub
-    final ProgressDialog dialog = ProgressDialog.show(this,"Creating your account...", "Please wait...", false);
-
-    Thread t = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-            // TODO Auto-generated method stub
-        	
-        	
-
-            ConnectionConfiguration connConfig = new ConnectionConfiguration(
-                    HOST, PORT,SERVICE);
-            XMPPConnection connection = new XMPPConnection(connConfig);
-
-            try {
-                connection.connect();
-                Log.i("XMPPChatDemoActivity",
-                        "Connected to " + connection.getHost());
-                
-            } catch (XMPPException ex) 
-            {
-                Log.e("XMPPChatDemoActivity", "Failed to connect to "
-                        + connection.getHost());
-                Log.e("XMPPChatDemoActivity", ex.toString());
-            //  setConnection(null);
-            }
-
-            try{
-
-                //connection.connect();
-                connection.login("admin", "openfire");
-                Log.i("XMPPChatDemoActivity","Logged in as " + connection.getUser());
-                String kk= connection.getUser();
-                AccountManager accountManager = connection.getAccountManager();
-       
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("username", username1.getText().toString());
-                map.put("name", fullName1.getText().toString());
-                map.put("password", password1.getText().toString());
-                map.put("email", email1.getText().toString());
-                map.put("creationDate", ""+System.currentTimeMillis() / 1000L);
-                accountManager.createAccount(username, password, map);
-                dialog.dismiss();
-            }
-            catch(XMPPException ex){
-
-                Log.e("XMPPChatDemoActivity", "Failed to Register in as "+ username);
-                 connection.disconnect();
-
-            }
-
-
-        } 
-
-});
-    t.start();
-    dialog.show();
+		// final ProgressDialog dialog = ProgressDialog.show(this,"Creating your
+		// account...", "Please wait...", false);
+		//
+		// Thread t = new Thread(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		// // TODO Auto-generated method stub
+		//
+		//
+		//
+		// ConnectionConfiguration connConfig = new ConnectionConfiguration(
+		// HOST, PORT,SERVICE);
+		// XMPPConnection connection = new XMPPConnection(connConfig);
+		//
+		// try {
+		// connection.connect();
+		// Log.i("XMPPChatDemoActivity",
+		// "Connected to " + connection.getHost());
+		//
+		// } catch (XMPPException ex)
+		// {
+		// Log.e("XMPPChatDemoActivity", "Failed to connect to "
+		// + connection.getHost());
+		// Log.e("XMPPChatDemoActivity", ex.toString());
+		// // setConnection(null);
+		// }
+		//
+		// try{
+		//
+		// //connection.connect();
+		// connection.login("admin", "openfire");
+		// Log.i("XMPPChatDemoActivity","Logged in as " + connection.getUser());
+		// String kk= connection.getUser();
+		// AccountManager accountManager = connection.getAccountManager();
+		//
+		// Map<String, String> map = new HashMap<String, String>();
+		// map.put("username", username1.getText().toString());
+		// map.put("name", fullName1.getText().toString());
+		// map.put("password", password1.getText().toString());
+		// map.put("email", email1.getText().toString());
+		// map.put("creationDate", ""+System.currentTimeMillis() / 1000L);
+		// accountManager.createAccount(username, password, map);
+		// dialog.dismiss();
+		// }
+		// catch(XMPPException ex){
+		//
+		// Log.e("XMPPChatDemoActivity", "Failed to Register in as "+ username);
+		// connection.disconnect();
+		//
+		// }
+		//
+		//
+		// }
+		//
+		// });
+		// t.start();
+		// dialog.show();
     
 }
 }   

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.jivesoftware.smack.util.Base64;
+import org.jivesoftware.smack.util.stringencoder.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -132,7 +132,7 @@ public class ProfilePicture {
 
 			byte[] byte_arr = stream.toByteArray();
 
-			final String imageStr = Base64.encodeBytes(byte_arr);
+			final String imageStr = Base64.encodeToString(byte_arr);//Base64.encodeBytes(byte_arr)
 			// L.debug("imageStr "+imageStr);
 			// long now = System.currentTimeMillis();
 			// final String dateCreated = DateUtils.millisToSimpleDate(now,

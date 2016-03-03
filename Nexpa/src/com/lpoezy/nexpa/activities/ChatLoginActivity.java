@@ -1,20 +1,8 @@
 package com.lpoezy.nexpa.activities;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.util.StringUtils;
 
 import com.lpoezy.nexpa.R;
 
@@ -89,31 +77,31 @@ public class ChatLoginActivity extends Activity{
 	 * @param connection
 	 */
 	public void setConnection(XMPPConnection connection) {
-		this.connection = connection;
-		if (connection != null) {
-			// Add a packet listener to get messages sent to us
-			PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-			connection.addPacketListener(new PacketListener() {
-				@Override
-				public void processPacket(Packet packet) {
-					Message message = (Message) packet;
-					if (message.getBody() != null) {
-						String fromName = StringUtils.parseBareAddress(message
-								.getFrom());
-						Log.i("XMPPChatDemoActivity", "Text Recieved " + message.getBody()
-								+ " from " + fromName );
-						messages.add(fromName + ":");
-						messages.add(message.getBody());
-						// Add the incoming message to the list view
-						mHandler.post(new Runnable() {
-							public void run() {
-								setListAdapter();
-							}
-						});
-					}
-				}
-			}, filter);
-		}
+//		this.connection = connection;
+//		if (connection != null) {
+//			// Add a packet listener to get messages sent to us
+//			PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
+//			connection.addPacketListener(new PacketListener() {
+//				@Override
+//				public void processPacket(Packet packet) {
+//					Message message = (Message) packet;
+//					if (message.getBody() != null) {
+//						String fromName = StringUtils.parseBareAddress(message
+//								.getFrom());
+//						Log.i("XMPPChatDemoActivity", "Text Recieved " + message.getBody()
+//								+ " from " + fromName );
+//						messages.add(fromName + ":");
+//						messages.add(message.getBody());
+//						// Add the incoming message to the list view
+//						mHandler.post(new Runnable() {
+//							public void run() {
+//								setListAdapter();
+//							}
+//						});
+//					}
+//				}
+//			}, filter);
+//		}
 	}
 
 	private void setListAdapter() {
@@ -125,92 +113,92 @@ public class ChatLoginActivity extends Activity{
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		try {
-			if (connection != null)
-				connection.disconnect();
-		} catch (Exception e) {
-
-		}
+//		try {
+//			if (connection != null)
+//				connection.disconnect();
+//		} catch (Exception e) {
+//
+//		}
 	}
 	
 	public void connect() {
 
-		final ProgressDialog dialog = ProgressDialog.show(this,
-				"Connecting...", "Please wait...", false);
-
-		Thread t = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				// Create a connection
-				ConnectionConfiguration connConfig = new ConnectionConfiguration(
-						HOST, PORT, inputEmail.getText().toString()+ SERVICE);
-				XMPPConnection connection = new XMPPConnection(connConfig);
-
-				try {
-					connection.connect();
-					Log.i("XMPPChatDemoActivity",
-							"Connected to " + connection.getHost());
-				} catch (XMPPException ex) {
-					Log.e("XMPPChatDemoActivity", "Failed to connect to "
-							+ connection.getHost());
-					Log.e("XMPPChatDemoActivity", ex.toString());
-					setConnection(null);
-				}
-				try {
-					// SASLAuthentication.supportSASLMechanism("PLAIN", 0);
-					connection.login(inputEmail.getText().toString(), inputPassword.getText().toString());
-					Log.i("XMPPChatDemoActivity",
-							"Logged in as " + connection.getUser());
-					dialog.dismiss();
-					
-
-					// Set the status to available
-					Presence presence = new Presence(Presence.Type.available);
-					connection.sendPacket(presence);
-					//setConnection(connection);
-
-					Roster roster = connection.getRoster();
-					Collection<RosterEntry> entries = roster.getEntries();
-					for (RosterEntry entry : entries) {
-						Log.e("XMPPChatDemoActivity",
-								"--------------------------------------");
-						Log.e("XMPPChatDemoActivity", "RosterEntry " + entry);
-						Log.e("XMPPChatDemoActivity",
-								"User: " + entry.getUser());
-						Log.e("XMPPChatDemoActivity",
-								"Name: " + entry.getName());
-						Log.e("XMPPChatDemoActivity",
-								"Status: " + entry.getStatus());
-						Log.e("XMPPChatDemoActivity",
-								"Type: " + entry.getType());
-						Presence entryPresence = roster.getPresence(entry
-								.getUser());
-
-						Log.d("XMPPChatDemoActivity", "Presence Status: "
-								+ entryPresence.getStatus());
-						Log.d("XMPPChatDemoActivity", "Presence Type: "
-								+ entryPresence.getType());
-						Presence.Type type = entryPresence.getType();
-						if (type == Presence.Type.available)
-							Log.d("XMPPChatDemoActivity", "Presence AVIALABLE");
-						Log.d("XMPPChatDemoActivity", "Presence : "
-								+ entryPresence);
-
-					}
-				} catch (XMPPException ex) {
-					Log.e("XMPPChatDemoActivity", "Failed to log in as "
-							+ inputEmail.getText().toString());
-					Log.e("XMPPChatDemoActivity", ex.toString());
-					setConnection(null);
-				}
-
-					
-			}
-			
-		});	
-		t.start();
-		dialog.show();
+//		final ProgressDialog dialog = ProgressDialog.show(this,
+//				"Connecting...", "Please wait...", false);
+//
+//		Thread t = new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				// Create a connection
+//				ConnectionConfiguration connConfig = new ConnectionConfiguration(
+//						HOST, PORT, inputEmail.getText().toString()+ SERVICE);
+//				XMPPConnection connection = new XMPPConnection(connConfig);
+//
+//				try {
+//					connection.connect();
+//					Log.i("XMPPChatDemoActivity",
+//							"Connected to " + connection.getHost());
+//				} catch (XMPPException ex) {
+//					Log.e("XMPPChatDemoActivity", "Failed to connect to "
+//							+ connection.getHost());
+//					Log.e("XMPPChatDemoActivity", ex.toString());
+//					setConnection(null);
+//				}
+//				try {
+//					// SASLAuthentication.supportSASLMechanism("PLAIN", 0);
+//					connection.login(inputEmail.getText().toString(), inputPassword.getText().toString());
+//					Log.i("XMPPChatDemoActivity",
+//							"Logged in as " + connection.getUser());
+//					dialog.dismiss();
+//					
+//
+//					// Set the status to available
+//					Presence presence = new Presence(Presence.Type.available);
+//					connection.sendPacket(presence);
+//					//setConnection(connection);
+//
+//					Roster roster = connection.getRoster();
+//					Collection<RosterEntry> entries = roster.getEntries();
+//					for (RosterEntry entry : entries) {
+//						Log.e("XMPPChatDemoActivity",
+//								"--------------------------------------");
+//						Log.e("XMPPChatDemoActivity", "RosterEntry " + entry);
+//						Log.e("XMPPChatDemoActivity",
+//								"User: " + entry.getUser());
+//						Log.e("XMPPChatDemoActivity",
+//								"Name: " + entry.getName());
+//						Log.e("XMPPChatDemoActivity",
+//								"Status: " + entry.getStatus());
+//						Log.e("XMPPChatDemoActivity",
+//								"Type: " + entry.getType());
+//						Presence entryPresence = roster.getPresence(entry
+//								.getUser());
+//
+//						Log.d("XMPPChatDemoActivity", "Presence Status: "
+//								+ entryPresence.getStatus());
+//						Log.d("XMPPChatDemoActivity", "Presence Type: "
+//								+ entryPresence.getType());
+//						Presence.Type type = entryPresence.getType();
+//						if (type == Presence.Type.available)
+//							Log.d("XMPPChatDemoActivity", "Presence AVIALABLE");
+//						Log.d("XMPPChatDemoActivity", "Presence : "
+//								+ entryPresence);
+//
+//					}
+//				} catch (XMPPException ex) {
+//					Log.e("XMPPChatDemoActivity", "Failed to log in as "
+//							+ inputEmail.getText().toString());
+//					Log.e("XMPPChatDemoActivity", ex.toString());
+//					setConnection(null);
+//				}
+//
+//					
+//			}
+//			
+//		});	
+//		t.start();
+//		dialog.show();
 	}
 
 }

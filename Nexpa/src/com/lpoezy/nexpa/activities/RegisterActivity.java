@@ -1,18 +1,5 @@
 package com.lpoezy.nexpa.activities;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.jivesoftware.smack.AccountManager;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.PacketCollector;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketIDFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Registration;
-
 import com.lpoezy.nexpa.R;
 
 import android.app.Activity;
@@ -23,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class RegisterActivity extends Activity {
-	private Connection connection;
+	//private Connection connection;
 	
 	EditText username, password, email, fullName;
 	Button register;

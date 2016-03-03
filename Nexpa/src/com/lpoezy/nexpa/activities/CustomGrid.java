@@ -2,22 +2,12 @@ package com.lpoezy.nexpa.activities;
 
 import java.util.ArrayList;
 
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smackx.pubsub.PresenceState;
-
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.objects.Correspondent;
-import com.lpoezy.nexpa.objects.ProfilePicture;
-import com.lpoezy.nexpa.objects.UserProfile;
-import com.lpoezy.nexpa.utility.L;
-import com.lpoezy.nexpa.utility.RoundedImageView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

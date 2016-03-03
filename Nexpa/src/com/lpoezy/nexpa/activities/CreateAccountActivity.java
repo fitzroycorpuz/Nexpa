@@ -129,6 +129,7 @@ public class CreateAccountActivity extends Activity {
 					JSONObject jObj = new JSONObject(response);
 					boolean error = jObj.getBoolean("error");
 					if (!error) {
+						/*/
 						ac.CreateChatAccount(CreateAccountActivity.this, name, password, email);
 						String uid = jObj.getString("id");
 						JSONObject user = jObj.getJSONObject("user");
@@ -141,6 +142,7 @@ public class CreateAccountActivity extends Activity {
 						timer = new Timer();
 						initializeTimerTask();
 						timer.scheduleAtFixedRate(showMainPageIntent, 1000, 2000);
+						//*/
 					} else {
 						String errorMsg = jObj.getString("error_msg");
 						makeNotify(errorMsg, AppMsg.STYLE_ALERT);

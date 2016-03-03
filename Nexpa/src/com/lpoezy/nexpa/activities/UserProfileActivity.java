@@ -191,45 +191,45 @@ public class UserProfileActivity extends AppCompatActivity
 
 			// Create a new presence. Pass in false to indicate we're
 			// unavailable.
-			Presence presence = new Presence(Presence.Type.unavailable);
-			presence.setStatus("I知 unavailable");
-			connection.sendPacket(presence);
+//			Presence presence = new Presence(Presence.Type.unavailable);
+//			presence.setStatus("I知 unavailable");
+//			connection.sendPacket(presence);
 
 			// connection.disconnect();
 		} else {
 
-			Account ac = new Account();
-			ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
-
-				@Override
-				public void onXMPPConnected(XMPPConnection con) {
-
-					// Create a new presence. Pass in false to indicate we're
-					// unavailable.
-					Presence presence = new Presence(Presence.Type.unavailable);
-					presence.setStatus("I知 unavailable");
-					con.sendPacket(presence);
-				}
-
-			});
+//			Account ac = new Account();
+//			ac.LogInChatAccount(db.getUsername(), db.getPass(), db.getEmail(), new OnXMPPConnectedListener() {
+//
+//				@Override
+//				public void onXMPPConnected(XMPPConnection con) {
+//
+//					// Create a new presence. Pass in false to indicate we're
+//					// unavailable.
+//					Presence presence = new Presence(Presence.Type.unavailable);
+//					presence.setStatus("I知 unavailable");
+//					con.sendPacket(presence);
+//				}
+//
+//			});
 
 		}
 
-		if (ChatMessagesService.isRunning) {
-			context.stopService(new Intent(context, ChatMessagesService.class));
-		}
-
-		if (SyncDataService.isRunning) {
-			context.stopService(new Intent(context, SyncDataService.class));
-		}
-
-		if (SyncUserProfileService.isRunning) {
-			context.stopService(new Intent(context, SyncUserProfileService.class));
-		}
-
-		if (SyncProfilePictureService.isRunning) {
-			context.stopService(new Intent(context, SyncProfilePictureService.class));
-		}
+//		if (ChatMessagesService.isRunning) {
+//			context.stopService(new Intent(context, ChatMessagesService.class));
+//		}
+//
+//		if (SyncDataService.isRunning) {
+//			context.stopService(new Intent(context, SyncDataService.class));
+//		}
+//
+//		if (SyncUserProfileService.isRunning) {
+//			context.stopService(new Intent(context, SyncUserProfileService.class));
+//		}
+//
+//		if (SyncProfilePictureService.isRunning) {
+//			context.stopService(new Intent(context, SyncProfilePictureService.class));
+//		}
 
 		if (callback != null) {
 			((onUserIsLoggedOutListener) callback).onUserIsLoggedOut();

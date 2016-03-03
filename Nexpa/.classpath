@@ -3,13 +3,19 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry exported="true" kind="lib" path="lib/asmack-jse-buddycloud-2010.12.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/volley.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackson-core-2.7.0-rc2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackson-databind-2.7.0-rc2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.7.0-rc2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/gson-2.2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-android-extensions-4.1.0-rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-core-4.1.0-rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-extensions-4.1.0-rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-im-4.1.0-rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-resolver-dnsjava-4.1.0-rc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-tcp-4.1.0-rc4.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>

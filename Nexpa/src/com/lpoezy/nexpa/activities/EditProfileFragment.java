@@ -1,16 +1,5 @@
 package com.lpoezy.nexpa.activities;
 
-import java.io.ByteArrayOutputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-
-import org.jivesoftware.smack.util.Base64;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.objects.ProfilePicture;
@@ -19,9 +8,7 @@ import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.utility.BmpFactory;
 import com.lpoezy.nexpa.utility.DateUtils;
 import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
-import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
-import com.lpoezy.nexpa.utility.SystemUtilz;
 import com.lpoezy.nexpa.utility.Utilz;
 
 import android.app.Activity;
@@ -35,7 +22,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;

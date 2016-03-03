@@ -268,6 +268,8 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 				Account ac = new Account();
 				SQLiteHandler db = new SQLiteHandler(getApplicationContext());
 				db.openToWrite();
+				
+				/*/
 				ac.LogInChatAccount(db.getUsername(), db.getPass(),
 						db.getEmail(), null);
 
@@ -280,6 +282,7 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 				} catch (Exception e) {
 					L.error("" + e);
 				}
+				//*/
 			} else {
 				updateStatusText(2);
 				Log.e("XMPP CHAT", "Connected... ");
@@ -294,39 +297,39 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 
 		if (packetListener == null) {
 
-			packetListener = new PacketListener() {
-				@Override
-				public void processPacket(Packet packet) {
-
-					final Message message = (Message) packet;
-
-					if (message.getBody() != null) {
-
-						String fromName = StringUtils.parseBareAddress(message
-								.getFrom());
-						L.error("XMPPChatDemoActivity, Text Recieved: "
-								+ message.getBody() + " from " + fromName);
-
-						String senderRaw = message.getFrom();
-						String[] arr = senderRaw.split("@");
-						String senderEdited = arr[0];
-						messageToSend = message.getBody();
-						String formattedMsg = StringFormattingUtils
-								.getBroadcastChatEquivalentMes(messageToSend);
-						String formattedLoc = StringFormattingUtils
-								.getBroadcastChatEquivalentLocation(messageToSend);
-						db.insertBroadcast(2, senderEdited + "", formattedMsg,
-								longitude, latitude, formattedLoc, 0);
-						mNotifier.sendEmptyMessage(2);
-
-					}
-				}
-			};
-
-			Log.e("XMPP STATUS", "Adding packet listener...");
-			PacketFilter filter = new MessageTypeFilter(Message.Type.normal);
-			db.updateBroadcasting(1);
-			connection.addPacketListener(packetListener, filter);
+//			packetListener = new PacketListener() {
+//				@Override
+//				public void processPacket(Packet packet) {
+//
+//					final Message message = (Message) packet;
+//
+//					if (message.getBody() != null) {
+//
+//						String fromName = StringUtils.parseBareAddress(message
+//								.getFrom());
+//						L.error("XMPPChatDemoActivity, Text Recieved: "
+//								+ message.getBody() + " from " + fromName);
+//
+//						String senderRaw = message.getFrom();
+//						String[] arr = senderRaw.split("@");
+//						String senderEdited = arr[0];
+//						messageToSend = message.getBody();
+//						String formattedMsg = StringFormattingUtils
+//								.getBroadcastChatEquivalentMes(messageToSend);
+//						String formattedLoc = StringFormattingUtils
+//								.getBroadcastChatEquivalentLocation(messageToSend);
+//						db.insertBroadcast(2, senderEdited + "", formattedMsg,
+//								longitude, latitude, formattedLoc, 0);
+//						mNotifier.sendEmptyMessage(2);
+//
+//					}
+//				}
+//			};
+//
+//			Log.e("XMPP STATUS", "Adding packet listener...");
+//			PacketFilter filter = new MessageTypeFilter(Message.Type.normal);
+//			db.updateBroadcasting(1);
+//			connection.addPacketListener(packetListener, filter);
 		}
 		interactor--;
 		Log.e("XMPP interactor", interactor + "");
@@ -1170,28 +1173,28 @@ public class GroupChatHomeActivity extends AppCompatActivity implements
 
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-				if (connection == null) {
-					Account ac = new Account();
-					ac.LogInChatAccount(db.getUsername(), db.getPass(),
-							db.getEmail(), null);
-					Log.e("Null Chat", "ENTERED NULL CHAT");
-					failedToBroadcast(6);
-				} else if (!connection.isConnected()) {
-					Account ac = new Account();
-					ac.LogInChatAccount(db.getUsername(), db.getPass(),
-							db.getEmail(), null);
-					failedToBroadcast(6);
-				} else {
-					btnStartChat.setEnabled(false);
-					btnCancel.setEnabled(false);
-					getReceivers();
-
-					if (broadCount == 0) {
-						broadCount = 1;
-						showList();
-
-					}
-				}
+//				if (connection == null) {
+//					Account ac = new Account();
+//					ac.LogInChatAccount(db.getUsername(), db.getPass(),
+//							db.getEmail(), null);
+//					Log.e("Null Chat", "ENTERED NULL CHAT");
+//					failedToBroadcast(6);
+//				} else if (!connection.isConnected()) {
+//					Account ac = new Account();
+//					ac.LogInChatAccount(db.getUsername(), db.getPass(),
+//							db.getEmail(), null);
+//					failedToBroadcast(6);
+//				} else {
+//					btnStartChat.setEnabled(false);
+//					btnCancel.setEnabled(false);
+//					getReceivers();
+//
+//					if (broadCount == 0) {
+//						broadCount = 1;
+//						showList();
+//
+//					}
+//				}
 			}
 		});
 		btnCancel.setOnClickListener(new View.OnClickListener() {

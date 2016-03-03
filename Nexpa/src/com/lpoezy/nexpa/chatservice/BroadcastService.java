@@ -48,6 +48,8 @@ public class BroadcastService {
 	    	 Toast.makeText(this, " Service Started", Toast.LENGTH_LONG).show();
 	        db = new SQLiteHandler(this);
 			db.openToWrite();
+			
+			/*/
 			connection = XMPPLogic.getInstance().getConnection();
 		//	if ((longitude != 0) && (latitude != 0)) {
 				if (connection != null) {
@@ -81,6 +83,8 @@ public class BroadcastService {
 			//} else {
 				//makeNotify("Broadcasting Unavailable", AppMsg.STYLE_INFO);
 			//}
+				
+				//*/
 	    }
 
 	    @Override

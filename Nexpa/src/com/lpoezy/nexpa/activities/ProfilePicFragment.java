@@ -1,22 +1,10 @@
 package com.lpoezy.nexpa.activities;
 
-import android.os.Bundle;
-import android.provider.ContactsContract.Profile;
-import android.provider.MediaStore;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import org.jivesoftware.smack.util.Base64;
-
 import com.lpoezy.nexpa.R;
-import com.lpoezy.nexpa.R.layout;
 import com.lpoezy.nexpa.objects.ProfilePicture;
-import com.lpoezy.nexpa.objects.UserProfile;
-import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.utility.DateUtils;
-import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 import com.lpoezy.nexpa.utility.L;
 import com.lpoezy.nexpa.utility.SystemUtilz;
 import com.lpoezy.nexpa.utility.Utilz;
@@ -24,16 +12,14 @@ import com.lpoezy.nexpa.utility.Utilz;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 
 /**

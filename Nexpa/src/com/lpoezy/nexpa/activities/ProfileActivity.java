@@ -92,8 +92,8 @@ public class ProfileActivity extends Activity {
         session.setLogin(false);
         LogoutFB(this);
         db.deleteUsers();
-        XMPPConnection connection = XMPPLogic.getInstance().getConnection();
-		connection.disconnect();
+//        XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+//		connection.disconnect();
         
         // Launching the login activity
         Intent intent = new Intent(ProfileActivity.this, MainSignInActivity.class);

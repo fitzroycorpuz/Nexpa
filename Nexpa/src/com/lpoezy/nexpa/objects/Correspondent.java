@@ -1,36 +1,15 @@
 package com.lpoezy.nexpa.objects;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPConnection;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.lpoezy.nexpa.activities.ChatActivity;
-import com.lpoezy.nexpa.chatservice.OneComment;
 import com.lpoezy.nexpa.configuration.AppConfig;
-import com.lpoezy.nexpa.openfire.XMPPLogic;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.utility.DateUtils;
-import com.lpoezy.nexpa.utility.DateUtils.DateFormatz;
 import com.lpoezy.nexpa.utility.HttpUtilz;
 import com.lpoezy.nexpa.utility.L;
-import com.lpoezy.nexpa.utility.StringFormattingUtils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
 
 public class Correspondent {
 
@@ -186,14 +165,14 @@ public class Correspondent {
 	
 	public void checkIfOnline() {
 		
-		XMPPConnection connection = XMPPLogic.getInstance().getConnection();
-		
-		if(connection != null && connection.isConnected()){
-			final Roster roster = connection.getRoster();
-			 boolean isAvailable = roster.getPresence(this.username+"@vps.gigapros.com").isAvailable();
-			
-			 setAvailable(isAvailable);
-		}
+//		XMPPConnection connection = XMPPLogic.getInstance().getConnection();
+//		
+//		if(connection != null && connection.isConnected()){
+//			final Roster roster = connection.getRoster();
+//			 boolean isAvailable = roster.getPresence(this.username+"@vps.gigapros.com").isAvailable();
+//			
+//			 setAvailable(isAvailable);
+//		}
 	
 	}
 

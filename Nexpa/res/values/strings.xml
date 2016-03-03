@@ -97,6 +97,9 @@
     <string name="title_activity_test">TestActivity</string>
     <string name="delete">delete</string>
     
+     <!-- xmpp -->
+     <string name="server">vps.gigapros.com</string>
+    
     <!-- dialog msgs -->
     <string name="dialog_msg_sending_email">Sending email...</string>
 
