@@ -303,14 +303,28 @@ public class MainSignInActivity extends Activity {
 	}
 
 	private void checkLogin(final String uname, final String password) {
-		// final String tag_string_req = "login";
-		// pDialog.setMessage("Logging in ...");
-		//
-		// showDialog();
 		
 		if(mBounded){
 			
-			mService.login(uname, password);
+			 final String tag_string_req = "login";
+			 pDialog.setMessage("Logging in ...");
+			 pDialog.show();
+			
+			mService.login(uname, password, new XMPPService.OnUpdateScreenListener() {
+				
+				@Override
+				public void onUpdateScreen() {
+					
+					pDialog.dismiss();
+				}
+
+				@Override
+				public void onResumeScreen() {
+					
+					pDialog.dismiss();
+					
+				}
+			});
 			
 			
 			

@@ -63,16 +63,38 @@ public class XMPPService extends Service {
 		return isRunning;
 	}
 
-	public void login(final String uname, final String password) {
+	public void login(final String uname, final String password, OnUpdateScreenListener callback) {
 		
 		if(xmpp.connection.isConnected()){
 			
 			xmpp.login(uname, password);
+			
+			if(xmpp.connection.isAuthenticated()){
+				
+				try {
+					
+					Thread.sleep(5000);
+					
+				} catch (InterruptedException e) {
+					
+				}
+				
+				callback.onUpdateScreen();
+				return;
+			}
 			
 		}else{
 			
 			L.error("Not conncted to openfire server!!!");
 			
 		}
+		
+		callback.onResumeScreen();
+	}
+	
+	public interface OnUpdateScreenListener 
+	{
+		public void onResumeScreen();
+		public void onUpdateScreen();
 	}
 }
