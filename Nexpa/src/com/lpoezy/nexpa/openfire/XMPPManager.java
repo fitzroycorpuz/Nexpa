@@ -1,6 +1,8 @@
 package com.lpoezy.nexpa.openfire;
 
 import java.io.IOException;
+
+import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -22,6 +24,9 @@ import com.google.gson.Gson;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.XMPPService;
 import com.lpoezy.nexpa.objects.ChatMessage;
+import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.sqlite.SessionManager;
+import com.lpoezy.nexpa.utility.L;
 
 import android.app.Service;
 import android.content.Context;
@@ -39,7 +44,7 @@ public class XMPPManager {
 	public static boolean isToasted = true;
 	private boolean chat_created = false;
 	private String serverAddress;
-	public static XMPPTCPConnection connection;
+	public static AbstractXMPPConnection  connection;
 	public static String loginUser;
 	public static String passwordUser;
 	Gson gson;
@@ -90,6 +95,7 @@ public class XMPPManager {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	private void initialiseConnection() {
 
 		XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
@@ -131,7 +137,7 @@ public class XMPPManager {
 							Toast.makeText(context, caller + "=>connecting....", Toast.LENGTH_LONG).show();
 						}
 					});
-				Log.d("Connect() Function", caller + "=>connecting....");
+				L.debug("Connect() Function "+ caller + "=>connecting....");
 
 				try {
 					connection.connect();
@@ -159,7 +165,7 @@ public class XMPPManager {
 							}
 						});
 
-					Log.e("(" + caller + ")", "IOException: " + e.getMessage());
+					L.error("(" + caller + "), IOException: " + e.getMessage());
 				} catch (SmackException e) {
 					new Handler(Looper.getMainLooper()).post(new Runnable() {
 
@@ -168,7 +174,7 @@ public class XMPPManager {
 							Toast.makeText(context, "(" + caller + ")" + "SMACKException: ", Toast.LENGTH_SHORT).show();
 						}
 					});
-					Log.e("(" + caller + ")", "SMACKException: " + e.getMessage());
+					L.error("(" + caller + "), SMACKException: " + e.getMessage());
 				} catch (XMPPException e) {
 					if (isToasted)
 
@@ -190,15 +196,17 @@ public class XMPPManager {
 		connectionThread.execute();
 	}
 
-	public void login() {
-
+	public void login(String uname, String password) {
+		
 		try {
-			connection.login(loginUser, passwordUser);
-			Log.i("LOGIN", "Yey! We're connected to the Xmpp server!");
-
+			
+			connection.login(uname, password);
+			L.debug("LOGIN, Yey! We're connected to the Xmpp server!");
+			
 		} catch (XMPPException | SmackException | IOException e) {
-			e.printStackTrace();
+			L.error(""+e);
 		} catch (Exception e) {
+			L.error(""+e);
 		}
 
 	}
@@ -232,14 +240,20 @@ public class XMPPManager {
 				Mychat.sendMessage(message);
 
 			} else {
-
-				login();
+				
+				String uname, password;
+				SQLiteHandler db = new SQLiteHandler(context);
+				db.openToRead();
+				uname = db.getUsername();
+				password = db.getPass();
+				login(uname, password);
+				db.close();
 			}
 		} catch (NotConnectedException e) {
-			Log.e("xmpp.SendMessage()", "msg Not sent!-Not Connected!");
+			L.error("xmpp.SendMessage(), msg Not sent!-Not Connected!");
 
 		} catch (Exception e) {
-			Log.e("xmpp.SendMessage()-Exception", "msg Not sent!" + e.getMessage());
+			L.error("xmpp.SendMessage()-Exception, msg Not sent!" + e.getMessage());
 		}
 
 	}
@@ -248,10 +262,23 @@ public class XMPPManager {
 		@Override
 		public void connected(final XMPPConnection connection) {
 
-			Log.d("xmpp", "Connected!");
+			L.debug("xmpp, Connected!");
 			connected = true;
 			if (!connection.isAuthenticated()) {
-				login();
+				
+				SessionManager sm = new SessionManager(context);
+				if(sm.isLoggedIn()){
+					
+					String uname, password;
+					SQLiteHandler db = new SQLiteHandler(context);
+					db.openToRead();
+					uname = db.getUsername();
+					password = db.getPass();
+					login(uname, password);
+					db.close();
+					
+				}
+				
 			}
 		}
 
