@@ -5,6 +5,8 @@ import com.devspark.appmsg.AppMsg.Style;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,8 +22,19 @@ public class L {
 		Log.e(TAG, msg);
 	}
 	
-	public static void makeText(Activity context, CharSequence msg, Style style) {
-		AppMsg.makeText(context, msg, style).show();
+	public static void makeText(final Activity context, final CharSequence msg, final Style style) {
+		
+		new Handler(Looper.getMainLooper()).post(new Runnable() {
+			
+			@Override
+			public void run() {
+				AppMsg.makeText(context, msg, style).show();
+				
+			}
+		});
+		
+		
+		
 	}
 	
 	public static void toast(Context context, String msg) {

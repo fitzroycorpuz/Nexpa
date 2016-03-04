@@ -1,14 +1,19 @@
 package com.lpoezy.nexpa.openfire;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.AlreadyLoggedInException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
@@ -16,6 +21,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
@@ -23,6 +29,7 @@ import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 import com.google.gson.Gson;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.XMPPService;
+import com.lpoezy.nexpa.chatservice.XMPPService.OnUpdateScreenListener;
 import com.lpoezy.nexpa.objects.ChatMessage;
 import com.lpoezy.nexpa.sqlite.SQLiteHandler;
 import com.lpoezy.nexpa.sqlite.SessionManager;
@@ -44,7 +51,7 @@ public class XMPPManager {
 	public static boolean isToasted = true;
 	private boolean chat_created = false;
 	private String serverAddress;
-	public static AbstractXMPPConnection  connection;
+	public static AbstractXMPPConnection connection;
 	public static String loginUser;
 	public static String passwordUser;
 	Gson gson;
@@ -137,7 +144,7 @@ public class XMPPManager {
 							Toast.makeText(context, caller + "=>connecting....", Toast.LENGTH_LONG).show();
 						}
 					});
-				L.debug("Connect() Function "+ caller + "=>connecting....");
+				L.debug("Connect() Function " + caller + "=>connecting....");
 
 				try {
 					connection.connect();
@@ -196,17 +203,31 @@ public class XMPPManager {
 		connectionThread.execute();
 	}
 
-	public void login(String uname, String password) {
-		
+	public void register(String uname, String password, String email) throws NoResponseException, XMPPErrorException, NotConnectedException {
+
+		AccountManager accountManager = AccountManager.getInstance(connection);
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("username", uname);
+		map.put("name", uname);
+		map.put("password", password);
+		map.put("email", email);
+
+		accountManager.createAccount(uname, password, map);
+
+		L.debug("REGISTER, New user created successfully.");
+
+	}
+
+	public void login(String uname, String password) throws AlreadyLoggedInException, SmackException {
+
 		try {
-			
+
 			connection.login(uname, password);
 			L.debug("LOGIN, Yey! We're connected to the Xmpp server!");
-			
-		} catch (XMPPException | SmackException | IOException e) {
-			L.error(""+e);
-		} catch (Exception e) {
-			L.error(""+e);
+
+		} catch (XMPPException | IOException e) {
+			L.error("" + e);
+
 		}
 
 	}
@@ -240,7 +261,7 @@ public class XMPPManager {
 				Mychat.sendMessage(message);
 
 			} else {
-				
+
 				String uname, password;
 				SQLiteHandler db = new SQLiteHandler(context);
 				db.openToRead();
@@ -265,20 +286,26 @@ public class XMPPManager {
 			L.debug("xmpp, Connected!");
 			connected = true;
 			if (!connection.isAuthenticated()) {
-				
+
 				SessionManager sm = new SessionManager(context);
-				if(sm.isLoggedIn()){
-					
+				if (sm.isLoggedIn()) {
+
 					String uname, password;
 					SQLiteHandler db = new SQLiteHandler(context);
 					db.openToRead();
 					uname = db.getUsername();
 					password = db.getPass();
-					login(uname, password);
+
+					try {
+						login(uname, password);
+					} catch (Exception e) {
+						L.error("" + e);
+					}
+
 					db.close();
-					
+
 				}
-				
+
 			}
 		}
 
@@ -423,18 +450,15 @@ public class XMPPManager {
 		}
 
 		private void processMessage(final ChatMessage chatMessage) {
-			/*/
-			chatMessage.isMine = false;
-			Chats.chatlist.add(chatMessage);
-			new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-				@Override
-				public void run() {
-					Chats.chatAdapter.notifyDataSetChanged();
-
-				}
-			});
-			//*/
+			/*
+			 * / chatMessage.isMine = false; Chats.chatlist.add(chatMessage);
+			 * new Handler(Looper.getMainLooper()).post(new Runnable() {
+			 * 
+			 * @Override public void run() {
+			 * Chats.chatAdapter.notifyDataSetChanged();
+			 * 
+			 * } }); //
+			 */
 		}
 
 	}

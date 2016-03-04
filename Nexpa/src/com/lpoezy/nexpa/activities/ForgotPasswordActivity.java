@@ -13,6 +13,8 @@ import com.devspark.appmsg.AppMsg.Style;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.chatservice.LocalBinder;
+import com.lpoezy.nexpa.chatservice.XMPPService;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.utility.HttpUtilz;
@@ -20,7 +22,12 @@ import com.lpoezy.nexpa.utility.L;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +43,26 @@ public class ForgotPasswordActivity extends Activity {
 	Account ac;
 	private ProgressDialog pDialog;
 
+	protected boolean mBounded;
+	protected XMPPService mService;
+
+	private ServiceConnection mServiceConn = new ServiceConnection() {
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			mBounded = false;
+			mService = null;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			mBounded = true;
+
+			mService = ((LocalBinder<XMPPService>) service).getService();
+		}
+	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,61 +75,90 @@ public class ForgotPasswordActivity extends Activity {
 
 		btnResetPassword.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				final String email = inputEmail.getText().toString();
+
+				String email = inputEmail.getText().toString();
 				if (email.isEmpty()) {
-					makeNotify("Please fill out your registered email", AppMsg.STYLE_ALERT);
-
+					L.makeText(ForgotPasswordActivity.this, "Please fill out your registered email.",
+							AppMsg.STYLE_ALERT);
 				} else if (isEmailValid(email) == false) {
-					makeNotify("Email address is not valid", AppMsg.STYLE_ALERT);
+					L.makeText(ForgotPasswordActivity.this, "Email address is not valid.", AppMsg.STYLE_ALERT);
 				} else {
-					String msg = getResources().getString(R.string.dialog_msg_sending_email);
-					pDialog.setMessage(msg);
-					showDialog();
-
-					new Thread(new Runnable() {
-
-						@Override
-						public void run() {
-
-							HashMap<String, String> postDataParams = new HashMap<String, String>();
-							postDataParams.put("tag", "reset_password");
-							postDataParams.put("email", email);
-
-							final String spec = AppConfig.URL_SEND_EMAIL;
-							String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-
-							JSONObject result;
-							try {
-								result = new JSONObject(webPage);
-								final boolean error = result.getBoolean("error");
-
-								final String msg = result.getString("msg");
-
-								inputEmail.post(new Runnable() {
-
-									@Override
-									public void run() {
-
-										hideDialog();
-
-										makeNotify(msg, AppMsg.STYLE_INFO); 
-
-									}
-								});
-
-							} catch (JSONException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-
-						}
-					}).start();
+					if (mBounded) {
+						resetPassword(email);
+					} else {
+						L.error("service not yet available");
+					}
 
 				}
 
 			}
 		});
 
+	}
+
+	protected void resetPassword(final String email) {
+
+		String msg = getResources().getString(R.string.dialog_msg_sending_email);
+		pDialog.setMessage(msg);
+		showDialog();
+
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				L.debug("resetPassword "+AppConfig.URL_SEND_EMAIL);
+				HashMap<String, String> postDataParams = new HashMap<String, String>();
+				postDataParams.put("tag", "reset_password");
+				postDataParams.put("email", email);
+				
+				final String spec = AppConfig.URL_SEND_EMAIL;
+				String webPage = HttpUtilz.makeRequest(spec, postDataParams);
+				L.debug("webPage: "+webPage);
+				JSONObject result;
+				try {
+					result = new JSONObject(webPage);
+					final boolean error = result.getBoolean("error");
+
+					final String msg = result.getString("msg");
+
+					inputEmail.post(new Runnable() {
+
+						@Override
+						public void run() {
+
+							hideDialog();
+
+						}
+					});
+
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		}).start();
+
+	}
+
+	@Override
+	protected void onStop() {
+
+		super.onStop();
+
+		if (mServiceConn != null) {
+			unbindService(mServiceConn);
+		}
+
+	}
+
+	@Override
+	protected void onResume() {
+
+		super.onResume();
+
+		Intent service = new Intent(this, XMPPService.class);
+		bindService(service, mServiceConn, Context.BIND_AUTO_CREATE);
 	}
 
 	public static boolean isEmailValid(String email) {
@@ -115,10 +171,6 @@ public class ForgotPasswordActivity extends Activity {
 			isValid = true;
 		}
 		return isValid;
-	}
-
-	private void makeNotify(CharSequence con, Style style) {
-		AppMsg.makeText(this, con, style).show();
 	}
 
 	private void showDialog() {

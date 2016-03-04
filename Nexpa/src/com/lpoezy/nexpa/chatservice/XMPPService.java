@@ -1,5 +1,10 @@
 package com.lpoezy.nexpa.chatservice;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.AlreadyLoggedInException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.chat.Chat;
 
 import com.lpoezy.nexpa.openfire.XMPPManager;
@@ -12,7 +17,7 @@ import android.net.ConnectivityManager;
 import android.os.IBinder;
 
 public class XMPPService extends Service {
-	private static final String DOMAIN = "192.168.56.1";// vps.gigapros.com
+	private static final String DOMAIN = "198.154.106.139";// vps.gigapros.com
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "9db9b6749ffbf61e19aea4358a11d837";
 	public static ConnectivityManager cm;
@@ -34,7 +39,7 @@ public class XMPPService extends Service {
 		cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		xmpp = XMPPManager.getInstance(XMPPService.this, DOMAIN, USERNAME, PASSWORD);
 		xmpp.connect("onCreate");
-		
+
 		isRunning = true;
 	}
 
@@ -63,38 +68,77 @@ public class XMPPService extends Service {
 		return isRunning;
 	}
 
-	public void login(final String uname, final String password, OnUpdateScreenListener callback) {
+	public void register(final String uname, final String email, final String password, final OnUpdateScreenListener callback) {
 		
-		if(xmpp.connection.isConnected()){
-			
-			xmpp.login(uname, password);
-			
-			if(xmpp.connection.isAuthenticated()){
-				
-				try {
-					
-					Thread.sleep(5000);
-					
-				} catch (InterruptedException e) {
-					
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				if (xmpp.connection.isConnected()) {
+
+					try {
+						xmpp.register(uname, password, email);
+						
+						callback.onUpdateScreen();
+						
+					} catch (NoResponseException | NotConnectedException e) {
+						callback.onResumeScreen("User is not, or no longer, connected.");
+					} catch (XMPPErrorException e) {
+						callback.onResumeScreen("User Name already exists, please enter another one.");
+					} 
+
+				} else {
+
+					L.error("Not connected to openfire server!!!");
+
 				}
-				
-				callback.onUpdateScreen();
-				return;
+
 			}
-			
-		}else{
-			
-			L.error("Not conncted to openfire server!!!");
-			
-		}
-		
-		callback.onResumeScreen();
+		}).start();
+
 	}
-	
-	public interface OnUpdateScreenListener 
-	{
-		public void onResumeScreen();
+
+	public void login(final String uname, final String password, final OnUpdateScreenListener callback) {
+
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				if (xmpp.connection.isConnected()) {
+
+					try {
+						xmpp.login(uname, password);
+						
+						if (xmpp.connection.isAuthenticated()) {
+
+							callback.onUpdateScreen();
+						}
+						
+					} catch (AlreadyLoggedInException e) {
+						callback.onResumeScreen("This user is already logged in, please use another login name.");
+					} catch (SmackException e) {
+						callback.onResumeScreen("User is not, or no longer, connected.");
+						
+					} 
+
+				} else {
+
+					L.error("Not conncted to openfire server!!!");
+
+				}
+
+				
+			}
+		}).start();
+
+	}
+
+	public interface OnUpdateScreenListener {
+		public void onResumeScreen(String errorMsg);
+
 		public void onUpdateScreen();
 	}
+
 }

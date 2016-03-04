@@ -37,7 +37,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -131,9 +133,18 @@ public class MainSignInActivity extends Activity {
 				String username = inputEmail.getText().toString();
 				String password = inputPassword.getText().toString();
 				if (username.trim().length() > 0 && password.trim().length() > 0) {
-					checkLogin(username, password);
+
+					if (mBounded) {
+
+						checkLogin(username, password);
+
+					} else {
+
+						L.error("service not yet available");
+					}
+
 				} else {
-					makeNotify("Please enter your username and password", AppMsg.STYLE_INFO);
+					L.makeText(MainSignInActivity.this, "Please enter your username and password.", AppMsg.STYLE_ALERT);
 				}
 			}
 		});
@@ -191,6 +202,7 @@ public class MainSignInActivity extends Activity {
 	}
 
 	private void makeNotify(CharSequence con, Style style) {
+
 		AppMsg.makeText(this, con, style).show();
 	}
 
@@ -303,34 +315,27 @@ public class MainSignInActivity extends Activity {
 	}
 
 	private void checkLogin(final String uname, final String password) {
-		
-		if(mBounded){
-			
-			 final String tag_string_req = "login";
-			 pDialog.setMessage("Logging in ...");
-			 pDialog.show();
-			
-			mService.login(uname, password, new XMPPService.OnUpdateScreenListener() {
-				
-				@Override
-				public void onUpdateScreen() {
-					
-					pDialog.dismiss();
-				}
 
-				@Override
-				public void onResumeScreen() {
-					
-					pDialog.dismiss();
-					
-				}
-			});
-			
-			
-			
-		}else{
-			L.error("service not yet available");
-		}
+		final String tag_string_req = "login";
+		pDialog.setMessage("Logging in ...");
+		showDialog();
+
+		mService.login(uname, password, new XMPPService.OnUpdateScreenListener() {
+
+			@Override
+			public void onUpdateScreen() {
+
+				hideDialog();
+			}
+
+			@Override
+			public void onResumeScreen(String errorMsg) {
+
+				hideDialog();
+
+				L.makeText(MainSignInActivity.this, errorMsg, AppMsg.STYLE_ALERT);
+			}
+		});
 
 	}
 
@@ -368,7 +373,16 @@ public class MainSignInActivity extends Activity {
 	}
 
 	private void hideDialog() {
-		if (pDialog.isShowing())
-			pDialog.dismiss();
+
+		new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+			@Override
+			public void run() {
+				if (pDialog.isShowing())
+					pDialog.dismiss();
+
+			}
+		});
+
 	}
 }
