@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lpoezy.nexpa.R;
 import com.lpoezy.nexpa.chatservice.LocalBinder;
 import com.lpoezy.nexpa.chatservice.XMPPService;
+import com.lpoezy.nexpa.chatservice.XMPPService.OnUpdateScreenListener;
 import com.lpoezy.nexpa.configuration.AppConfig;
 import com.lpoezy.nexpa.openfire.Account;
 import com.lpoezy.nexpa.utility.HttpUtilz;
@@ -27,7 +28,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -102,42 +105,28 @@ public class ForgotPasswordActivity extends Activity {
 		pDialog.setMessage(msg);
 		showDialog();
 
-		new Thread(new Runnable() {
-
+		mService.resetPassword(email, new OnUpdateScreenListener() {
+			
 			@Override
-			public void run() {
-				L.debug("resetPassword "+AppConfig.URL_SEND_EMAIL);
-				HashMap<String, String> postDataParams = new HashMap<String, String>();
-				postDataParams.put("tag", "reset_password");
-				postDataParams.put("email", email);
+			public void onUpdateScreen() {
+				new Handler(Looper.getMainLooper()).post(new Runnable() {
+					
+					@Override
+					public void run() {
+						
+						hideDialog();
+						
+					}
+				});
 				
-				final String spec = AppConfig.URL_SEND_EMAIL;
-				String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-				L.debug("webPage: "+webPage);
-				JSONObject result;
-				try {
-					result = new JSONObject(webPage);
-					final boolean error = result.getBoolean("error");
-
-					final String msg = result.getString("msg");
-
-					inputEmail.post(new Runnable() {
-
-						@Override
-						public void run() {
-
-							hideDialog();
-
-						}
-					});
-
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
+				String res = getResources().getString(R.string.msg_request_to_reset_password_success);
+				L.makeText(ForgotPasswordActivity.this, res , AppMsg.STYLE_INFO);
+				
 			}
-		}).start();
+			
+			@Override
+			public void onResumeScreen(String errorMsg) {	}
+		});
 
 	}
 

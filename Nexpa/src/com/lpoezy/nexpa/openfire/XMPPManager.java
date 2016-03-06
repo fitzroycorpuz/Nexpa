@@ -7,6 +7,7 @@ import java.util.Map;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.AlreadyLoggedInException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
@@ -19,6 +20,8 @@ import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.sasl.SASLMechanism;
+import org.jivesoftware.smack.sasl.provided.SASLDigestMD5Mechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
@@ -26,22 +29,20 @@ import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
-import com.google.gson.Gson;
-import com.lpoezy.nexpa.R;
-import com.lpoezy.nexpa.chatservice.XMPPService;
-import com.lpoezy.nexpa.chatservice.XMPPService.OnUpdateScreenListener;
-import com.lpoezy.nexpa.objects.ChatMessage;
-import com.lpoezy.nexpa.sqlite.SQLiteHandler;
-import com.lpoezy.nexpa.sqlite.SessionManager;
-import com.lpoezy.nexpa.utility.L;
-
-import android.app.Service;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.lpoezy.nexpa.R;
+import com.lpoezy.nexpa.chatservice.XMPPService;
+import com.lpoezy.nexpa.objects.ChatMessage;
+import com.lpoezy.nexpa.sqlite.SQLiteHandler;
+import com.lpoezy.nexpa.sqlite.SessionManager;
+import com.lpoezy.nexpa.utility.L;
 
 public class XMPPManager {
 
@@ -59,7 +60,8 @@ public class XMPPManager {
 	public static XMPPManager instance = null;
 	public static boolean instanceCreated = false;
 
-	public XMPPManager(XMPPService context, String serverAdress, String logiUser, String passwordser) {
+	public XMPPManager(XMPPService context, String serverAdress,
+			String logiUser, String passwordser) {
 		this.serverAddress = serverAdress;
 		this.loginUser = logiUser;
 		this.passwordUser = passwordser;
@@ -68,7 +70,8 @@ public class XMPPManager {
 
 	}
 
-	public static XMPPManager getInstance(XMPPService context, String server, String user, String pass) {
+	public static XMPPManager getInstance(XMPPService context, String server,
+			String user, String pass) {
 
 		if (instance == null) {
 			instance = new XMPPManager(context, server, user, pass);
@@ -110,9 +113,11 @@ public class XMPPManager {
 		config.setServiceName(serverAddress);
 		config.setHost(serverAddress);
 		config.setPort(5222);
+		
 		config.setDebuggerEnabled(true);
 		XMPPTCPConnection.setUseStreamManagementResumptiodDefault(true);
 		XMPPTCPConnection.setUseStreamManagementDefault(true);
+		
 		connection = new XMPPTCPConnection(config.build());
 		XMPPConnectionListener connectionListener = new XMPPConnectionListener();
 		connection.addConnectionListener(connectionListener);
@@ -141,19 +146,23 @@ public class XMPPManager {
 						@Override
 						public void run() {
 
-							Toast.makeText(context, caller + "=>connecting....", Toast.LENGTH_LONG).show();
+							Toast.makeText(context,
+									caller + "=>connecting....",
+									Toast.LENGTH_LONG).show();
 						}
 					});
 				L.debug("Connect() Function " + caller + "=>connecting....");
 
 				try {
 					connection.connect();
-					DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
+					DeliveryReceiptManager dm = DeliveryReceiptManager
+							.getInstanceFor(connection);
 					dm.setAutoReceiptMode(AutoReceiptMode.always);
 					dm.addReceiptReceivedListener(new ReceiptReceivedListener() {
 
 						@Override
-						public void onReceiptReceived(final String fromid, final String toid, final String msgid,
+						public void onReceiptReceived(final String fromid,
+								final String toid, final String msgid,
 								final Stanza packet) {
 
 						}
@@ -162,15 +171,19 @@ public class XMPPManager {
 
 				} catch (IOException e) {
 					if (isToasted)
-						new Handler(Looper.getMainLooper()).post(new Runnable() {
+						new Handler(Looper.getMainLooper())
+								.post(new Runnable() {
 
-							@Override
-							public void run() {
+									@Override
+									public void run() {
 
-								Toast.makeText(context, "(" + caller + ")" + "IOException: ", Toast.LENGTH_SHORT)
-										.show();
-							}
-						});
+										Toast.makeText(
+												context,
+												"(" + caller + ")"
+														+ "IOException: ",
+												Toast.LENGTH_SHORT).show();
+									}
+								});
 
 					L.error("(" + caller + "), IOException: " + e.getMessage());
 				} catch (SmackException e) {
@@ -178,23 +191,31 @@ public class XMPPManager {
 
 						@Override
 						public void run() {
-							Toast.makeText(context, "(" + caller + ")" + "SMACKException: ", Toast.LENGTH_SHORT).show();
+							Toast.makeText(context,
+									"(" + caller + ")" + "SMACKException: ",
+									Toast.LENGTH_SHORT).show();
 						}
 					});
-					L.error("(" + caller + "), SMACKException: " + e.getMessage());
+					L.error("(" + caller + "), SMACKException: "
+							+ e.getMessage());
 				} catch (XMPPException e) {
 					if (isToasted)
 
-						new Handler(Looper.getMainLooper()).post(new Runnable() {
+						new Handler(Looper.getMainLooper())
+								.post(new Runnable() {
 
-							@Override
-							public void run() {
+									@Override
+									public void run() {
 
-								Toast.makeText(context, "(" + caller + ")" + "XMPPException: ", Toast.LENGTH_SHORT)
-										.show();
-							}
-						});
-					Log.e("connect(" + caller + ")", "XMPPException: " + e.getMessage());
+										Toast.makeText(
+												context,
+												"(" + caller + ")"
+														+ "XMPPException: ",
+												Toast.LENGTH_SHORT).show();
+									}
+								});
+					Log.e("connect(" + caller + ")",
+							"XMPPException: " + e.getMessage());
 
 				}
 				return isconnecting = false;
@@ -203,7 +224,9 @@ public class XMPPManager {
 		connectionThread.execute();
 	}
 
-	public void register(String uname, String password, String email) throws NoResponseException, XMPPErrorException, NotConnectedException {
+	public void register(String uname, String password, String email)
+			throws NoResponseException, XMPPErrorException,
+			NotConnectedException {
 
 		AccountManager accountManager = AccountManager.getInstance(connection);
 		Map<String, String> map = new HashMap<String, String>();
@@ -214,11 +237,13 @@ public class XMPPManager {
 
 		accountManager.createAccount(uname, password, map);
 
-		L.debug("REGISTER, New user created successfully.");
+		L.debug("REGISTER, New user created successfully." + uname + ", "
+				+ password + ", " + email);
 
 	}
 
-	public void login(String uname, String password) throws AlreadyLoggedInException, SmackException {
+	public void login(String uname, String password)
+			throws AlreadyLoggedInException, SmackException {
 
 		try {
 
@@ -234,7 +259,8 @@ public class XMPPManager {
 
 	private class ChatManagerListenerImpl implements ChatManagerListener {
 		@Override
-		public void chatCreated(final org.jivesoftware.smack.chat.Chat chat, final boolean createdLocally) {
+		public void chatCreated(final org.jivesoftware.smack.chat.Chat chat,
+				final boolean createdLocally) {
 			if (!createdLocally)
 				chat.addMessageListener(mMessageListener);
 
@@ -246,8 +272,10 @@ public class XMPPManager {
 		String body = gson.toJson(chatMessage);
 
 		if (!chat_created) {
-			Mychat = ChatManager.getInstanceFor(connection)
-					.createChat(chatMessage.receiver + "@" + context.getString(R.string.server), mMessageListener);
+			Mychat = ChatManager.getInstanceFor(connection).createChat(
+					chatMessage.receiver + "@"
+							+ context.getString(R.string.server),
+					mMessageListener);
 			chat_created = true;
 		}
 		final Message message = new Message();
@@ -274,7 +302,8 @@ public class XMPPManager {
 			L.error("xmpp.SendMessage(), msg Not sent!-Not Connected!");
 
 		} catch (Exception e) {
-			L.error("xmpp.SendMessage()-Exception, msg Not sent!" + e.getMessage());
+			L.error("xmpp.SendMessage()-Exception, msg Not sent!"
+					+ e.getMessage());
 		}
 
 	}
@@ -319,7 +348,8 @@ public class XMPPManager {
 					public void run() {
 						// TODO Auto-generated method stub
 
-						Toast.makeText(context, "ConnectionCLosed!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "ConnectionCLosed!",
+								Toast.LENGTH_SHORT).show();
 
 					}
 				});
@@ -337,7 +367,8 @@ public class XMPPManager {
 
 					@Override
 					public void run() {
-						Toast.makeText(context, "ConnectionClosedOn Error!!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "ConnectionClosedOn Error!!",
+								Toast.LENGTH_SHORT).show();
 
 					}
 				});
@@ -365,7 +396,8 @@ public class XMPPManager {
 					@Override
 					public void run() {
 
-						Toast.makeText(context, "ReconnectionFailed!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "ReconnectionFailed!",
+								Toast.LENGTH_SHORT).show();
 
 					}
 				});
@@ -386,7 +418,8 @@ public class XMPPManager {
 					public void run() {
 						// TODO Auto-generated method stub
 
-						Toast.makeText(context, "REConnected!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "REConnected!",
+								Toast.LENGTH_SHORT).show();
 
 					}
 				});
@@ -402,7 +435,8 @@ public class XMPPManager {
 			Log.d("xmpp", "Authenticated!");
 			loggedin = true;
 
-			ChatManager.getInstanceFor(connection).addChatListener(mChatManagerListener);
+			ChatManager.getInstanceFor(connection).addChatListener(
+					mChatManagerListener);
 
 			chat_created = false;
 			new Thread(new Runnable() {
@@ -426,7 +460,8 @@ public class XMPPManager {
 					public void run() {
 						// TODO Auto-generated method stub
 
-						Toast.makeText(context, "Connected!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "Connected!",
+								Toast.LENGTH_SHORT).show();
 
 					}
 				});
@@ -439,11 +474,15 @@ public class XMPPManager {
 		}
 
 		@Override
-		public void processMessage(final org.jivesoftware.smack.chat.Chat chat, final Message message) {
-			Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '" + message);
+		public void processMessage(final org.jivesoftware.smack.chat.Chat chat,
+				final Message message) {
+			Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
+					+ message);
 
-			if (message.getType() == Message.Type.chat && message.getBody() != null) {
-				final ChatMessage chatMessage = gson.fromJson(message.getBody(), ChatMessage.class);
+			if (message.getType() == Message.Type.chat
+					&& message.getBody() != null) {
+				final ChatMessage chatMessage = gson.fromJson(
+						message.getBody(), ChatMessage.class);
 
 				processMessage(chatMessage);
 			}
