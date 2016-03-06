@@ -17,6 +17,8 @@
 	<classpathentry exported="true" kind="lib" path="libs/smack-resolver-dnsjava-4.1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/smack-tcp-4.1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/smack-android-4.1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-sasl-provided-4.1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-experimental-4.1.6.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>

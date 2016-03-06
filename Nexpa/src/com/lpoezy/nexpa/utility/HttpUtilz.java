@@ -53,8 +53,7 @@ public class HttpUtilz {
 					conn.setRequestMethod("POST");
 					conn.setDoInput(true);
 					conn.setDoOutput(true);
-					L.debug("sending profile pic to server directory...");
-
+					
 					OutputStream os = conn.getOutputStream();
 					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 
