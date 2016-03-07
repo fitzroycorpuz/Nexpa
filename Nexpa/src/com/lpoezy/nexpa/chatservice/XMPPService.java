@@ -109,7 +109,7 @@ public class XMPPService extends Service {
 
 				final String spec = AppConfig.URL_SEND_EMAIL;
 				String webPage = HttpUtilz.makeRequest(spec, postDataParams);
-				// L.debug("webPage: "+webPage);
+				 L.debug("webPage: "+webPage);
 				JSONObject result;
 				try {
 					result = new JSONObject(webPage);
@@ -150,6 +150,7 @@ public class XMPPService extends Service {
 				} else {
 
 					L.error("Not connected to openfire server!!!");
+					callback.onResumeScreen("Not connected to openfire server!!!");
 
 				}
 
@@ -173,82 +174,8 @@ public class XMPPService extends Service {
 
 						if (xmpp.connection.isAuthenticated()) {
  
-//							HttpOverXmppReq req = new HttpOverXmppReq(
-//									HttpMethod.GET, "ldonios-pc/nexpa/json/?name=c");
-//							req.setVersion("1.1");
-//
-//							// prepare headers
-//							List<Header> list = new ArrayList<Header>();
-//							list.add(new Header("Host", "ldonios-pc"));
-//							list.add(new Header("Content-Type", "application/x-www-form- urlencoded"));
-//							req.setHeaders(new HeadersExtension(list));
-//
-//							req.setTo("momo@ldonios-pc/Smack");
-//
-//							xmpp.connection.sendIqWithResponseCallback(req,
-//									new PacketListener() {
-//										public void processPacket(Stanza packet) {
-//											HttpOverXmppResp resp = (HttpOverXmppResp) packet;
-//											// check HTTP response code
-//											L.debug("resp.getStatusCode() "
-//													+ resp.getStatusCode());
-//											if (resp.getStatusCode() == 200) {
-//												// get content of the response
-//												NamedElement child = resp
-//														.getData().getChild();
-//												// check which type of content
-//												// of the response arrived
-//												if (child instanceof AbstractHttpOverXmpp.Xml) {
-//													// print the message and
-//													// anxiously read if from
-//													// console ;)
-//													L.debug(((AbstractHttpOverXmpp.Xml) child)
-//															.getText());
-//												} else {
-//													// process other
-//													// AbstractHttpOverXmpp.DataChild
-//													// subtypes
-//													L.error("error!!!");
-//												}
-//											}
-//										}
-//									});
-							
-							
-							
-							
-							
 							callback.onUpdateScreen();
-							// download user info
-
-							//
-							// OfUserIQ ofUserIQ = new OfUserIQ();
-							// ofUserIQ.setTo("ldonios-pc");
-							// //ofUserIQ.setFrom(uname+"@ldonios-pc");
-							// ofUserIQ.setType(IQ.Type.set);
-							//
-							// //ServiceDiscoveryManager.getInstanceFor(xmpp.connection).addFeature("urn:xmpp:http");
-							// xmpp.connection.sendIqWithResponseCallback(ofUserIQ,
-							// new StanzaListener() {
-							//
-							// @Override
-							// public void processPacket(Stanza stanza) throws
-							// NotConnectedException {
-							// L.debug("Send IQ with Response, ****** message "
-							// + stanza);
-							//
-							// }
-							// }, new ExceptionCallback() {
-							// @Override
-							// public void processException(Exception exception)
-							// {
-							// exception.printStackTrace();
-							// L.error("IO archjieve Exception, "+
-							// exception.getMessage());
-							// }
-							// }, 5000);
-
-							// save user info
+							
 						}
 
 					} catch (AlreadyLoggedInException e) {
@@ -260,8 +187,8 @@ public class XMPPService extends Service {
 
 				} else {
 
-					L.error("Not conncted to openfire server!!!");
-
+					//L.error("Not conncted to openfire server!!!");
+					callback.onResumeScreen("Not conncted to openfire server!!!");
 				}
 
 			}
