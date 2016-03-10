@@ -159,6 +159,7 @@ public class CreateAccountActivity extends Activity {
 			public void onUpdateScreen() {
 
 				hideDialog();
+				L.makeText(CreateAccountActivity.this, "Your account created successfully.", AppMsg.STYLE_INFO);
 			}
 
 			@Override

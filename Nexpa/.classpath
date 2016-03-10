@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/volley.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackson-core-2.7.0-rc2.jar"/>
@@ -10,15 +10,23 @@
 	<classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.7.0-rc2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/gson-2.2.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-android-extensions-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-core-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-extensions-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-im-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-resolver-dnsjava-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-tcp-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-android-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-sasl-provided-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/smack-experimental-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-android-extensions-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-core-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-extensions-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-im-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-tcp-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-android-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-sasl-provided-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/smack-experimental-4.1.6.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.18.jar"/>
+	<classpathentry kind="lib" path="libs/smack-resolver-minidns-4.1.6.jar"/>
+	<classpathentry kind="lib" path="libs/minidns-0.1.7.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-client.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-media-jaxb.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.18.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-common.jar"/>
+	<classpathentry kind="lib" path="lib/android-ws-combine.jar"/>
+	<classpathentry kind="lib" path="lib/javax.ws.rs-api-2.0.1.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>

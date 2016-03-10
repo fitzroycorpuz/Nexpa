@@ -326,6 +326,8 @@ public class MainSignInActivity extends Activity {
 			public void onUpdateScreen() {
 
 				hideDialog();
+				
+				L.makeText(MainSignInActivity.this, "you logged in successfully.", AppMsg.STYLE_INFO);
 			}
 
 			@Override

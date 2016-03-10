@@ -20,6 +20,7 @@ import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.sasl.SASLErrorException;
 import org.jivesoftware.smack.sasl.SASLMechanism;
 import org.jivesoftware.smack.sasl.provided.SASLDigestMD5Mechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -243,14 +244,14 @@ public class XMPPManager {
 	}
 
 	public void login(String uname, String password)
-			throws AlreadyLoggedInException, SmackException {
+			throws AlreadyLoggedInException, SmackException, XMPPException {
 
 		try {
 
 			connection.login(uname, password);
 			L.debug("LOGIN, Yey! We're connected to the Xmpp server!");
 
-		} catch (XMPPException | IOException e) {
+		} catch (IOException e) {
 			L.error("" + e);
 
 		}
